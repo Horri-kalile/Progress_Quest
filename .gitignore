@@ -1,0 +1,6 @@
+.metals/
+.vscode/
+ProgressQuest/.bsp/
+ProgressQuest/.idea/
+ProgressQuest/project/
+ProgressQuest/target/
