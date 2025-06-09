@@ -6,7 +6,7 @@ ThisBuild / fork := true // Needed for ScalaFX and Akka to work well together
 
 lazy val root = (project in file("."))
   .settings(
-    name := "Zero-Player-Game"
+    name := "ProgressQuest"
   )
 //  Compatible with JavaFX 21 / Java 21
 libraryDependencies += "org.scalafx" %% "scalafx" % "21.0.0-R32"
