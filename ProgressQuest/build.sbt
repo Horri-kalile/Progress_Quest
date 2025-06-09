@@ -8,5 +8,6 @@ lazy val root = (project in file("."))
   .settings(
     name := "ProgressQuest"
   )
-libraryDependencies += "org.scalafx" %% "scalafx" % "24.0.0-R35"
+//  Compatible with JavaFX 21 / Java 21
+libraryDependencies += "org.scalafx" %% "scalafx" % "21.0.0-R32"
 libraryDependencies += "com.typesafe.akka" %% "akka-actor-typed" % "2.8.5"
