@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id="root [file:/C:/Users/11858/Desktop/PPS/ProgressQuest/ProgressQuest/]" external.linked.project.path="$MODULE_DIR$/../.." external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" type="JAVA_MODULE" version="4">
+<module external.linked.project.id="root [file:/C:/Users/11858/Desktop/PPS/Progress_Quest/ProgressQuest/]" external.linked.project.path="$MODULE_DIR$/../.." external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_23">
     <output url="file://$MODULE_DIR$/../../target/scala-3.3.6/classes" />
     <output-test url="file://$MODULE_DIR$/../../target/scala-3.3.6/test-classes" />
@@ -16,24 +16,24 @@
     <orderEntry type="library" name="sbt: com.typesafe.akka:akka-actor_3:2.8.5:jar" level="project" />
     <orderEntry type="library" name="sbt: com.typesafe.akka:akka-slf4j_3:2.8.5:jar" level="project" />
     <orderEntry type="library" name="sbt: com.typesafe:config:1.4.2:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.openjfx:javafx-base:24:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.openjfx:javafx-base:24:win:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.openjfx:javafx-controls:24:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.openjfx:javafx-controls:24:win:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.openjfx:javafx-fxml:24:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.openjfx:javafx-fxml:24:win:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.openjfx:javafx-graphics:24:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.openjfx:javafx-graphics:24:win:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.openjfx:javafx-media:24:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.openjfx:javafx-media:24:win:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.openjfx:javafx-swing:24:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.openjfx:javafx-swing:24:win:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.openjfx:javafx-web:24:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.openjfx:javafx-web:24:win:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.openjfx:javafx-base:21:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.openjfx:javafx-base:21:win:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.openjfx:javafx-controls:21:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.openjfx:javafx-controls:21:win:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.openjfx:javafx-fxml:21:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.openjfx:javafx-fxml:21:win:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.openjfx:javafx-graphics:21:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.openjfx:javafx-graphics:21:win:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.openjfx:javafx-media:21:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.openjfx:javafx-media:21:win:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.openjfx:javafx-swing:21:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.openjfx:javafx-swing:21:win:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.openjfx:javafx-web:21:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.openjfx:javafx-web:21:win:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-java8-compat_3:1.0.0:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang:scala-library:2.13.16:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang:scala3-library_3:3.3.6:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.scalafx:scalafx_3:24.0.0-R35:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scalafx:scalafx_3:21.0.0-R32:jar" level="project" />
     <orderEntry type="library" name="sbt: org.slf4j:slf4j-api:1.7.36:jar" level="project" />
   </component>
 </module>
