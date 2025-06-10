@@ -1,5 +1,7 @@
 .metals/
 .vscode/
+.bloop/
+streams/
 ProgressQuest/.bsp/
 ProgressQuest/.idea/
 ProgressQuest/project/
