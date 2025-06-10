@@ -31,8 +31,17 @@ object ProgressQuestUI extends JFXApp3 {
             )
           }
 
-          // Center Section: Inventory
-          center = createPanelWithHeader("Inventory", createInventoryContent())
+          // Center Section: Inventory, Mondo, Skill, Mission
+          center = new HBox {
+            spacing = 15
+            alignment = Pos.CenterLeft
+            children = Seq(
+              createPanelWithHeader("Inventory", createInventoryContent()),
+              createPanelWithHeader("Mondo", createMondoContent()),
+              createPanelWithHeader("Skill", createSkillContent()),
+              createPanelWithHeader("Mission", createMissionContent())
+            )
+          }
 
           // Bottom Section: Diary and Combat Log
           bottom = new HBox {
@@ -72,45 +81,39 @@ object ProgressQuestUI extends JFXApp3 {
     }
   }
 
-  private def createCharacterContent(): Seq[Node] = {
-    Seq(
-      createTableRow("Name", "saitama"),
-      createTableRow("Race", "Low Elf"),
-      createTableRow("Class", "Mage"),
-      createTableRow("Level", "5"),
-      createTableRow("Gold", "123")
-    )
-  }
+  private def createCharacterContent(): Seq[Node] = Seq(
+    createTableRow("Name", "saitama"),
+    createTableRow("Race", "Low Elf"),
+    createTableRow("Class", "Mage"),
+    createTableRow("Level", "5"),
+    createTableRow("Gold", "123")
+  )
 
-  private def createEquipmentContent(): Seq[Node] = {
-    Seq(
-      createTableRow("Weapon", "Sword"),
-      createTableRow("Armor", "Robe"),
-      createTableRow("Accessories", "Ring of Mana"),
-      createTableRow("Accessories", "Gloves of Dexterity"),
-      createTableRow("Accessories", "Boots of Speed")
-    )
-  }
+  private def createEquipmentContent(): Seq[Node] = Seq(
+    createTableRow("Weapon", "Sword"),
+    createTableRow("Armor", "Robe"),
+    createTableRow("Accessories", "Ring of Mana"),
+    createTableRow("Accessories", "Gloves of Dexterity"),
+    createTableRow("Accessories", "Boots of Speed")
+  )
 
-  private def createStatsContent(): Seq[Node] = {
-    Seq(
-      createTableRow("STR", "10"),
-      createTableRow("DEX", "8"),
-      createTableRow("INT", "15"),
-      createTableRow("HP", ""),
-      new ProgressBar {
-        progress = 0.8
-        prefWidth = 200
-        style = "-fx-accent: #4682b4"
-      },
-      createTableRow("MP", ""),
-      new ProgressBar {
-        progress = 0.4
-        prefWidth = 200
-        style = "-fx-accent: #9370db"
-      }
-    )
-  }
+  private def createStatsContent(): Seq[Node] = Seq(
+    createTableRow("STR", "10"),
+    createTableRow("DEX", "8"),
+    createTableRow("INT", "15"),
+    createTableRow("HP", ""),
+    new ProgressBar {
+      progress = 0.8
+      prefWidth = 200
+      style = "-fx-accent: #4682b4"
+    },
+    createTableRow("MP", ""),
+    new ProgressBar {
+      progress = 0.4
+      prefWidth = 200
+      style = "-fx-accent: #9370db"
+    }
+  )
 
   private def createInventoryContent(): Node = {
     new GridPane {
@@ -127,6 +130,15 @@ object ProgressQuestUI extends JFXApp3 {
       add(new Label("3"), 1, 3)
     }
   }
+
+  private def createMondoContent(): Node =
+    new Label("World exploration coming soon...")
+
+  private def createSkillContent(): Node =
+    new Label("Skills will be displayed here.")
+
+  private def createMissionContent(): Node =
+    new Label("No active mission.")
 
   private def createDiaryContent(): Node = {
     new TextArea {
