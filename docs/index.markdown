@@ -16,9 +16,10 @@ title: ProgressQuest
 ## **Contributors**
 
 - Jiahao Guo – [jiahao.guo@studio.unibo.it](mailto:jiahao.guo@studio.unibo.it)
-
+- Kalile Horri – [kalile.horri@studio.unibo.it](mailto:kalile.horri@studio.unibo.it)
 
 [![Gianmaria](https://github.com/schwein69.png?size=80)](https://github.com/schwein69)
+[![Gianmaria](https://github.com/Horri-kalile.png?size=80)](https://github.com/Horri-kalile)
 
 ---
 
