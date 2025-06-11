@@ -18,7 +18,7 @@ title: ProgressQuest
 - Jiahao Guo – [jiahao.guo@studio.unibo.it](mailto:jiahao.guo@studio.unibo.it)
 
 
-[![Gianmaria](https://github.com/schwein69.png?size=80)](https://github.com/schwein69)
+[![JiahaoGuo](https://github.com/schwein69.png?size=80)](https://github.com/schwein69)
 
 ---
 
