@@ -5,7 +5,7 @@ nav_order: 3
 ---
 # **Requisiti**
 
-## Funzionali
+## **Funzionali**
 
 1. **Avanzamento automatico del personaggio**  
    Il sistema gestisce la progressione del player senza intervento diretto, attraverso eventi casuali.
