@@ -18,7 +18,7 @@ object MissionController {
   def proposeMission(player: Player, mission: Mission): (Player, MissionDecision) = {
     val accepted = scala.util.Random.nextBoolean()
     val decision = if accepted then MissionDecision.Accept else MissionDecision.Refuse
-    println(s"${player.name} ${if accepted then "accepte" else "refuse"} la mission : ${mission.description}")
+    println(s"${player.name} ${if accepted then "accepte" else "refuse"}  mission : ${mission.description}")
     (player, decision)
   }
 
