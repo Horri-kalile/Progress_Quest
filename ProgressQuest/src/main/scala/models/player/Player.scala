@@ -5,20 +5,26 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.util.Random
 
-class Player(val name: String,
-             val identity: Identity,
-             var level: Int,
-             var exp: Int,
-             var hp: Int,
-             var mp: Int,
-             var attributes: Attributes,
-             val behaviorType: BehaviorType
-            ) extends Entity:
+case class Player(
+                   name: String,
+                   identity: Identity,
+                   level: Int,
+                   exp: Int,
+                   hp: Int,
+                   mp: Int,
+                   baseAttributes: Attributes,
+                   behaviorType: BehaviorType,
+                   inventory: Map[Item, Int] = Map.empty,
+                   equipment: Map[EquipmentSlot, Option[Equipment]] = EquipmentSlot.values.map(_ -> None).toMap,
+                   skills: List[Skill] = List.empty,
+                   gold: Double
+                 ) extends Entity:
 
-  private val inventory: ListBuffer[Item] = ListBuffer.empty
-  private var equipment: HashMap[EquipmentSlot, Option[Equipment]] = HashMap.from(EquipmentSlot.values.map(slot => slot -> None))
-  val skills: List[Skill] = List.empty
-  private val behavior: Behavior = BehaviorResolver.getBehavior(behaviorType)
+  val behavior: Behavior = BehaviorResolver.getBehavior(behaviorType)
+
+  def attributes: Attributes =
+    val bonuses = equipment.values.flatten.map(_.statBonus)
+    bonuses.foldLeft(baseAttributes)(_ + _)
 
   /*TODO algoritmo di calcolo*/
   def maxHP: Int = attributes.constitution * 10
@@ -29,77 +35,110 @@ class Player(val name: String,
 
   def currentMP: Int = mp
 
-  //TODO calcolare exp necessaria in base al livello
-  def gainExp(amount: Int): Unit =
-    exp += amount
-    if exp >= level * 100 then levelUp()
 
-  /*TODO aggiornare stats*/
-  def levelUp(): Unit =
-    level += 1
-    exp = 0
-    hp = maxHP
-    mp = maxMP
+  //TODO calcolare exp necessaria in base al livello
+  def gainExp(amount: Int): Player =
+    val newExp = exp + amount
+    if newExp >= level * 100 then levelUp()
+    else this.copy(exp = newExp)
+
+  def levelUp(): Player =
+    this.copy(
+      level = level + 1,
+      exp = 0,
+      hp = maxHP,
+      mp = maxMP
+    )
 
   /*TODO calcolo danno*/
   override def receiveDamage(amount: Int): Int =
-    val finalDamage = ???
-    hp = 0
+    val finalDamage = behavior.onDamageTaken(this, amount)
+    val newHP = (hp - finalDamage).max(0)
     finalDamage
 
   override def receiveHealing(amount: Int): Unit =
-    hp = math.min(maxHP, hp + amount)
+    val newHP = (hp + amount).min(maxHP)
+    this.copy(hp = newHP)
 
   def useSkill(skill: Skill): Boolean = mp match
-    case a if mp >= skill.manaCost => mp -= skill.manaCost; true
+    case a if mp >= skill.manaCost => this.copy(mp = mp - skill.manaCost); true
     case _ => false
 
-  def equip(item: Equipment): Unit =
-    equipment = equipment.updated(item.slot, Some(item))
-    recalculateAttributes()
+  def equip(item: Equipment): Player =
+    val updated = equipment.updated(item.slot, Some(item))
+    this.copy(equipment = updated)
 
-  def unequipped(slot: EquipmentSlot): Unit =
-    equipment = equipment.updated(slot, None)
-    recalculateAttributes()
+  def unequip(slot: EquipmentSlot): Player =
+    val updated = equipment.updated(slot, None)
+    this.copy(equipment = updated)
 
-  private def recalculateAttributes(): Unit =
-    val bonus = equipment.values.flatten.foldLeft(attributes)(_ + _.statBonus)
-    attributes = attributes + bonus
+  def learnSkill(skill: Skill): Player =
+    if skills.exists(_.name == skill.name) then this
+    else this.copy(skills = skill :: skills)
 
-
-  def useItem(itemName: String): Boolean =
-    inventory.find(_.name == itemName).foreach { item =>
-      item.applyTo(this)
-      inventory -= item
+  def obtainItem(item: Item, amount: Int = 1): Player =
+    val updated = inventory.updatedWith(item) {
+      case Some(count) => Some(count + amount)
+      case None => Some(amount)
     }
-    true
+    this.copy(inventory = updated)
 
-  def emptyInventory(): Boolean =
-    inventory.isEmpty
 
-  def stealFromInventory(): Option[Item] =
-    if inventory.nonEmpty then
-      val index = Random.nextInt(inventory.size)
-      Some(inventory.remove(index))
+  def sellItem(): String =
+    if inventory.isEmpty then "Inventory empty. Nothing sold."
+    else
+      val itemList = inventory.toList
+      val (item, count) = itemList(Random.nextInt(itemList.size))
+      val toRemove = Random.between(1, count + 1)
+      val updatedInventory =
+        if count > toRemove then inventory.updated(item, count - toRemove)
+        else inventory - item
+
+      val totalGold = item.gold * toRemove
+      val updatedPlayer = this.copy(
+        inventory = updatedInventory,
+        gold = gold + totalGold
+      )
+      s"Sold $toRemove × ${item.name} for $totalGold gold."
+
+
+  def stealFromInventory(): String =
+    if inventory.isEmpty then "Nothing to steal."
+    else
+      val itemList = inventory.toList
+      val (item, count) = itemList(Random.nextInt(itemList.size))
+      val updatedInventory =
+        if count > 1 then inventory.updated(item, count - 1)
+        else inventory - item
+
+      val updatedPlayer = this.copy(inventory = updatedInventory)
+      s"A ${item.name} was stolen from your inventory."
+
+
+  def emptyInventory: Boolean = inventory.isEmpty
+
+  def startGame(): Player = behavior.onGameStart(this)
+
+  def doDamage(damage: Int): Player = behavior.onBattleDamage(this, damage)
+
+  def takeDamage(damage: Int): Player =
+    val finalDmg = behavior.onDamageTaken(this, damage)
+    val newHP = (hp - finalDmg).max(0)
+    this.copy(hp = newHP)
+
+  def replaceEquipment(incoming: Equipment): Player =
+    val currentOpt = equipment(incoming.slot)
+    if currentOpt.forall(incoming.value > _.value) then
+      val updated = equipment.updated(incoming.slot, Some(incoming))
+      this.copy(equipment = updated)
+    else this
+
+  def equipmentList: Iterable[Equipment] =
+    equipment.values.flatten
+
+  def earnGold(amount: Double): Player =
+    this.copy(gold = gold + amount)
+
+  def spendGold(amount: Double): Option[Player] =
+    if gold >= amount then Some(this.copy(gold = gold - amount))
     else None
-
-  def startGame(): Unit =
-    // Apply any behavior effects that happen on game start
-    behavior.onGameStart(this)
-
-
-  def doDamage(damage: Int): Unit =
-    // Any behavior effects during a battle
-    behavior.onBattleDamage(this, damage)
-
-  def takeDamage(damage: Int): Unit =
-    // Behavior can modify the incoming damage
-    val finalDamage = behavior.onDamageTaken(this, damage)
-    hp = (hp - finalDamage).max(0)
-  // println (s"$name took $finalDamage damage, HP now $hp")
-
-  def isAlive: Boolean = hp > 0
-
-  def replaceEquipment(current: Equipment, incoming: Equipment): Unit =
-    if incoming.value > current.value then equipment = equipment.updated(incoming.slot, Some(incoming))
-    recalculateAttributes()

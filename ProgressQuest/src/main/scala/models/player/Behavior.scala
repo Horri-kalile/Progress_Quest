@@ -42,7 +42,7 @@ object TwiceAttack extends Behavior:
 object Heal extends Behavior:
   override def onBattleEnd(player: Player, exp: Int): Int =
     val heal = (player.maxHP * Random.between(0.1, 0.5)).toInt
-    player.hp = player.hp + heal
+    receiveHealing(heal)
     exp
 
 // Lucky doubles lucky attribute at game start
