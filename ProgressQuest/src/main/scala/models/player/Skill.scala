@@ -7,48 +7,61 @@ sealed trait Skill:
 
   def manaCost: Int
 
-  def use(caster: Player, target: Entity): Unit
+  def powerLevel: Int
+
+  def use(caster: Player, target: Entity): (Player, Entity)
+
+  def poweredUp: Skill
 
 trait Entity:
-  def receiveDamage(amount: Int): Int
+  def receiveDamage(amount: Int): Entity
 
-  def receiveHealing(amount: Int): Unit
+  def receiveHealing(amount: Int): Entity
 
-case class PhysicalDamageSkill(name: String, manaCost: Int, baseMultiplier: Double) extends Skill:
-  override def use(caster: Player, target: Entity): Unit =
+case class PhysicalDamageSkill(name: String, manaCost: Int, baseMultiplier: Double, powerLevel: Int = 1) extends Skill:
+  override def use(caster: Player, target: Entity): (Player, Entity) =
     if caster.currentMP >= manaCost then
-      caster.mp -= manaCost
-      val str = caster.attributes.strength
-      val eqPower = caster.equipment.map(_.value).sumOption.getOrElse(0)
-      val level = caster.level
+      val updatedCaster = caster.copy(mp = caster.currentMP - manaCost)
+      val attributes = updatedCaster.attributes
+      val eqPower = updatedCaster.equipment.values.flatten.map(_.value).sum
       val multiplier = Random.between(0.1, baseMultiplier)
-      val damage = ((str + level + eqPower) * multiplier).toInt
-      target.receiveDamage(damage)
+      val damage = ((attributes.strength + updatedCaster.level + eqPower) * multiplier * powerLevel).toInt
+      val updatedTarget = target.receiveDamage(damage)
+      (updatedCaster, updatedTarget)
+    else (caster, target)
 
-case class MagicDamageSkill(name: String, manaCost: Int, baseMultiplier: Double) extends Skill:
-  override def use(caster: Player, target: Entity): Unit =
+  override def poweredUp: Skill = copy(powerLevel = powerLevel + 1)
+
+case class MagicDamageSkill(name: String, manaCost: Int, baseMultiplier: Double, powerLevel: Int = 1) extends Skill:
+  override def use(caster: Player, target: Entity): (Player, Entity) =
     if caster.currentMP >= manaCost then
-      caster.mp -= manaCost
-      val magicPower = caster.attributes.intelligence + caster.attributes.wisdom
-      val eqPower = caster.equipment.map(_.value).sumOption.getOrElse(0)
-      val level = caster.level
+      val updatedCaster = caster.copy(mp = caster.currentMP - manaCost)
+      val attributes = updatedCaster.attributes
+      val eqPower = updatedCaster.equipment.values.flatten.map(_.value).sum
+      val magicPower = attributes.intelligence + attributes.wisdom
       val multiplier = Random.between(0.1, baseMultiplier)
-      val damage = ((magicPower + level + eqPower) * multiplier).toInt
-      target.receiveDamage(damage)
+      val damage = ((magicPower + updatedCaster.level + eqPower) * multiplier * powerLevel).toInt
+      val updatedTarget = target.receiveDamage(damage)
+      (updatedCaster, updatedTarget)
+    else (caster, target)
 
-case class HealingSkill(name: String, manaCost: Int, baseMultiplier: Double) extends Skill:
-  override def use(caster: Player, target: Entity): Unit =
+  override def poweredUp: Skill = copy(powerLevel = powerLevel + 1)
+
+case class HealingSkill(name: String, manaCost: Int, baseMultiplier: Double, powerLevel: Int = 1) extends Skill:
+  override def use(caster: Player, target: Entity): (Player, Entity) =
     if caster.currentMP >= manaCost then
-      caster.mp -= manaCost
+      val updatedCaster = caster.copy(mp = caster.currentMP - manaCost)
       val healingPower = caster.attributes.wisdom + caster.level
       val multiplier = Random.between(0.1, baseMultiplier)
-      val heal = (healingPower * multiplier).toInt
-      target.receiveHealing(heal)
+      val heal = (healingPower * multiplier * powerLevel).toInt
+      val updatedTarget = target.receiveHealing(heal)
+      (updatedCaster, updatedTarget)
+    else (caster, target)
+
+  override def poweredUp: Skill = copy(powerLevel = powerLevel + 1)
 
 object SkillFactory:
-
   val allSkills: List[Skill] = List(
-    // --- Physical Damage Skills ---
     PhysicalDamageSkill("Slash", 4, 1.2),
     PhysicalDamageSkill("Piercing Strike", 6, 1.5),
     PhysicalDamageSkill("Crushing Blow", 8, 1.8),
@@ -60,7 +73,6 @@ object SkillFactory:
     PhysicalDamageSkill("Finishing Strike", 11, 2.0),
     PhysicalDamageSkill("Shield Breaker", 6, 1.4),
 
-    // --- Magic Damage Skills ---
     MagicDamageSkill("Fireball", 8, 1.9),
     MagicDamageSkill("Ice Lance", 6, 1.5),
     MagicDamageSkill("Arcane Bolt", 4, 1.2),
@@ -72,13 +84,12 @@ object SkillFactory:
     MagicDamageSkill("Holy Beam", 6, 1.4),
     MagicDamageSkill("Void Ripple", 11, 2.0),
 
-    // --- Healing Skills ---
     HealingSkill("Minor Heal", 5, 1.2),
     HealingSkill("Rejuvenation", 8, 1.6),
     HealingSkill("Greater Heal", 10, 1.8),
     HealingSkill("Light's Grace", 7, 1.4),
-    HealingSkill("Holy Remedy", 11, 2.0),
+    HealingSkill("Holy Remedy", 11, 2.0)
   )
 
   def randomSkill(): Skill =
-    scala.util.Random.shuffle(allSkills).head
+    Random.shuffle(allSkills).head

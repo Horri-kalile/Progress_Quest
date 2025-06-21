@@ -8,7 +8,7 @@ enum BehaviorType:
   case Aggressive, Defensive, FastLeveling, TwiceAttack, Heal, Lucky, InvulnerableOnce, OneShotChange
 
 sealed trait Behavior:
-  def onGameStart(player: Player): Unit = ()
+  def onGameStart(player: Player): Player = player // default: returns player unchanged
 
   def onBattleDamage(player: Player, damage: Int): Int = damage
 
@@ -38,18 +38,20 @@ object TwiceAttack extends Behavior:
     val newDamage = (damage * Random.between(0.5, 1.5) + damage * Random.between(0.5, 1.5)).toInt
     newDamage
 
-// DoubleHP doubles hp at start game
+// Heal behavior: heals player after battle
 object Heal extends Behavior:
   override def onBattleEnd(player: Player, exp: Int): Int =
-    val heal = (player.maxHP * Random.between(0.1, 0.5)).toInt
-    receiveHealing(heal)
+    val healAmount = (player.maxHP * Random.between(0.1, 0.5)).toInt
+    player.receiveHealing(healAmount)
     exp
 
-// Lucky doubles lucky attribute at game start
+// Lucky behavior: doubles lucky attribute at game start
 object Lucky extends Behavior:
-  override def onGameStart(player: Player): Unit =
-    val current = player.attributes
-    player.attributes = current.copy(lucky = current.lucky * 2)
+  override def onGameStart(player: Player): Player =
+    val current = player.baseAttributes
+    val updatedAttributes = current.copy(lucky = current.lucky * 2)
+    player.copy(baseAttributes = updatedAttributes)
+
 
 // InvulnerableOnce could miss once attack
 object InvulnerableOnce extends Behavior:

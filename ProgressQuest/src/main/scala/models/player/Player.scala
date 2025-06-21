@@ -1,5 +1,7 @@
 package models.player
 
+import models.event.Mission
+
 import scala.collection.immutable.HashMap
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -17,6 +19,7 @@ case class Player(
                    inventory: Map[Item, Int] = Map.empty,
                    equipment: Map[EquipmentSlot, Option[Equipment]] = EquipmentSlot.values.map(_ -> None).toMap,
                    skills: List[Skill] = List.empty,
+                   missions: List[Mission] = List.empty,
                    gold: Double
                  ) extends Entity:
 
@@ -35,6 +38,8 @@ case class Player(
 
   def currentMP: Int = mp
 
+  def inventorySize: Int = inventory.size
+
 
   //TODO calcolare exp necessaria in base al livello
   def gainExp(amount: Int): Player =
@@ -51,12 +56,12 @@ case class Player(
     )
 
   /*TODO calcolo danno*/
-  override def receiveDamage(amount: Int): Int =
+  override def receiveDamage(amount: Int): Player =
     val finalDamage = behavior.onDamageTaken(this, amount)
     val newHP = (hp - finalDamage).max(0)
-    finalDamage
+    this.copy(hp = newHP)
 
-  override def receiveHealing(amount: Int): Unit =
+  override def receiveHealing(amount: Int): Player =
     val newHP = (hp + amount).min(maxHP)
     this.copy(hp = newHP)
 
@@ -84,8 +89,8 @@ case class Player(
     this.copy(inventory = updated)
 
 
-  def sellItem(): String =
-    if inventory.isEmpty then "Inventory empty. Nothing sold."
+  def sellItem(): (Player, String) =
+    if inventory.isEmpty then (this, "Inventory empty. Nothing sold.")
     else
       val itemList = inventory.toList
       val (item, count) = itemList(Random.nextInt(itemList.size))
@@ -99,7 +104,7 @@ case class Player(
         inventory = updatedInventory,
         gold = gold + totalGold
       )
-      s"Sold $toRemove × ${item.name} for $totalGold gold."
+      (updatedPlayer, s"Sold $toRemove × ${item.name} for $totalGold gold.")
 
 
   def stealFromInventory(): String =
@@ -119,7 +124,7 @@ case class Player(
 
   def startGame(): Player = behavior.onGameStart(this)
 
-  def doDamage(damage: Int): Player = behavior.onBattleDamage(this, damage)
+  def doDamage(damage: Int): Int = behavior.onBattleDamage(this, damage)
 
   def takeDamage(damage: Int): Player =
     val finalDmg = behavior.onDamageTaken(this, damage)
@@ -142,3 +147,20 @@ case class Player(
   def spendGold(amount: Double): Option[Player] =
     if gold >= amount then Some(this.copy(gold = gold - amount))
     else None
+
+  def restore(): Player =
+    this.copy(hp = maxHP, mp = maxMP)
+
+  def addMission(m: Mission): Player = this.copy(missions = m :: missions)
+
+  def activeMissions: List[Mission] = missions.filterNot(_.isCompleted)
+
+  def progressMission(mission: Mission): Player =
+    val updatedMissions = missions.map { m =>
+      if m.id == mission.id then m.progressed() else m
+    }
+    this.copy(missions = updatedMissions)
+
+  def powerUp(): Player =
+    this.copy(baseAttributes = baseAttributes.incrementAll(1))
+
