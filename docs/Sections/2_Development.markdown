@@ -74,19 +74,17 @@ La comunicazione interna si svolge principalmente **da remoto**, attraverso due 
 
 ## **Strumenti di Supporto**
 
-### 🔧 Version Control
+Per facilitare e strutturare il processo di sviluppo, il team utilizza una serie di strumenti che supportano il versionamento del codice, la collaborazione e l'automazione.
 
-Il progetto utilizza **Git** con flusso **GitFlow**, strutturato in branch dedicati:
+Il controllo di versione è gestito tramite **Git**, con l’utilizzo di **branch tematici** per lo sviluppo parallelo delle diverse componenti del progetto. Questo approccio consente un’organizzazione chiara del lavoro e facilita l’integrazione graduale delle funzionalità.
 
-- `main`: versione stabile per il rilascio
-- `models`: logica e strutture dati del dominio
-- `view`: gestione dell’output e presentazione
-- `controller`: coordinamento delle azioni e flusso di gioco
-- `report`: documentazione del progetto
+Il team utilizzerà il **versioning** per il rilascio delle **versioni stabili del gioco**, seguendo lo **schema semantico (Semantic Versioning)** nel formato `MAJOR.MINOR.PATCH`.
+
+La documentazione viene pubblicata tramite **GitHub Pages**, permettendo un accesso rapido e centralizzato alle informazioni chiave del progetto (report, glossario, specifiche, ecc.).
+
+Per l’automazione del flusso di lavoro, viene impiegato **GitHub Actions**, che consente di automatizzare processi di deployment.
+
+Questi strumenti permettono al team di mantenere un processo di sviluppo efficiente, tracciabile e facilmente scalabile.
 
 
-### 🌐 Deploy & Documentazione
-
-- La documentazione ufficiale (inclusi glossario, specifiche e report) è pubblicata tramite **GitHub Pages**.
-- È utilizzato **Jekyll** per la generazione statica dei contenuti.
 
