@@ -21,13 +21,13 @@ Sono stati identificati i ruoli chiave per coordinare le attività:
 
 Durante il meeting iniziale sono stati assegnati i seguenti ruoli:
 
-- **Kalil Horri** – *Product Owner* & Sviluppatore  
+- **Kalile Horri** – _Product Owner_ & Sviluppatore  
   Responsabile della gestione del progetto, definizione degli obiettivi assieme al scrum master e supervisione del repository GitHub.
 
-- **Jiahao Guo** – *Scrum Master* & Sviluppatore  
+- **Jiahao Guo** – _Scrum Master_ & Sviluppatore  
   Facilita le attività del team, gestisce la pubblicazione tramite GitHub Pages e strutturazione del report.
 
-- **Intissar** – *Responsabile Test* & Sviluppatrice  
+- **Intissar** – _Responsabile Test_ & Sviluppatrice  
   Si occupa dei test automatici e dell'integrazione continua, contribuendo allo sviluppo delle funzionalità principali.
 
 ---
@@ -48,7 +48,7 @@ All’inizio di ogni sprint, il team si riunisce per pianificare:
 ### Task Management
 
 - La gestione operativa è affidata a **Trello**, dove i task vengono assegnati, monitorati e categorizzati per sprint.
-- I task incompleti o bloccati vengono temporaneamente spostati nella colonna *paused* in attesa di completamento o revisione.
+- I task incompleti o bloccati vengono temporaneamente spostati nella colonna _paused_ in attesa di completamento o revisione.
 - Ogni task è collegato a uno specifico branch Git, in base al contesto di lavoro (`models`, `view`, `controller`, ecc.).
 
 ### Completion of task
@@ -65,10 +65,9 @@ Un task è considerato completato solo quando:
 
 La comunicazione interna si svolge principalmente **da remoto**, attraverso due tipologie di meeting:
 
-* **Long Meeting**: incontri strutturati dedicati all’analisi del lavoro svolto, utili per valutare l’efficacia del processo e identificare task nei cicli successivi.
+- **Long Meeting**: incontri strutturati dedicati all’analisi del lavoro svolto, utili per valutare l’efficacia del processo e identificare task nei cicli successivi.
 
-* **Short Meeting**: brevi sessioni (20–40 minuti) focalizzate sulla risoluzione di problemi imprevisti, ridefinizione dei task o, se necessario, rimodellazione parziale del dominio.
-
+- **Short Meeting**: brevi sessioni (20–40 minuti) focalizzate sulla risoluzione di problemi imprevisti, ridefinizione dei task o, se necessario, rimodellazione parziale del dominio.
 
 ---
 
@@ -85,6 +84,3 @@ La documentazione viene pubblicata tramite **GitHub Pages**, permettendo un acce
 Per l’automazione del flusso di lavoro, viene impiegato **GitHub Actions**, che consente di automatizzare processi di deployment.
 
 Questi strumenti permettono al team di mantenere un processo di sviluppo efficiente, tracciabile e facilmente scalabile.
-
-
-
