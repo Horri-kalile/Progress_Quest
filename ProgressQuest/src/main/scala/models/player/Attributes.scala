@@ -21,6 +21,18 @@ case class Attributes(strength: Int, constitution: Int, dexterity: Int, intellig
     lucky + other.lucky
   )
 
+extension (attr: Attributes)
+  def incrementAll(amount: Int): Attributes =
+    attr.copy(
+      strength = attr.strength + amount,
+      constitution = attr.constitution + amount,
+      intelligence = attr.intelligence + amount,
+      wisdom = attr.wisdom + amount,
+      dexterity = attr.dexterity + amount,
+      lucky = attr.lucky + amount
+    )
+
+
 object Attributes:
   def random(): Attributes =
     Attributes(
@@ -38,7 +50,7 @@ object Attributes:
     math.min(max, math.max(min, base.round.toInt))
 
   private def generateWithWeights(weights: List[Double], playerLevel: Int): Attributes =
-    val List(str, con, dex, int, wis, luck)  = weights.map(w => biasedValue(w, max = playerLevel))
+    val List(str, con, dex, int, wis, luck) = weights.map(w => biasedValue(w, max = playerLevel))
     Attributes(str, con, dex, int, wis, luck)
 
 

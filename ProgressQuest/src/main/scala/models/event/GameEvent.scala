@@ -1,93 +1,131 @@
 package models.event
 
-import models.player.{Equipment, Item, Player}
-
+import models.player.{EquipmentFactory, Item, Player}
 import scala.util.Random
 
 enum EventType:
-  case fight, mission, training, restore, sell, buy, special
+  case fight, mission, training, restore, sell, special, gameOver
 
 sealed trait GameEvent:
-  def action(player: Player): Unit
+  def action(player: Player): Player
 
 case object FightEvent extends GameEvent:
-  override def action(player: Player): Unit = ???
+  override def action(player: Player): Player = ???
+/*val monster = MonsterFactory.randomForLevel(player.level)
+val (updatedPlayer, _) = CombatSimulator.simulate(player, monster)
+if updatedPlayer.hp <= 0 then
+  GameOverEvent.action(updatedPlayer)
+else
+  updatedPlayer*/
 
 case object MissionEvent extends GameEvent:
-  override def action(player: Player): Unit = ???
+  override def action(player: Player): Player =
+    if player.activeMissions.nonEmpty && Random.nextBoolean() then
+      val mission = Random.shuffle(player.activeMissions).head
+      println(s"You progressed on mission: ${mission.description}")
+      player.progressMission(mission)
+    else
+      val mission = MissionFactory.random()
+      println(s"You accepted a new mission: ${mission.description}")
+      player.addMission(mission)
 
 case object TrainingEvent extends GameEvent:
-  override def action(player: Player): Unit =
-    val exp = Random.between(player.exp * 0.25, player.exp * 0.5).toInt
-    player.gainExp(exp)
+  override def action(player: Player): Player =
+    val exp = Random.between((player.exp * 0.25).toInt, (player.exp * 0.5).toInt + 1)
     println(s"Training completed: +$exp EXP")
+    player.gainExp(exp)
 
 case object RestoreEvent extends GameEvent:
-  override def action(player: Player): Unit =
-    player.hp = player.maxHP
-    player.mp = player.maxMP
+  override def action(player: Player): Player =
     println("You rested and recovered fully.")
+    player.restore()
+
+case object PowerUpEvent extends GameEvent:
+  private val cost = 100
+
+  def canPowerUp(player: Player): Boolean = player.gold >= cost
+
+  override def action(player: Player): Player =
+    if canPowerUp(player) then
+      println(s"You spend $cost gold to power up your stats!")
+      player.spendGold(cost).map(_.powerUp()).getOrElse(player)
+    else player
 
 case object SellEvent extends GameEvent:
-  override def action(player: Player): Unit = ???
+  override def action(player: Player): Player =
+    val itemCountToSell = Random.between(1, player.inventorySize + 1)
+    val (finalPlayer, messages) = (1 to itemCountToSell).foldLeft((player, List.empty[String])) {
+      case ((p, logs), _) =>
+        val (updated, msg) = p.sellItem()
+        (updated, logs :+ msg)
+    }
 
-case object BuyEvent extends GameEvent:
-  override def action(player: Player): Unit = ???
+    messages.foreach(println)
+
+    PowerUpEvent.action(finalPlayer)
+
 
 case object SpecialEvent extends GameEvent:
-  override def action(player: Player): Unit =
+  override def action(player: Player): Player =
     Random.nextInt(8) match
-      case 0 => // Level up/down by random levels
+      case 0 =>
         val change = Random.between(1, 4)
         if Random.nextBoolean() then
-          for _ <- 1 to change do player.levelUp()
+          val newPlayer = (1 to change).foldLeft(player)((p, _) => p.levelUp())
           println(s"Blessing! You leveled up $change times.")
+          newPlayer
         else
-          player.level = math.max(1, player.level - change)
+          val newLevel = math.max(1, player.level - change)
           println(s"Curse! You lost $change levels.")
+          player.copy(level = newLevel)
 
-      case 1 => // Fight strong monster - good
-        val eq = ??? //TODO Equipment.random()
+      case 1 =>
+        val eq = EquipmentFactory.generateRandomEquipment(probabilityDrop = 1.0, playerLevel = player.level)
         println("You defeated a powerful monster!")
-      /*println(s"You looted a rare item: ${eq.name}")
-      player.equip(eq)*/
+        println(s"You looted a rare item: ${eq.get.name}")
+        player.replaceEquipment(eq.get)
 
-      case 2 => // Fight strong monster - bad
+      case 2 =>
         println("You were defeated by a powerful monster. Game over!")
-        player.receiveDamage(player.hp)
+        GameOverEvent.action(player)
 
-      case 3 => // Discover dungeon - good
-        val eq = ??? //TODO Equipment.random()
+      case 3 =>
+        val eq = EquipmentFactory.generateRandomEquipment(probabilityDrop = 1.0, playerLevel = player.level)
         println("You discovered a hidden dungeon and found rare equipment!")
-      //player.equip(eq)
+        println(s"You found: ${eq.get.name}")
+        player.replaceEquipment(eq.get)
 
-      case 4 => // Discover dungeon - bad
-        player.hp = math.max(1, player.hp / 2)
-        player.mp = math.max(0, player.mp / 2)
+      case 4 =>
         println("You were injured in a dungeon trap! HP and MP halved.")
+        player.copy(hp = math.max(1, player.hp / 2), mp = math.max(0, player.mp / 2))
 
-      case 5 => // People ask for help - good TODO calculate exp
-        val gain = Random.between(50, 150)
-        player.gainExp(gain)
+      case 5 =>
+        val gain = Random.between(50, 151)
         println(s"You helped villagers and gained $gain EXP.")
+        player.gainExp(gain)
 
-      case 6 => // People ask for help - bad
+      case 6 =>
         println("It was a trap! You were killed. Game over!")
-        player.receiveDamage(player.hp) //TODO handle game over
+        GameOverEvent.action(player)
 
-      case 7 => // Thief - steal inventory if any
-        player.stealFromInventory() match
-          case Some(item) => println(s"A thief stole your ${item.name}")
-          case None => println("The thief found nothing to steal.")
+      case 7 =>
+        val result = player.stealFromInventory()
+        println(result)
+        player
+
+case object GameOverEvent extends GameEvent:
+  override def action(player: Player): Player =
+    println("GAME OVER.")
+    player.copy(hp = 0)
 
 object EventFactory:
-  def executeEvent(eventType: EventType, player: Player): Unit =
+  def executeEvent(eventType: EventType, player: Player): Player =
     val event: GameEvent = eventType match
       case EventType.fight => FightEvent
       case EventType.mission => MissionEvent
       case EventType.training => TrainingEvent
       case EventType.restore => RestoreEvent
       case EventType.sell => SellEvent
-      case EventType.buy => BuyEvent
       case EventType.special => SpecialEvent
+      case EventType.gameOver => GameOverEvent
     event.action(player)

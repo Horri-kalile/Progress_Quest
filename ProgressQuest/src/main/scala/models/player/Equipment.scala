@@ -52,7 +52,6 @@ object EquipmentFactory:
   private def randomNameForSlot(slot: EquipmentSlot): Option[String] =
     prefabNames.get(slot).flatMap(list => Random.shuffle(list).headOption)
 
-  /*Already managed drop rate*/
   def generateRandomEquipment(probabilityDrop: Double = 0.3, playerLevel: Int): Option[Equipment] =
     for
       drop <- tryDrop(probabilityDrop)

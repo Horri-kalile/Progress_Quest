@@ -1,3 +1,6 @@
 package models.player
 
-case class Item(name: String, applyTo: Player => Unit)
+enum Rarity:
+  case Common, Uncommon, Rare, Epic, Legendary
+
+case class Item(name: String, gold: Double, rarity: Rarity)
