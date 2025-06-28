@@ -1,0 +1,84 @@
+{
+  "missions": [
+    {
+      "name": "Goblin Hunt",
+      "description": "Eliminate goblins near the village."
+    },
+    {
+      "name": "Wolf Trouble",
+      "description": "Deal with wolves threatening livestock."
+    },
+    {
+      "name": "Lost Relic",
+      "description": "Retrieve a lost relic from nearby ruins."
+    },
+    {
+      "name": "Bandit Menace",
+      "description": "Drive off bandits harassing travelers."
+    },
+    {
+      "name": "Herb Gathering",
+      "description": "Collect rare herbs from the forest."
+    },
+    {
+      "name": "Cave Mystery",
+      "description": "Explore the mysterious cave in the hills."
+    },
+    {
+      "name": "Protect the Caravan",
+      "description": "Escort a trade caravan safely."
+    },
+    {
+      "name": "Ancient Puzzle",
+      "description": "Solve the ruins’ magical puzzle."
+    },
+    {
+      "name": "Ghost Problem",
+      "description": "Put restless spirits to peace."
+    },
+    {
+      "name": "Hunter's Request",
+      "description": "Track and trap a dangerous beast."
+    },
+    {
+      "name": "Scout the Area",
+      "description": "Map out nearby terrain for the guard."
+    },
+    {
+      "name": "Farm Assistance",
+      "description": "Help with urgent farm labor."
+    },
+    {
+      "name": "Mysterious Glow",
+      "description": "Investigate strange light from the woods."
+    },
+    {
+      "name": "Hidden Cache",
+      "description": "Uncover a smuggler’s hidden stash."
+    },
+    {
+      "name": "Messenger Duty",
+      "description": "Deliver an urgent message to the capital."
+    },
+    {
+      "name": "Festival Prep",
+      "description": "Help prepare for the annual village festival."
+    },
+    {
+      "name": "Mine Safety",
+      "description": "Check on missing miners."
+    },
+    {
+      "name": "Missing Person",
+      "description": "Search for a missing child."
+    },
+    {
+      "name": "Magical Leakage",
+      "description": "Seal a breach in the arcane barrier."
+    },
+    {
+      "name": "Treant Attack",
+      "description": "Drive away angry treants from the orchard."
+    }
+  ]
+}

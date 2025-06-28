@@ -46,7 +46,7 @@ object Attributes:
 
   //max is player level
   private def biasedValue(weight: Double = 1.0, min: Int = 1, max: Int): Int =
-    val base = scala.util.Random.nextDouble() * weight * max
+    val base = Random.nextDouble() * weight * max
     math.min(max, math.max(min, base.round.toInt))
 
   private def generateWithWeights(weights: List[Double], playerLevel: Int): Attributes =
