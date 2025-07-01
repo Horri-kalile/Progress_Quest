@@ -1,7 +1,15 @@
 .metals/
 .vscode/
+<<<<<<< HEAD
 .bloop/
 streams/
+=======
+<<<<<<< HEAD
+.bloop/
+streams/
+=======
+>>>>>>> main
+>>>>>>> models
 ProgressQuest/.bsp/
 ProgressQuest/.idea/
 ProgressQuest/project/

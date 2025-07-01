@@ -11,3 +11,9 @@ lazy val root = (project in file("."))
 //  Compatible with JavaFX 21 / Java 21
 libraryDependencies += "org.scalafx" %% "scalafx" % "21.0.0-R32"
 libraryDependencies += "com.typesafe.akka" %% "akka-actor-typed" % "2.8.5"
+libraryDependencies += "com.lihaoyi" %% "upickle" % "4.0.2"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.18" % Test
+
+
+
+

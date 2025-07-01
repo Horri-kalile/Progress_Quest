@@ -1,0 +1,69 @@
+{
+  "Weapon": [
+    "Soulreaver Blade",
+    "Ironfang Axe",
+    "Skywarden Bow",
+    "Illimitate Blade",
+    "Stormpiercer Lance",
+    "Dagger of the Deep",
+    "Inferno Scythe",
+    "Emberfang Katana",
+    "Hammer of Sundering",
+    "Darkness punches",
+    "Angel's breath"
+  ],
+  "Shield": [
+    "Mirror of the Sentinel",
+    "Aegis of the Forgotten",
+    "Bastion of Ash",
+    "Stonewall Tower Shield",
+    "Shield of Echoed Light",
+    "Emberguard Bulwark",
+    "Captain's shield"
+  ],
+  "Head": [
+    "Helm of Inner Flame",
+    "Bone Crown",
+    "Mask of the War Priest",
+    "Visor of the Voidwatch",
+    "Hood of the Trickster",
+    "Emerald hat"
+  ],
+  "Body": [
+    "Dragon's skin",
+    "Warlord’s Breastplate",
+    "Gold experience armor",
+    "Start platinium robe",
+    "Robe of the Silent Court",
+    "Crystalsteel Hauberk",
+    "Voidforged Armor"
+  ],
+  "Shoes": [
+    "Greaves of the Dancer",
+    "Phantomstep Boots",
+    "Frostbound Footwraps",
+    "Thunderstride Sandals",
+    "Emberstep Sabatons",
+    "Sonic's feet",
+    "Sportive socks"
+  ],
+  "Gauntlets": [
+    "Fistwraps of Flame",
+    "Gauntlets of the Depths",
+    "Spiked Grip",
+    "Gloves of the Feral",
+    "Ironbind Handguards"
+  ],
+  "Jewelry": [
+    "Ring of Binding Ice",
+    "Pendant of Black Suns",
+    "Band of the Blood Moon",
+    "Stellar ring",
+    "Analysis glasses",
+    "Necklace of the Wilds",
+    "Choker of the Forgotten Flame",
+    "Volcano pendant",
+    "Demon's eye",
+    "AntiMagic piece"
+  ]
+}
