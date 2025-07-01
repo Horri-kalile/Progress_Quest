@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/ProgressQuest.iml" filepath="$PROJECT_DIR$/.idea/modules/ProgressQuest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/ProgressQuest.ProgressQuest-build.iml" filepath="$PROJECT_DIR$/.idea/modules/ProgressQuest.ProgressQuest-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Progress_Quest.ProgressQuest.iml" filepath="$PROJECT_DIR$/.idea/modules/Progress_Quest.ProgressQuest.iml" />
     </modules>
   </component>
 </project>
