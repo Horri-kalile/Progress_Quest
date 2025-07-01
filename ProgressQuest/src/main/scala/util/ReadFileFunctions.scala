@@ -5,8 +5,7 @@ import upickle.default.*
 import scala.io.Source
 import scala.util.Using
 import models.event.{MissionData, Missions}
-import models.player.ItemNames
-import models.player.EquipmentSlot
+import models.player.{EquipmentSlot, ItemNames, SkillNameData}
 
 object ItemNameLoader:
   implicit val rw: ReadWriter[ItemNames] = macroRW
@@ -41,4 +40,14 @@ object EquipmentNameLoader:
           List(EquipmentSlot.Jewelry1, EquipmentSlot.Jewelry2).map(slot => slot -> items)
         case (name, items) =>
           EquipmentSlot.values.find(_.toString == name).map(_ -> items).toList
+    }
+
+
+object SkillLoader:
+  implicit val skillDataRw: ReadWriter[SkillNameData] = macroRW
+
+  def loadSkillNames(path: String = "assets/skills.json"): SkillNameData =
+    Using.resource(Source.fromFile(path)) { source =>
+      val raw = source.mkString
+      read[SkillNameData](raw)
     }
