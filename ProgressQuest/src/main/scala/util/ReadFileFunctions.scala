@@ -6,7 +6,7 @@ import scala.io.Source
 import scala.util.Using
 import models.event.{MissionData, Missions}
 import models.player.ItemNames
-
+import models.player.EquipmentSlot
 
 object ItemNameLoader:
   implicit val rw: ReadWriter[ItemNames] = macroRW
@@ -28,4 +28,17 @@ object MissionLoader:
       val raw = source.mkString
       val parsed = read[Missions](raw)
       parsed.missions
+    }
+
+
+object EquipmentNameLoader:
+  def loadEquipmentNames(path: String = "assets/equipments.json"): Map[EquipmentSlot, List[String]] =
+    Using.resource(Source.fromFile(path)) { source =>
+      val raw = source.mkString
+      val parsed = read[Map[String, List[String]]](raw)
+      parsed.flatMap:
+        case ("Jewelry", items) =>
+          List(EquipmentSlot.Jewelry1, EquipmentSlot.Jewelry2).map(slot => slot -> items)
+        case (name, items) =>
+          EquipmentSlot.values.find(_.toString == name).map(_ -> items).toList
     }

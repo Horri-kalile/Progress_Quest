@@ -1,14 +1,14 @@
 package models
 
 import models.event.MissionData
-import models.player.ItemFactory
+import models.player.{EquipmentFactory, EquipmentSlot, ItemFactory}
 import org.scalatest.funsuite.AnyFunSuite
-import util.{ItemNameLoader, MissionLoader}
+import util.{EquipmentNameLoader, ItemNameLoader, MissionLoader}
 
-class TestModels extends AnyFunSuite {
+class TestModels extends AnyFunSuite:
   val missions: List[MissionData] = MissionLoader.loadMissions()
   val itemNames: List[String] = ItemNameLoader.loadItemNames()
-
+  val equipmentNames: Map[EquipmentSlot, List[String]] = EquipmentNameLoader.loadEquipmentNames()
 
   // TestMission
   test("load missions from JSON file") {
@@ -27,4 +27,18 @@ class TestModels extends AnyFunSuite {
 
     println(s"Randomly generated item: $item")
   }
-}
+
+  // TestEquipment
+
+  test("generate random equipment with correct structure") {
+    assert(equipmentNames.nonEmpty)
+    println(equipmentNames)
+    val equip = EquipmentFactory.generateRandomEquipment(probabilityDrop = 1.0, playerLevel = 10)
+    assert(equip.get.name.nonEmpty, "Equipment name must not be empty")
+    assert(equip.get.value > 0, "Equipment value should be greater than 0")
+    assert(equip.get.statBonus.total == equip.get.value, "Stat value should match total attributes")
+
+    println(s"Generated Equipment: $equip")
+  }
+
+
