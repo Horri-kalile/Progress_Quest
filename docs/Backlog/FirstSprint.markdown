@@ -10,7 +10,7 @@ Il team si è riunito in presenza per analizzare le specifiche del progetto e de
 
 ---
 
-## 📌 Scelte Tecnologiche Iniziali
+## Scelte Tecnologiche Iniziali
 
 - È stato deciso di **rimandare lo sviluppo dell'interfaccia grafica** alle fasi successive.
 - L’obiettivo prioritario di questo sprint è l’implementazione dei modelli principali necessari al gioco.
@@ -18,7 +18,7 @@ Il team si è riunito in presenza per analizzare le specifiche del progetto e de
 
 ---
 
-## 🎯 Obiettivi dello Sprint
+## Obiettivi dello Sprint
 
 - Configurazione iniziale del progetto con gli strumenti scelti:
   - GitHub  
@@ -35,7 +35,7 @@ Il team si è riunito in presenza per analizzare le specifiche del progetto e de
 
 ---
 
-## 🗓️ Pianificazione & Comunicazione
+## Pianificazione & Comunicazione
 
 - Incontri brevi, online
 - Collaborazione diretta sul codice e nelle decisioni architetturali
@@ -47,20 +47,20 @@ Il team si è riunito in presenza per analizzare le specifiche del progetto e de
 
 ## 👥 Assegnazione dei Task
 
-### 🔹 Kalile
+### Kalile
 - Implementazione del modello **Monster**
 - Sketch e prototipo iniziale della **view**
 
-### 🔹 Guo Jiahao
+### Guo Jiahao
 - Sviluppo dei modelli relativi al **Player**
 - Strutturazione dei **Behavior**
 
-### 🔹 Intissar
+### Intissar
 - Analisi e progettazione del **Controller**
 
 ---
 
-## ✅ Sprint Review – 11/06/2025
+## Sprint Review – 11/06/2025
 
 ### Risultati Raggiunti:
 
