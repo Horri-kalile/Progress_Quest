@@ -1,0 +1,55 @@
+{
+  "Forest": [
+    "Giant Rat",
+    "Cave Goblin",
+    "Forest Wolf",
+    "Wild Boar",
+    "Entangler Spider",
+    "Forest Troll",
+    "Elven Archer",
+    "Dire Bear"
+  ],
+  "Swamp": [
+    "Swamp Toad",
+    "Bog Lurker",
+    "Moss Creeper",
+    "Swamp Hag",
+    "Mud Golem",
+    "Venomous Serpent",
+    "Wailing Banshee",
+    "Sludge Elemental",
+    "Swamp Hydra"
+  ],
+  "Desert": [
+    "Sand Scorpion",
+    "Desert Vulture",
+    "Dust Wraith",
+    "Mummy",
+    "Sand Serpent",
+    "Desert Nomad",
+    "Cactus Beast",
+    "Sandy Raptor"
+  ],
+  "Volcano": [
+    "Lava Elemental",
+    "Fire Drake",
+    "Magma Golem",
+    "Flame Wraith",
+    "Ash Serpent",
+    "Volcanic Giant",
+    "Inferno Imp",
+    "Molten Spider",
+    "Cinder Phoenix"
+  ],
+  "Plains": [
+    "Wild Horse",
+    "Plains Runner",
+    "Grassland Wolf",
+    "Prairie Dog",
+    "Bison",
+    "Sun Hawk",
+    "Cactus Cat",
+    "Plains Rider",
+    "Horned Stag"
+  ]
+}
