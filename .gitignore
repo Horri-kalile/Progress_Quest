@@ -3,6 +3,7 @@ target/
 project/target/
 project/project/
 streams/
+out/
 
 # === IDE and tool configs ===
 .idea/
