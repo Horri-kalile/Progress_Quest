@@ -1,14 +1,16 @@
-import scalafx.application.JFXApp3
-import scalafx.scene.Scene
-import scalafx.scene.control._
-import scalafx.scene.layout._
-import scalafx.geometry.{Insets, Pos}
-import scalafx.scene.text.Font
-import scalafx.scene.paint.Color
-import scalafx.Includes._
-import scalafx.scene.Node
+package view
+
 import models.mondo
 import models.monster.OriginZone
+import scalafx.Includes.*
+import scalafx.application.JFXApp3
+import scalafx.geometry.{Insets, Pos}
+import scalafx.scene.{Node, Scene}
+import scalafx.scene.control.*
+import scalafx.scene.layout.*
+import scalafx.scene.paint.Color
+import scalafx.scene.text.Font
+import view.ProgressQuestUI.stage
 
 object ProgressQuestUI extends JFXApp3 {
 

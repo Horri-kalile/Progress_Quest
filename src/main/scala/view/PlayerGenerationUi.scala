@@ -1,13 +1,13 @@
 package view
 
+import models.player.*
+import scalafx.Includes.*
 import scalafx.application.JFXApp3
+import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.Scene
 import scalafx.scene.control.{Button, Label}
 import scalafx.scene.layout.{BorderPane, HBox, VBox}
-import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.paint.Color.*
-import models.player.{Attributes, BehaviorType, ClassType, Identity, Race}
-import scalafx.Includes.*
 
 import scala.util.Random
 
