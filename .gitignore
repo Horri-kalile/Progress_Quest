@@ -1,16 +1,13 @@
+# === SBT build folders ===
+target/
+project/target/
+project/project/
+streams/
+
+# === IDE and tool configs ===
+.idea/
+*.iml
 .metals/
-.vscode/
-<<<<<<< HEAD
 .bloop/
-streams/
-=======
-<<<<<<< HEAD
-.bloop/
-streams/
-=======
->>>>>>> main
->>>>>>> models
-ProgressQuest/.bsp/
-ProgressQuest/.idea/
-ProgressQuest/project/
-ProgressQuest/target/
+.bsp/
+
