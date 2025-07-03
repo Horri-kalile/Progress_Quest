@@ -2,6 +2,7 @@ package view
 
 import models.world
 import models.monster.OriginZone
+import models.world.World
 import scalafx.Includes.*
 import scalafx.application.JFXApp3
 import scalafx.geometry.{Insets, Pos}
@@ -162,13 +163,12 @@ object ProgressQuestUI extends JFXApp3 {
     }
   }
   private def createMondoContent(): Node = {
-    import models.world.Mondo
     import models.monster.OriginZone
     
     // Get a random zone and create a Mondo instance
     val zones = OriginZone.values.toList
     val currentZone = zones(scala.util.Random.nextInt(zones.length))
-    val mondoInstance = new Mondo(currentZone)
+    val mondoInstance = new World(currentZone)
     
     new VBox {
       spacing = 10
