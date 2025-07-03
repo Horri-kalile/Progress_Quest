@@ -1,6 +1,7 @@
 package models
 
 import models.event.MissionData
+import models.monster.{MonstersFactory, OriginZone}
 import models.player.{EquipmentFactory, EquipmentSlot, ItemFactory, SkillFactory, SkillNameData}
 import org.scalatest.funsuite.AnyFunSuite
 import util.{EquipmentNameLoader, ItemNameLoader, MissionLoader, SkillLoader}
@@ -49,5 +50,34 @@ class TestModels extends AnyFunSuite:
     assert(skill.manaCost >= 0)
     println(s"Generated Skill: ${skill.name} | Mana: ${skill.manaCost} | Skill Type: ${skill.effectType} | PowerLevel: ${skill.powerLevel}")
 
+  // TestMonsterGeneration
+  test("Generate normal monster for a given zone and player level") {
+    val zone = OriginZone.Forest
+    val playerLevel = 5
+    val monster = MonstersFactory.randomMonsterForZone(zone, playerLevel)
 
+    assert(monster.originZone == zone)
+    assert(monster.level >= 1)
+    assert(monster.attributes.hp > 0)
+    assert(monster.goldReward > 0)
+    assert(monster.experienceReward > 0)
+
+    println(s"Normal monster: ${monster.name}, Level: ${monster.level}, HP: ${monster.attributes.hp}, Behavior: ${monster.behavior}")
+  }
+
+  test("Generate strong monster has higher level and stats") {
+    val zone = OriginZone.Volcano
+    val playerLevel = 10
+
+    val normal = MonstersFactory.randomMonsterForZone(zone, playerLevel)
+    val strong = MonstersFactory.randomMonsterForZone(zone, playerLevel, strong = true)
+
+    assert(strong.level >= normal.level)
+    assert(strong.attributes.hp >= normal.attributes.hp)
+    assert(strong.attributes.attack >= normal.attributes.attack)
+    assert(strong.goldReward >= normal.goldReward)
+    assert(strong.experienceReward >= normal.experienceReward)
+
+    println(s"Strong monster: ${strong.name}, Level: ${strong.level}, HP: ${strong.attributes.hp}, Behavior: ${strong.behavior}")
+  }
 

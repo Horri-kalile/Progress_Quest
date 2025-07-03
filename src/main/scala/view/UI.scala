@@ -1,6 +1,6 @@
 package view
 
-import models.mondo
+import models.world
 import models.monster.OriginZone
 import scalafx.Includes.*
 import scalafx.application.JFXApp3
@@ -162,7 +162,7 @@ object ProgressQuestUI extends JFXApp3 {
     }
   }
   private def createMondoContent(): Node = {
-    import models.mondo.Mondo
+    import models.world.Mondo
     import models.monster.OriginZone
     
     // Get a random zone and create a Mondo instance

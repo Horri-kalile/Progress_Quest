@@ -5,6 +5,7 @@ import upickle.default.*
 import scala.io.Source
 import scala.util.Using
 import models.event.{MissionData, Missions}
+import models.monster.MonsterNameData
 import models.player.{EquipmentSlot, ItemNames, SkillNameData}
 
 object ItemNameLoader:
@@ -50,4 +51,13 @@ object SkillLoader:
     Using.resource(Source.fromFile(path)) { source =>
       val raw = source.mkString
       read[SkillNameData](raw)
+    }
+
+object MonsterLoader:
+  implicit val monsterDataRw: ReadWriter[MonsterNameData] = macroRW
+
+  def loadMonsters(path: String = "assets/monsters.json"): Map[String, List[String]] =
+    Using.resource(Source.fromFile(path)) { source =>
+      val raw = source.mkString
+      read[Map[String, List[String]]](raw)
     }

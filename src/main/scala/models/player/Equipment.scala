@@ -3,7 +3,6 @@ package models.player
 import util.EquipmentNameLoader
 
 import scala.util.Random
-import scala.util.Random.nextDouble
 
 enum EquipmentSlot:
   case Weapon, Shield, Head, Body, Jewelry1, Jewelry2, Shoes, Gauntlets
