@@ -1,33 +1,40 @@
 package view
 
 import models.monster.OriginZone
-import models.player.{EquipmentSlot, Player}
+import models.player.{EquipmentSlot, Player, Skill, SkillEffectType}
 import models.world.World
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.{Node, Scene}
 import scalafx.scene.control.*
 import scalafx.scene.layout.*
 import scalafx.stage.Stage
+import scalafx.stage.Screen
+import scalafx.Includes.jfxNode2sfx
 
 object GameUi {
 
+
+  private val screenBounds = Screen.primary.visualBounds
+  private val screenWidth: Double = screenBounds.width
+  private val screenHeight: Double = screenBounds.height
   private var stageOpt: Option[Stage] = None
   var playerOpt: Option[Player] = None
 
   /** Call this to open the main game UI window */
-  def open(): Unit = {
+  def open(): Unit =
     val player = playerOpt.getOrElse(throw new Exception("Player not set"))
     val stage = new Stage {
       title = "ProgressQuest"
-      width = 850
-      height = 700
+      width = screenWidth * 0.8
+      height = screenHeight * 0.8
+      title = "Progress Quest"
       scene = new Scene {
         root = new BorderPane {
           padding = Insets(15)
           style = "-fx-background-color: #e0e0e0"
 
           // Top Section: Character, Equipment, Stats
-          top = new HBox {
+          top = new HBox:
             spacing = 15
             alignment = Pos.TopLeft
             children = Seq(
@@ -41,34 +48,45 @@ object GameUi {
                 children = createStatsContent(player)
               })
             )
-          }
+            children.foreach(child =>
+              HBox.setHgrow(child, Priority.Always)
+              child.maxWidth(Double.MaxValue)
+            )
+
+
 
           // Center Section: Inventory, World, Skills, and Mission
-          center = new HBox {
+          center = new HBox:
             spacing = 15
             children = Seq(
               createPanelWithHeader("Inventory", createInventoryContent()),
               createPanelWithHeader("World", createWorldContent()),
-              createPanelWithHeader("Skills", createSkillsContent()),
+              createPanelWithHeader("Skills", createSkillsContent(player)),
               createPanelWithHeader("Mission", createMissionContent())
             )
-          }
+            children.foreach(child =>
+              HBox.setHgrow(child, Priority.Always)
+              child.maxWidth(Double.MaxValue)
+            )
 
           // Bottom Section: Diary and Combat Log
-          bottom = new HBox {
+          bottom = new HBox:
             spacing = 15
             children = Seq(
               createPanelWithHeader("Hero Diary", createDiaryContent()),
               createPanelWithHeader("Combat Log", createCombatLogContent())
             )
-          }
+            children.foreach(child =>
+              HBox.setHgrow(child, Priority.Always)
+              child.maxWidth(Double.MaxValue)
+            )
         }
       }
     }
 
     stage.show()
     stageOpt = Some(stage)
-  }
+
 
   private def createPanelWithHeader(title: String, content: Node): VBox = {
     new VBox {
@@ -105,11 +123,11 @@ object GameUi {
   )
 
   private def createEquipmentContent(player: Player): Seq[Node] =
-    EquipmentSlot.values.toSeq.map { slot =>
+    EquipmentSlot.values.toSeq.map(slot =>
       val equipped = player.equipment.getOrElse(slot, None)
       val label = equipped.map(e => s"${e.name} (Value: ${e.value})").getOrElse("None")
       createTableRow(slot.toString, label)
-    }
+    )
 
 
   private def createStatsContent(player: Player): Seq[Node] =
@@ -150,7 +168,7 @@ object GameUi {
     )
 
 
-  private def createInventoryContent(): Node = new GridPane {
+  private def createInventoryContent(): Node = new GridPane:
     hgap = 10
     vgap = 5
     padding = Insets(5)
@@ -162,7 +180,7 @@ object GameUi {
     add(new Label("1"), 1, 2)
     add(new Label("Scroll"), 0, 3)
     add(new Label("3"), 1, 3)
-  }
+
 
   private def createDiaryContent(): Node = new TextArea {
     text = "Hero entered the dungeon...\nFound a mysterious sword\nMet a friendly merchant"
@@ -204,15 +222,33 @@ object GameUi {
     }
   }
 
-  private def createSkillsContent(): Node = new VBox {
-    spacing = 5
-    children = Seq(
-      createTableRow("Magic", "Level 2"),
-      createTableRow("Swordsmanship", "Level 1"),
-      createTableRow("Archery", "Level 3"),
-      createTableRow("Stealth", "Level 1")
-    )
-  }
+  private def createSkillsContent(player: Player): Node =
+    val physicalSkills = player.skills.filter(_.effectType == SkillEffectType.Physical)
+    val magicSkills = player.skills.filter(_.effectType == SkillEffectType.Magic)
+    val healingSkills = player.skills.filter(_.effectType == SkillEffectType.Healing)
+
+    def formatSkill(skill: Skill): Label =
+      new Label(s"${skill.name} (Lv.${skill.powerLevel}, MP: ${skill.manaCost})"):
+        style = "-fx-font-size: 11"
+
+    def makeColumn(title: String, skills: List[Skill]) =
+      new VBox:
+        spacing = 5
+        alignment = Pos.TopLeft
+        children = Seq(
+          new Label(title):
+            style = "-fx-font-weight: bold; -fx-underline: true"
+        ) ++ skills.map(formatSkill)
+
+    new HBox:
+      spacing = 40
+      alignment = Pos.TopLeft
+      children = Seq(
+        makeColumn("Physical", physicalSkills),
+        makeColumn("Magic", magicSkills),
+        makeColumn("Healing", healingSkills)
+      )
+
 
   private def createMissionContent(): Node = new VBox {
     spacing = 5
