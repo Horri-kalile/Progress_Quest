@@ -1,7 +1,7 @@
 package controllers
 
-import models.player._
 import models.event.Mission
+import models.player.*
 
 
 object PlayerController {
