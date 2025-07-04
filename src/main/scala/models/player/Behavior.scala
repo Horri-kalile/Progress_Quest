@@ -41,7 +41,7 @@ object TwiceAttack extends Behavior:
 // Heal behavior: heals player after battle
 object Heal extends Behavior:
   override def onBattleEnd(player: Player, exp: Int): Int =
-    val healAmount = (player.maxHP * Random.between(0.1, 0.5)).toInt
+    val healAmount = (player.hp * Random.between(0.1, 0.5)).toInt
     player.receiveHealing(healAmount)
     exp
 

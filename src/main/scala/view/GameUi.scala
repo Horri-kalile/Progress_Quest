@@ -32,23 +32,23 @@ object GameUi {
             alignment = Pos.TopLeft
             children = Seq(
               createPanelWithHeader("Character Player", new VBox {
-                children = createCharacterContent()
+                children = createCharacterContent(player)
               }),
               createPanelWithHeader("Equipment", new VBox {
                 children = createEquipmentContent()
               }),
               createPanelWithHeader("Stats", new VBox {
-                children = createStatsContent()
+                children = createStatsContent(player)
               })
             )
           }
 
-          // Center Section: Inventory, Mondo, Skills, and Mission
+          // Center Section: Inventory, World, Skills, and Mission
           center = new HBox {
             spacing = 15
             children = Seq(
               createPanelWithHeader("Inventory", createInventoryContent()),
-              createPanelWithHeader("Mondo", createMondoContent()),
+              createPanelWithHeader("World", createWorldContent()),
               createPanelWithHeader("Skills", createSkillsContent()),
               createPanelWithHeader("Mission", createMissionContent())
             )
@@ -95,12 +95,12 @@ object GameUi {
     }
   }
 
-  private def createCharacterContent(): Seq[Node] = Seq(
-    createTableRow("Name", "saitama"),
-    createTableRow("Race", "Low Elf"),
-    createTableRow("Class", "Mage"),
-    createTableRow("Level", "5"),
-    createTableRow("Gold", "123")
+  private def createCharacterContent(player: Player): Seq[Node] = Seq(
+    createTableRow("Name", player.name),
+    createTableRow("Race", player.identity.race.toString),
+    createTableRow("Class", player.identity.classType.toString),
+    createTableRow("Level", player.level.toString),
+    createTableRow("Gold", player.gold.toString)
   )
 
   private def createEquipmentContent(): Seq[Node] = Seq(
@@ -111,23 +111,35 @@ object GameUi {
     createTableRow("Accessories", "Boots of Speed")
   )
 
-  private def createStatsContent(): Seq[Node] = Seq(
-    createTableRow("STR", "10"),
-    createTableRow("DEX", "8"),
-    createTableRow("INT", "15"),
-    createTableRow("HP", ""),
-    new ProgressBar {
-      progress = 0.8
-      prefWidth = 200
-      style = "-fx-accent: #4682b4"
-    },
-    createTableRow("MP", ""),
-    new ProgressBar {
-      progress = 0.4
-      prefWidth = 200
-      style = "-fx-accent: #9370db"
+  private def createStatsContent(player: Player): Seq[Node] =
+    val attrMap = Map(
+      "STR" -> player.attributes.strength.toString,
+      "CON" -> player.attributes.constitution.toString,
+      "DEX" -> player.attributes.dexterity.toString,
+      "INT" -> player.attributes.intelligence.toString,
+      "WIS" -> player.attributes.wisdom.toString,
+      "LUK" -> player.attributes.lucky.toString
+    )
+
+    val attrRows = attrMap.toSeq.map { case (label, value) =>
+      createTableRow(label, value)
     }
-  )
+
+    attrRows ++ Seq(
+      createTableRow("HP", ""),
+      new ProgressBar {
+        progress = player.currentHp / player.hp
+        prefWidth = 200
+        style = "-fx-accent: #4682b4"
+      },
+      createTableRow("MP", ""),
+      new ProgressBar {
+        progress = player.currentMp / player.mp
+        prefWidth = 200
+        style = "-fx-accent: #9370db"
+      }
+    )
+
 
   private def createInventoryContent(): Node = new GridPane {
     hgap = 10
@@ -161,7 +173,7 @@ object GameUi {
     focusTraversable = false
   }
 
-  private def createMondoContent(): Node = {
+  private def createWorldContent(): Node = {
     val zones = OriginZone.values.toList
     val currentZone = zones(scala.util.Random.nextInt(zones.length))
     val mondoInstance = new World(currentZone)

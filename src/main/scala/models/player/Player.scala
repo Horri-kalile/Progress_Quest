@@ -14,6 +14,8 @@ case class Player(
                    exp: Int,
                    hp: Int,
                    mp: Int,
+                   currentHp: Int,
+                   currentMp: Int,
                    baseAttributes: Attributes,
                    behaviorType: BehaviorType,
                    inventory: Map[Item, Int] = Map.empty,
@@ -29,15 +31,6 @@ case class Player(
     val bonuses = equipment.values.flatten.map(_.statBonus)
     bonuses.foldLeft(baseAttributes)(_ + _)
 
-  /*TODO algoritmo di calcolo*/
-  def maxHP: Int = attributes.constitution * 10
-
-  def maxMP: Int = attributes.intelligence * 5
-
-  def currentHP: Int = hp
-
-  def currentMP: Int = mp
-
   def inventorySize: Int = inventory.size
 
 
@@ -51,8 +44,8 @@ case class Player(
     this.copy(
       level = level + 1,
       exp = 0,
-      hp = maxHP,
-      mp = maxMP
+      hp = hp,
+      mp = mp
     )
 
   /*TODO calcolo danno*/
@@ -62,7 +55,7 @@ case class Player(
     this.copy(hp = newHP)
 
   override def receiveHealing(amount: Int): Player =
-    val newHP = (hp + amount).min(maxHP)
+    val newHP = (hp + amount).min(hp)
     this.copy(hp = newHP)
 
   def useSkill(skill: Skill): Boolean = mp match
@@ -149,7 +142,7 @@ case class Player(
     else None
 
   def restore(): Player =
-    this.copy(hp = maxHP, mp = maxMP)
+    this.copy(currentHp = hp, currentMp = mp)
 
   def addMission(m: Mission): Player = this.copy(missions = m :: missions)
 
@@ -166,8 +159,8 @@ case class Player(
 
 object PlayerFactory:
   def createDefaultPlayer(name: String, identity: Identity, attributes: Attributes, behavior: BehaviorType): Player =
-    val hp = attributes.constitution * 10
-    val mp = attributes.intelligence * 5
+    val hp = attributes.constitution * 5
+    val mp = attributes.intelligence * 2
     val gold = 0.0
 
     Player(
@@ -177,8 +170,9 @@ object PlayerFactory:
       exp = 0,
       hp = hp,
       mp = mp,
+      currentHp = hp,
+      currentMp = mp,
       baseAttributes = attributes,
       behaviorType = behavior,
       gold = gold
     )
-  
