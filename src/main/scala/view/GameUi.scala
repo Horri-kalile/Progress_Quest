@@ -59,7 +59,7 @@ object GameUi {
           center = new HBox:
             spacing = 15
             children = Seq(
-              createPanelWithHeader("Inventory", createInventoryContent()),
+              createPanelWithHeader("Inventory", createInventoryContent(player)),
               createPanelWithHeader("World", createWorldContent()),
               createPanelWithHeader("Skills", createSkillsContent(player)),
               createPanelWithHeader("Mission", createMissionContent())
@@ -168,18 +168,19 @@ object GameUi {
     )
 
 
-  private def createInventoryContent(): Node = new GridPane:
-    hgap = 10
-    vgap = 5
+  private def createInventoryContent(player: Player): Node = new GridPane:
+    hgap = 50
+    vgap = 10
     padding = Insets(5)
+
     add(createTableHeader("Item"), 0, 0)
-    add(createTableHeader("Qty"), 1, 0)
-    add(new Label("Potion"), 0, 1)
-    add(new Label("2"), 1, 1)
-    add(new Label("Sword"), 0, 2)
-    add(new Label("1"), 1, 2)
-    add(new Label("Scroll"), 0, 3)
-    add(new Label("3"), 1, 3)
+    add(createTableHeader("Quantity"), 1, 0)
+
+    player.inventory.toSeq.zipWithIndex.foreach((pair, idx) =>
+      val (item, qty) = pair
+      add(new Label(item.name), 0, idx + 1)
+      add(new Label(qty.toString), 1, idx + 1)
+    )
 
 
   private def createDiaryContent(): Node = new TextArea {
