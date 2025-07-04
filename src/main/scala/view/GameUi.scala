@@ -1,7 +1,7 @@
 package view
 
 import models.monster.OriginZone
-import models.player.Player
+import models.player.{EquipmentSlot, Player}
 import models.world.World
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.{Node, Scene}
@@ -35,7 +35,7 @@ object GameUi {
                 children = createCharacterContent(player)
               }),
               createPanelWithHeader("Equipment", new VBox {
-                children = createEquipmentContent()
+                children = createEquipmentContent(player)
               }),
               createPanelWithHeader("Stats", new VBox {
                 children = createStatsContent(player)
@@ -100,44 +100,53 @@ object GameUi {
     createTableRow("Race", player.identity.race.toString),
     createTableRow("Class", player.identity.classType.toString),
     createTableRow("Level", player.level.toString),
-    createTableRow("Gold", player.gold.toString)
+    createTableRow("Gold", player.gold.toString),
+    createTableRow("Exp/NextLevel", new Label(s"${player.exp} / ${player.level * 100}").text.value.trim)
   )
 
-  private def createEquipmentContent(): Seq[Node] = Seq(
-    createTableRow("Weapon", "Sword"),
-    createTableRow("Armor", "Robe"),
-    createTableRow("Accessories", "Ring of Mana"),
-    createTableRow("Accessories", "Gloves of Dexterity"),
-    createTableRow("Accessories", "Boots of Speed")
-  )
+  private def createEquipmentContent(player: Player): Seq[Node] =
+    EquipmentSlot.values.toSeq.map { slot =>
+      val equipped = player.equipment.getOrElse(slot, None)
+      val label = equipped.map(e => s"${e.name} (Value: ${e.value})").getOrElse("None")
+      createTableRow(slot.toString, label)
+    }
+
 
   private def createStatsContent(player: Player): Seq[Node] =
-    val attrMap = Map(
-      "STR" -> player.attributes.strength.toString,
-      "CON" -> player.attributes.constitution.toString,
-      "DEX" -> player.attributes.dexterity.toString,
-      "INT" -> player.attributes.intelligence.toString,
-      "WIS" -> player.attributes.wisdom.toString,
-      "LUK" -> player.attributes.lucky.toString
+    val attrRows = Seq(
+      createTableRow("STR", player.attributes.strength.toString),
+      createTableRow("CON", player.attributes.constitution.toString),
+      createTableRow("DEX", player.attributes.dexterity.toString),
+      createTableRow("INT", player.attributes.intelligence.toString),
+      createTableRow("WIS", player.attributes.wisdom.toString),
+      createTableRow("LUK", player.attributes.lucky.toString)
     )
 
-    val attrRows = attrMap.toSeq.map { case (label, value) =>
-      createTableRow(label, value)
-    }
+    val hpLabel = new Label(s"${player.currentHp} / ${player.hp}")
+    val mpLabel = new Label(s"${player.currentMp} / ${player.mp}")
 
     attrRows ++ Seq(
       createTableRow("HP", ""),
-      new ProgressBar {
-        progress = player.currentHp / player.hp
-        prefWidth = 200
-        style = "-fx-accent: #4682b4"
-      },
+      new VBox:
+        spacing = 2
+        children = Seq(
+          hpLabel,
+          new ProgressBar:
+            progress = player.currentHp.toDouble / player.hp
+            prefWidth = 200
+            style = "-fx-accent: #4682b4"
+        )
+      ,
       createTableRow("MP", ""),
-      new ProgressBar {
-        progress = player.currentMp / player.mp
-        prefWidth = 200
-        style = "-fx-accent: #9370db"
-      }
+      new VBox:
+        spacing = 2
+        children = Seq(
+          mpLabel,
+          new ProgressBar:
+            progress = player.currentMp.toDouble / player.mp
+            prefWidth = 200
+            style = "-fx-accent: #9370db"
+        )
     )
 
 
