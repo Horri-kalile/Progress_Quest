@@ -164,3 +164,21 @@ case class Player(
   def powerUp(): Player =
     this.copy(baseAttributes = baseAttributes.incrementAll(1))
 
+object PlayerFactory:
+  def createDefaultPlayer(name: String, identity: Identity, attributes: Attributes, behavior: BehaviorType): Player =
+    val hp = attributes.constitution * 10
+    val mp = attributes.intelligence * 5
+    val gold = 0.0
+
+    Player(
+      name = name,
+      identity = identity,
+      level = 1,
+      exp = 0,
+      hp = hp,
+      mp = mp,
+      baseAttributes = attributes,
+      behaviorType = behavior,
+      gold = gold
+    )
+  

@@ -107,7 +107,11 @@ object PlayerGenerationUi extends JFXApp3:
       children = Seq(
         new Button("Confirm"):
           onAction = _ =>
-            println(s"Player Confirmed: Race = $selectedRace, Class = $selectedClass, Behavior = $selectedBehavior, Identity = $identity, Attributes = $randomAttributes")
+            val player = PlayerFactory.createDefaultPlayer(name, identity, randomAttributes, selectedBehavior)
+            println(s"Player Created: $player")
+            GameUi.playerOpt = Some(player)
+            GameUi.open()
+            stage.close()
       )
     stage = new JFXApp3.PrimaryStage:
       title = "Generate Your Player"
