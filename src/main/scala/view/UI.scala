@@ -240,4 +240,59 @@ object ProgressQuestUI extends JFXApp3 {
       style = "-fx-font-weight: bold; -fx-underline: true"
     }
   }
+  
+  /**
+   * Update the UI with current player information
+   * This method should be called from GameController
+   */
+  def updatePlayerInfo(player: models.player.Player): Unit = {
+    // TODO: Update UI panels with current player data
+    // This needs to be implemented by the UI specialist
+    println(s"UI Update: ${player.identity.name} - Level ${player.level} - HP: ${player.hp}/${player.maxHp}")
+  }
+  
+  /**
+   * Add a message to the combat log
+   */
+  def addCombatLog(message: String): Unit = {
+    // TODO: Add message to combat log panel
+    println(s"Combat Log: $message")
+  }
+  
+  /**
+   * Show game over screen
+   */
+  def showGameOver(): Unit = {
+    // TODO: Show game over dialog with restart option
+    println("GAME OVER - Show restart dialog")
+  }
+  
+  /**
+   * Create game control buttons (start/stop/pause)
+   */
+  private def createGameControls(): Node = {
+    new HBox {
+      spacing = 10
+      children = Seq(
+        new Button("Start Game") {
+          onAction = _ => {
+            // TODO: Start game with selected player
+            println("Start Game clicked")
+          }
+        },
+        new Button("Stop Game") {
+          onAction = _ => {
+            controllers.GameController.stopGame()
+            println("Game stopped")
+          }
+        },
+        new Button("Pause/Resume") {
+          onAction = _ => {
+            // TODO: Implement pause/resume functionality
+            println("Pause/Resume clicked")
+          }
+        }
+      )
+    }
+  }
 }
