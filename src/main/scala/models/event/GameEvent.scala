@@ -10,13 +10,17 @@ sealed trait GameEvent:
   def action(player: Player): Player
 
 case object FightEvent extends GameEvent:
-  override def action(player: Player): Player = ???
-/*val monster = MonsterFactory.randomForLevel(player.level)
-val (updatedPlayer, _) = CombatSimulator.simulate(player, monster)
-if updatedPlayer.hp <= 0 then
-  GameOverEvent.action(updatedPlayer)
-else
-  updatedPlayer*/
+  override def action(player: Player): Player = {
+    val monster = controllers.CombatController.getRandomMonster(player.level)
+    val (updatedPlayer, combatLog) = controllers.CombatController.simulateFight(player, monster)
+    
+    println(combatLog)
+    
+    if (updatedPlayer.hp <= 0) then
+      GameOverEvent.action(updatedPlayer)
+    else
+      updatedPlayer
+  }
 
 case object MissionEvent extends GameEvent:
   override def action(player: Player): Player =
