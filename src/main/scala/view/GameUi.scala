@@ -32,7 +32,7 @@ object GameUi:
     stageOpt = Some(stage)
 
   /** Creates the main UI root node for a given player */
-  def createRoot(player: Player): BorderPane =
+  private def createRoot(player: Player): BorderPane =
     new BorderPane:
       padding = Insets(15)
       style = "-fx-background-color: #e0e0e0"
