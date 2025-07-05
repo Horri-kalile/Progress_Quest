@@ -5,7 +5,7 @@ import scalafx.Includes.*
 import scalafx.application.JFXApp3
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.Scene
-import scalafx.scene.control.{Button, Label}
+import scalafx.scene.control.{Button, Label, TextField}
 import scalafx.scene.layout.{BorderPane, HBox, VBox}
 import scalafx.scene.paint.Color.*
 
@@ -17,14 +17,16 @@ object PlayerGenerationUi extends JFXApp3:
   private var selectedClass: ClassType = ClassType.Warrior
   private var selectedBehavior: BehaviorType = BehaviorType.Aggressive
   private var randomAttributes: Attributes = Attributes.random()
-  private val name: String = String("Player")
-  private var identity: Identity = Identity(name = name, race = selectedRace, classType = selectedClass)
+  private var identity: Identity = Identity(race = selectedRace, classType = selectedClass)
 
   override def start(): Unit =
     val raceLabel = new Label(selectedRace.toString)
     val classLabel = new Label(selectedClass.toString)
     val behaviorLabel = new Label(selectedBehavior.toString)
-    val playerNameLabel = new Label(name);
+    val playerNameLabel = new TextField {
+      promptText = "Enter your name"
+      text = "Player"
+    }
     val strengthLabel = new Label(s"Strength: ${randomAttributes.strength}")
     val constitutionLabel = new Label(s"Constitution: ${randomAttributes.constitution}")
     val dexterityLabel = new Label(s"Dexterity: ${randomAttributes.dexterity}")
@@ -36,6 +38,14 @@ object PlayerGenerationUi extends JFXApp3:
       spacing = 10
       padding = Insets(20)
       children = Seq(
+        // Name
+        new HBox:
+          spacing = 10
+          children = Seq(
+            new Label("Name: "),
+            playerNameLabel,
+          )
+        ,
         // Race
         new HBox:
           spacing = 10
@@ -45,7 +55,7 @@ object PlayerGenerationUi extends JFXApp3:
             new Button("Roll"):
               onAction = _ =>
                 selectedRace = Random.shuffle(Race.values.toList).head
-                identity = Identity(name = name, race = selectedRace, classType = selectedClass)
+                identity = Identity(race = selectedRace, classType = selectedClass)
                 raceLabel.text = selectedRace.toString
           )
         ,
@@ -59,7 +69,7 @@ object PlayerGenerationUi extends JFXApp3:
             new Button("Roll"):
               onAction = _ =>
                 selectedClass = Random.shuffle(ClassType.values.toList).head
-                identity = Identity(name = name, race = selectedRace, classType = selectedClass)
+                identity = Identity(race = selectedRace, classType = selectedClass)
                 classLabel.text = selectedClass.toString
           )
         ,
@@ -107,7 +117,12 @@ object PlayerGenerationUi extends JFXApp3:
       children = Seq(
         new Button("Confirm"):
           onAction = _ =>
-            println(s"Player Confirmed: Race = $selectedRace, Class = $selectedClass, Behavior = $selectedBehavior, Identity = $identity, Attributes = $randomAttributes")
+            val player = PlayerFactory.createDefaultPlayer(playerNameLabel.text.value.trim, identity, randomAttributes, selectedBehavior)
+            val finalPlayer = PlayerBonusesApplication.applyRaceAndClassBonuses(player)
+            println(s"Player Created: $finalPlayer")
+            GameUi.playerOpt = Some(finalPlayer)
+            GameUi.open()
+            stage.close()
       )
     stage = new JFXApp3.PrimaryStage:
       title = "Generate Your Player"

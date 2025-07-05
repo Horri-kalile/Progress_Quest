@@ -36,9 +36,9 @@ case class GenericSkill(
                        ) extends Skill:
 
   override def use(caster: Player, target: Entity): (Player, Entity) =
-    if caster.currentMP < manaCost then return (caster, target)
+    if caster.currentMp < manaCost then return (caster, target)
 
-    val updatedCaster = caster.copy(mp = caster.currentMP - manaCost)
+    val updatedCaster = caster.copy(mp = caster.currentMp - manaCost)
     val multiplier = Random.between(0.1, baseMultiplier)
 
     effectType match
@@ -65,6 +65,15 @@ case class GenericSkill(
 object SkillFactory:
   private val data: SkillNameData = SkillLoader.loadSkillNames()
 
+  def generateStartingSkill(classType: ClassType): Option[Skill] =
+    val mana = Random.between(4, 13)
+    val multiplier = Random.between(1.1, 2.0).toInt
+    classType match
+      case ClassType.Mage => Some(GenericSkill(Random.shuffle(data.magic).head, SkillEffectType.Magic, mana, multiplier))
+      case ClassType.Cleric | ClassType.Paladin => Some(GenericSkill(Random.shuffle(data.healing).head, SkillEffectType.Healing, mana, multiplier))
+      case ClassType.Assassin => Some(GenericSkill(Random.shuffle(data.physical).head, SkillEffectType.Physical, mana, multiplier))
+      case _ => None
+
   def randomSkill(): Skill =
     val skillType = Random.nextInt(3)
     val (name, effectType) = skillType match
@@ -73,6 +82,6 @@ object SkillFactory:
       case 2 => (Random.shuffle(data.healing).head, SkillEffectType.Healing)
 
     val mana = Random.between(4, 13)
-    val multiplier = Random.between(1.1, 2.0)
+    val multiplier = Random.between(1.1, 2.0).toInt
 
     GenericSkill(name, effectType, mana, multiplier)
