@@ -1,7 +1,7 @@
 package controllers
 
 import models.player.Player
-import models.monster.{Monster, MonsterFactory}
+import models.monster.{Monster, MonstersFactory}
 import scala.util.Random
 
 /**
@@ -23,7 +23,7 @@ object CombatController {
     
     if (playerWins) {
       // Player wins
-      val expGain = monster.expReward
+      val expGain = monster.experienceReward
       val goldGain = monster.goldReward
       val updatedPlayer = PlayerController.gainXP(
         PlayerController.addGold(player, goldGain), 
@@ -41,7 +41,7 @@ object CombatController {
   private def calculatePlayerAttack(player: Player): Int = {
     // Base attack from level + equipment bonuses
     val baseAttack = player.level * 10
-    val equipmentBonus = player.equipment.values.flatten.map(_.attackBonus).sum
+    val equipmentBonus = player.equipment.values.flatten.map(_.statBonus.strength).sum
     baseAttack + equipmentBonus + Random.nextInt(20)
   }
   
@@ -61,12 +61,13 @@ object CombatController {
         hp = 50 + (playerLevel * 5),
         attack = 15 + (playerLevel * 2),
         defense = 10 + playerLevel,
-        level = playerLevel
+        level = playerLevel,
+        
       ),
       behavior = models.monster.Aggressive,
-      originZone = models.monster.OriginZone.Grassland,
+      originZone = models.monster.OriginZone.Forest,
       monsterType = models.monster.MonsterType.Beast,
-      expReward = 25 + (playerLevel * 5),
+      experienceReward= 25 + (playerLevel * 5),
       goldReward = 10 + (playerLevel * 2)
     )
   }
