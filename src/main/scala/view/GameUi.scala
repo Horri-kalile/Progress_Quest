@@ -286,4 +286,126 @@ object GameUi {
   private def createTableHeader(text: String): Label = new Label(text) {
     style = "-fx-font-weight: bold; -fx-underline: true"
   }
+
+  /**
+   * Update the UI with current player information
+   * This method should be called from GameController
+   */
+  def updatePlayerInfo(player: Player): Unit = {
+    playerOpt = Some(player)
+    // Refresh the UI if it's open
+    stageOpt.foreach { stage =>
+      // Update the scene with new player data
+      // The UI will automatically reflect the new data since it uses playerOpt
+      stage.scene().root = createMainScene(player).root
+    }
+    println(s"UI Update: ${player.identity.name} - Level ${player.level} - HP: ${player.hp}/${player.maxHp}")
+  }
+
+  /**
+   * Add a message to the combat log
+   */
+  def addCombatLog(message: String): Unit = {
+    // TODO: Add message to combat log panel
+    println(s"Combat Log: $message")
+  }
+
+  /**
+   * Show game over screen
+   */
+  def showGameOver(): Unit = {
+    // TODO: Show game over dialog with restart option
+    println("GAME OVER - Show restart dialog")
+  }
+
+  /**
+   * Create game control buttons (start/stop/pause)
+   */
+  def createGameControls(): Node = {
+    new HBox {
+      spacing = 10
+      children = Seq(
+        new Button("Start Game") {
+          onAction = _ => {
+            playerOpt.foreach { player =>
+              controllers.GameController.startGame(player)
+              println("Game started")
+            }
+          }
+        },
+        new Button("Stop Game") {
+          onAction = _ => {
+            controllers.GameController.stopGame()
+            println("Game stopped")
+          }
+        },
+        new Button("Pause/Resume") {
+          onAction = _ => {
+            // TODO: Implement pause/resume functionality
+            println("Pause/Resume clicked")
+          }
+        }
+      )
+    }
+  }
+
+  /**
+   * Create the main scene (extracted for refresh functionality)
+   */
+  private def createMainScene(player: Player): Scene = {
+    new Scene {
+      root = new BorderPane {
+        padding = Insets(15)
+        style = "-fx-background-color: #e0e0e0"
+
+        // Top Section: Character, Equipment, Stats
+        top = new HBox:
+          spacing = 15
+          alignment = Pos.TopLeft
+          children = Seq(
+            createPanelWithHeader("Character Player", new VBox {
+              children = createCharacterContent(player)
+            }),
+            createPanelWithHeader("Equipment", new VBox {
+              children = createEquipmentContent(player)
+            }),
+            createPanelWithHeader("Stats", new VBox {
+              children = createStatsContent(player)
+            })
+          )
+
+        // Center Section: Inventory, Mondo, Skills, and Mission
+        center = new HBox:
+          spacing = 15
+          children = Seq(
+            createPanelWithHeader("Inventory", createInventoryContent(player)),
+            createPanelWithHeader("Mondo", createMondoContent()),
+            createPanelWithHeader("Skills", createSkillsContent(player)),
+            createPanelWithHeader("Mission", createMissionContent(player))
+          )
+          children.foreach(child =>
+            HBox.setHgrow(child, Priority.Always)
+            child.maxWidth(Double.MaxValue)
+          )
+
+        // Bottom Section: Diary, Combat Log, and Game Controls
+        bottom = new VBox {
+          spacing = 10
+          children = Seq(
+            createGameControls(),
+            new HBox:
+              spacing = 15
+              children = Seq(
+                createPanelWithHeader("Hero Diary", createDiaryContent()),
+                createPanelWithHeader("Combat Log", createCombatLogContent())
+              )
+              children.foreach(child =>
+                HBox.setHgrow(child, Priority.Always)
+                child.maxWidth(Double.MaxValue)
+              )
+          )
+        }
+      }
+    }
+  }
 }
