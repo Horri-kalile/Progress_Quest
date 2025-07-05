@@ -3,7 +3,7 @@ package controllers
 import models.monster._
 import scala.math.max
 
-object MonsterController
+object MonsterController {
 
 
 def isAlive(monster: Monster): Boolean = monster.attributes.hp > 0
@@ -62,4 +62,5 @@ def createMonster(
     behavior = behavior,
     description = description
   )
+}
 }
