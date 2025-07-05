@@ -3,7 +3,7 @@ package controllers
 import models.player.Player
 import models.event.{EventFactory, EventType}
 import util.RandomFunctions
-import view.ProgressQuestUI
+import view.GameUi
 import scalafx.application.Platform
 import java.util.{Timer, TimerTask}
 import scala.util.Random
@@ -90,8 +90,7 @@ object GameController {
    */
   private def updateUI(): Unit = {
     currentPlayer.foreach { player =>
-      // TODO: Update UI panels with current player data
-      ProgressQuestUI.updatePlayerInfo(player)
+      GameUi.updatePlayerInfo(player)
     }
   }
   
