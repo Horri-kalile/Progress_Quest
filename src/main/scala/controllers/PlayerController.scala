@@ -8,16 +8,16 @@ object PlayerController {
 
 
   def isAlive(player: Player): Boolean =
-    player.hp > 0
+    player.currentHp > 0
 
 
   def takeDamage(player: Player, damage: Int): Player = {
-    val newHp = (player.hp - damage).max(0)
+    val newHp = (player.currentHp - damage).max(0)
     player.copy(hp = newHp)
   }
 
   def heal(player: Player, amount: Int): Player = {
-    player.copy(hp = player.hp + amount)
+    player.copy(hp = player.currentHp + amount)
   }
 
 
@@ -64,7 +64,7 @@ object PlayerController {
     val maybeItem = player.inventory.keys.find(_.name == itemName)
     maybeItem match {
       case Some(item) => removeItem(player, item, 1)
-      case None       => player
+      case None => player
     }
   }
 
