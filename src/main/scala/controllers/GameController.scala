@@ -12,12 +12,12 @@ import scala.util.Random
  * Main Game Controller - Handles the game loop and coordinates between models and views
  */
 object GameController {
-  
+
   private var currentPlayer: Option[Player] = None
   private var gameTimer: Option[Timer] = None
   private var isGameRunning: Boolean = false
   private val eventInterval: Long = 3000 // 3 seconds between events
-  
+
   /**
    * Initialize the game with a player
    */
@@ -27,7 +27,7 @@ object GameController {
     startGameLoop()
     updateUI()
   }
-  
+
   /**
    * Stop the game loop
    */
@@ -36,13 +36,13 @@ object GameController {
     gameTimer.foreach(_.cancel())
     gameTimer = None
   }
-  
+
   /**
    * Main game loop - triggers events automatically
    */
-  private def startGameLoop(): Unit = {
+  private def startGameLoop(): Unit =
     gameTimer = Some(new Timer(true))
-    
+
     gameTimer.foreach(_.scheduleAtFixedRate(new TimerTask {
       override def run(): Unit = {
         if (isGameRunning) {
@@ -56,8 +56,7 @@ object GameController {
         }
       }
     }, eventInterval, eventInterval))
-  }
-  
+
   /**
    * Trigger a random event and update the game state
    */
@@ -65,14 +64,14 @@ object GameController {
     currentPlayer.foreach { player =>
       val eventType = Random.shuffle(EventType.values.toList).head
       val updatedPlayer = EventFactory.executeEvent(eventType, player)
-      
-      currentPlayer = Some(updatedPlayer)
-      
+
+      currentPlayer = Some(updatedPlayer._1)
+
       // Update UI on JavaFX Application Thread
       Platform.runLater(() => updateUI())
     }
   }
-  
+
   /**
    * Handle game over scenario
    */
@@ -84,7 +83,7 @@ object GameController {
       // TODO: Show restart option in UI
     })
   }
-  
+
   /**
    * Update the UI with current player state
    */
@@ -93,25 +92,24 @@ object GameController {
       GameUi.updatePlayerInfo(player)
     }
   }
-  
+
   /**
    * Get current player state
    */
   def getCurrentPlayer: Option[Player] = currentPlayer
-  
+
   /**
    * Check if game is running
    */
   def isRunning: Boolean = isGameRunning
-  
+
   /**
    * Manual event trigger for testing
    */
-  def triggerEvent(eventType: EventType): Unit = {
+  def triggerEvent(eventType: EventType): Unit =
     currentPlayer.foreach { player =>
       val updatedPlayer = EventFactory.executeEvent(eventType, player)
-      currentPlayer = Some(updatedPlayer)
+      currentPlayer = Some(updatedPlayer._1)
       updateUI()
     }
-  }
 }
