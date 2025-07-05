@@ -61,14 +61,16 @@ object CombatController {
         hp = 50 + (playerLevel * 5),
         attack = 15 + (playerLevel * 2),
         defense = 10 + playerLevel,
-        level = playerLevel,
-        
+
       ),
       behavior = models.monster.Aggressive,
       originZone = models.monster.OriginZone.Forest,
       monsterType = models.monster.MonsterType.Beast,
+      level = playerLevel,
       experienceReward= 25 + (playerLevel * 5),
-      goldReward = 10 + (playerLevel * 2)
+      goldReward = 10 + (playerLevel * 2),
+      description = "A sneaky goblin of level $playerLevel"
+
     )
   }
 }
