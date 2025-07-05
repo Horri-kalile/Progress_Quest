@@ -164,13 +164,32 @@ object GameUi:
     mouseTransparent = true
     focusTraversable = false
 
-  private def createCombatLogContent(): Node = new TextArea:
-    text = "Fought a goblin!\nTook 5 damage!\nDefeated the goblin!\nGained 10 XP!"
-    editable = false
-    prefHeight = 230
-    style = "-fx-font-family: monospace; -fx-font-size: 12; -fx-background-color: transparent"
-    mouseTransparent = true
-    focusTraversable = false
+
+  private def createCombatLogContent(): Node =
+    val combatLogArea = new TextArea:
+      text = "Fought a goblin!\nTook 5 damage!\nDefeated the goblin!\nGained 10 XP!"
+      editable = false
+      style = "-fx-font-family: monospace; -fx-font-size: 12; -fx-background-color: transparent"
+      mouseTransparent = true
+      focusTraversable = false
+
+    val monsterInfoArea = new TextArea:
+      text = "Goblin" //TODO MANAGE SHOW INFO
+      editable = false
+      style = "-fx-font-family: monospace; -fx-font-size: 12; -fx-background-color: transparent"
+      mouseTransparent = true
+      focusTraversable = false
+
+    val container = new HBox:
+      padding = Insets(5)
+      spacing = 10
+      children = Seq(combatLogArea, monsterInfoArea)
+
+    // Bind preferred widths proportionally to container width
+    combatLogArea.prefWidth <== container.width * 0.7
+    monsterInfoArea.prefWidth <== container.width * 0.3
+
+    container
 
   private def createWorldContent(player: Player): Node =
     new VBox:
