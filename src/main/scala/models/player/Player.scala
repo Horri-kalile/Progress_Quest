@@ -1,6 +1,8 @@
 package models.player
 
 import models.event.Mission
+import models.monster.OriginZone
+import models.world.World
 
 import scala.collection.immutable.HashMap
 import scala.collection.mutable
@@ -22,7 +24,8 @@ case class Player(
                    equipment: Map[EquipmentSlot, Option[Equipment]] = EquipmentSlot.values.map(_ -> None).toMap,
                    skills: List[Skill] = List.empty,
                    missions: List[Mission] = List.empty,
-                   gold: Double
+                   gold: Double,
+                   currentZone: OriginZone
                  ) extends Entity:
 
   val behavior: Behavior = BehaviorResolver.getBehavior(behaviorType)
@@ -174,5 +177,6 @@ object PlayerFactory:
       currentMp = mp,
       baseAttributes = attributes,
       behaviorType = behavior,
-      gold = gold
+      gold = gold,
+      currentZone = OriginZone.Plains
     )
