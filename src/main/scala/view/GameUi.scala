@@ -10,8 +10,10 @@ import scalafx.scene.layout.*
 import scalafx.stage.Stage
 import scalafx.stage.Screen
 import scalafx.Includes.jfxNode2sfx
+import scalafx.Includes.jfxScene2sfx
+import scalafx.Includes.jfxParent2sfx
 
-object GameUi {
+object GameUi:
 
 
   private val screenBounds = Screen.primary.visualBounds
@@ -23,70 +25,56 @@ object GameUi {
   /** Call this to open the main game UI window */
   def open(): Unit =
     val player = playerOpt.getOrElse(throw new Exception("Player not set"))
-    val stage = new Stage {
+    val stage = new Stage:
       title = "ProgressQuest"
       width = screenWidth * 0.8
       height = screenHeight * 0.8
       title = "Progress Quest"
-      scene = new Scene {
-        root = new BorderPane {
+      scene = new Scene:
+        root = new BorderPane:
           padding = Insets(15)
           style = "-fx-background-color: #e0e0e0"
 
           // Top Section: Character, Equipment, Stats
-          top = new HBox:
-            spacing = 15
-            alignment = Pos.TopLeft
-            children = Seq(
-              createPanelWithHeader("Character Player", new VBox {
-                children = createCharacterContent(player)
-              }),
-              createPanelWithHeader("Equipment", new VBox {
-                children = createEquipmentContent(player)
-              }),
-              createPanelWithHeader("Stats", new VBox {
-                children = createStatsContent(player)
-              })
+          top = createSectionRow(Seq(
+            createPanelWithHeader("Character Player", new VBox:
+              children = createCharacterContent(player)
+            ),
+            createPanelWithHeader("Equipment", new VBox:
+              children = createEquipmentContent(player)
+            ),
+            createPanelWithHeader("Stats", new VBox:
+              children = createStatsContent(player)
             )
-            children.foreach(child =>
-              HBox.setHgrow(child, Priority.Always)
-              child.maxWidth(Double.MaxValue)
-            )
-
-
+          ))
 
           // Center Section: Inventory, World, Skills, and Mission
-          center = new HBox:
-            spacing = 15
-            children = Seq(
-              createPanelWithHeader("Inventory", createInventoryContent(player)),
-              createPanelWithHeader("World", createWorldContent()),
-              createPanelWithHeader("Skills", createSkillsContent(player)),
-              createPanelWithHeader("Mission", createMissionContent())
-            )
-            children.foreach(child =>
-              HBox.setHgrow(child, Priority.Always)
-              child.maxWidth(Double.MaxValue)
-            )
+          center = createSectionRow(Seq(
+            createPanelWithHeader("Inventory", createInventoryContent(player)),
+            createPanelWithHeader("World", createWorldContent(player)),
+            createPanelWithHeader("Skills", createSkillsContent(player)),
+            createPanelWithHeader("Mission", createMissionContent(player))
+          ))
 
           // Bottom Section: Diary and Combat Log
-          bottom = new HBox:
-            spacing = 15
-            children = Seq(
-              createPanelWithHeader("Hero Diary", createDiaryContent()),
-              createPanelWithHeader("Combat Log", createCombatLogContent())
-            )
-            children.foreach(child =>
-              HBox.setHgrow(child, Priority.Always)
-              child.maxWidth(Double.MaxValue)
-            )
-        }
-      }
-    }
+          bottom = createSectionRow(Seq(
+            createPanelWithHeader("Hero Diary", createDiaryContent()),
+            createPanelWithHeader("Combat Log", createCombatLogContent())
+          ))
+
 
     stage.show()
     stageOpt = Some(stage)
 
+  private def createSectionRow(panels: Seq[Node]): HBox =
+    new HBox:
+      spacing = 15
+      alignment = Pos.TopLeft
+      children = panels
+      children.foreach { child =>
+        HBox.setHgrow(child, Priority.Always)
+        child.maxWidth(Double.MaxValue)
+      }
 
   private def createPanelWithHeader(title: String, content: Node): VBox = {
     new VBox {
@@ -201,10 +189,7 @@ object GameUi {
     focusTraversable = false
   }
 
-  private def createWorldContent(): Node = {
-    val zones = OriginZone.values.toList
-    val currentZone = zones(scala.util.Random.nextInt(zones.length))
-    val mondoInstance = new World(currentZone)
+  private def createWorldContent(player: Player): Node = {
 
     new VBox {
       spacing = 10
@@ -212,10 +197,10 @@ object GameUi {
         new Label("Current World:") {
           style = "-fx-font-weight: bold"
         },
-        new Label(currentZone.toString) {
+        new Label(player.currentZone.toString) {
           style = "-fx-font-size: 14; -fx-font-weight: bold"
         },
-        new Label(mondoInstance.getZoneDescription) {
+        new Label(World.getZoneDescription(player.currentZone)) {
           style = "-fx-font-size: 12; -fx-text-fill: #666666; -fx-wrap-text: true"
           maxWidth = 200
         }
@@ -251,7 +236,7 @@ object GameUi {
       )
 
 
-  private def createMissionContent(): Node = new VBox {
+  private def createMissionContent(player: Player): Node = new VBox:
     spacing = 5
     children = Seq(
       new Label("Current Mission:") {
@@ -269,23 +254,22 @@ object GameUi {
         style = "-fx-accent: #4CAF50"
       }
     )
-  }
 
-  private def createTableRow(label: String, value: String): HBox = new HBox {
+
+  private def createTableRow(label: String, value: String): HBox = new HBox:
     spacing = 10
     children = Seq(
-      new Label(label) {
+      new Label(label):
         style = "-fx-font-weight: bold; -fx-min-width: 80"
-      },
-      new Label(value) {
+      ,
+      new Label(value):
         style = "-fx-min-width: 120"
-      }
     )
-  }
 
-  private def createTableHeader(text: String): Label = new Label(text) {
+
+  private def createTableHeader(text: String): Label = new Label(text):
     style = "-fx-font-weight: bold; -fx-underline: true"
-  }
+
 
   /**
    * Update the UI with current player information
@@ -297,9 +281,9 @@ object GameUi {
     stageOpt.foreach { stage =>
       // Update the scene with new player data
       // The UI will automatically reflect the new data since it uses playerOpt
-      stage.scene().root = createMainScene(player).root
+      stage.scene().root = createMainScene(player).root.get()
     }
-    println(s"UI Update: ${player.identity.name} - Level ${player.level} - HP: ${player.hp}/${player.maxHp}")
+    println(s"UI Update: ${player.name} - Level ${player.level} - HP: ${player.currentHp}/${player.hp}")
   }
 
   /**
@@ -321,8 +305,8 @@ object GameUi {
   /**
    * Create game control buttons (start/stop/pause)
    */
-  def createGameControls(): Node = {
-    new HBox {
+  private def createGameControls(): Node =
+    new HBox:
       spacing = 10
       children = Seq(
         new Button("Start Game") {
@@ -346,66 +330,38 @@ object GameUi {
           }
         }
       )
-    }
-  }
+
 
   /**
    * Create the main scene (extracted for refresh functionality)
    */
-  private def createMainScene(player: Player): Scene = {
-    new Scene {
-      root = new BorderPane {
+  def createMainScene(player: Player): Scene =
+    new Scene:
+      root = new BorderPane:
         padding = Insets(15)
         style = "-fx-background-color: #e0e0e0"
 
-        // Top Section: Character, Equipment, Stats
-        top = new HBox:
-          spacing = 15
-          alignment = Pos.TopLeft
-          children = Seq(
-            createPanelWithHeader("Character Player", new VBox {
-              children = createCharacterContent(player)
-            }),
-            createPanelWithHeader("Equipment", new VBox {
-              children = createEquipmentContent(player)
-            }),
-            createPanelWithHeader("Stats", new VBox {
-              children = createStatsContent(player)
-            })
+        top = createSectionRow(Seq(
+          createPanelWithHeader("Character Player", new VBox:
+            children = createCharacterContent(player)
+          ),
+          createPanelWithHeader("Equipment", new VBox:
+            children = createEquipmentContent(player)
+          ),
+          createPanelWithHeader("Stats", new VBox:
+            children = createStatsContent(player)
           )
+        ))
 
-        // Center Section: Inventory, Mondo, Skills, and Mission
-        center = new HBox:
-          spacing = 15
-          children = Seq(
-            createPanelWithHeader("Inventory", createInventoryContent(player)),
-            createPanelWithHeader("Mondo", createMondoContent()),
-            createPanelWithHeader("Skills", createSkillsContent(player)),
-            createPanelWithHeader("Mission", createMissionContent(player))
-          )
-          children.foreach(child =>
-            HBox.setHgrow(child, Priority.Always)
-            child.maxWidth(Double.MaxValue)
-          )
+        center = createSectionRow(Seq(
+          createPanelWithHeader("Inventory", createInventoryContent(player)),
+          createPanelWithHeader("World", createWorldContent(player)),
+          createPanelWithHeader("Skills", createSkillsContent(player)),
+          createPanelWithHeader("Mission", createMissionContent(player))
+        ))
 
-        // Bottom Section: Diary, Combat Log, and Game Controls
-        bottom = new VBox {
-          spacing = 10
-          children = Seq(
-            createGameControls(),
-            new HBox:
-              spacing = 15
-              children = Seq(
-                createPanelWithHeader("Hero Diary", createDiaryContent()),
-                createPanelWithHeader("Combat Log", createCombatLogContent())
-              )
-              children.foreach(child =>
-                HBox.setHgrow(child, Priority.Always)
-                child.maxWidth(Double.MaxValue)
-              )
-          )
-        }
-      }
-    }
-  }
-}
+        bottom = createSectionRow(Seq(
+          createPanelWithHeader("Hero Diary", createDiaryContent()),
+          createPanelWithHeader("Combat Log", createCombatLogContent())
+        ))
+
