@@ -23,6 +23,9 @@ object GameUi:
   private var eventMessages: List[String] = List.empty
   private var combatMessages: List[String] = List.empty
 
+  // Hero Diary progress bar reference
+  private var heroDiaryProgressBar: Option[ProgressBar] = None
+
   /** Call this to open the main game UI window */
   def open(): Unit =
     val player = playerOpt.getOrElse(throw new Exception("Player not set"))
@@ -293,7 +296,18 @@ object GameUi:
    */
   def addEventLog(message: String): Unit =
     eventMessages = (eventMessages :+ message).takeRight(30) // Keep last 30 messages
+    
+    // Update UI first to get fresh progress bar reference
     updateCurrentUI()
+    
+    // Then animate the progress bar after a small delay
+    val animationTimer = new java.util.Timer()
+    animationTimer.schedule(new java.util.TimerTask() {
+      override def run(): Unit = {
+        animateHeroDiaryProgress()
+        animationTimer.cancel()
+      }
+    }, 100) // Small delay to ensure UI is fully updated
 
   /**
    * Update the current UI if it's open
@@ -314,6 +328,14 @@ object GameUi:
     println("GAME OVER - Show restart dialog")
 
   private def createHeroDiaryPanel(): VBox =
+    val progressBar = new ProgressBar:
+      progress = 0.0
+      prefWidth = 150
+      style = "-fx-accent:rgb(63, 147, 156)"
+    
+    // Store the progress bar reference
+    heroDiaryProgressBar = Some(progressBar)
+    
     new VBox:
       spacing = 0
       children = Seq(
@@ -326,10 +348,7 @@ object GameUi:
             new Label("Hero Diary"):
               style = "-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 14"
             ,
-            new ProgressBar:
-              progress = 0.3
-              prefWidth = 150
-              style = "-fx-accent:rgb(63, 147, 156)"
+            progressBar
           )
         ,
         new VBox:
@@ -337,4 +356,34 @@ object GameUi:
           padding = Insets(10)
           children = Seq(createDiaryContent())
       )
+
+  /**
+   * Animate the Hero Diary progress bar
+   */
+  private def animateHeroDiaryProgress(): Unit =
+    heroDiaryProgressBar.foreach { progressBar =>
+      // Reset to 0 and animate to 1.0
+      progressBar.progress = 0.0
+      
+      // Simple animation using a thread with Platform.runLater
+      val animationThread = new Thread(() => {
+        try {
+          for (i <- 0 to 10) {
+            val progress = i / 10.0
+            scalafx.application.Platform.runLater(() => {
+              progressBar.progress = progress
+            })
+            Thread.sleep(100) // 100ms delay
+          }
+          Thread.sleep(500) // Stay at 100% for 500ms
+          scalafx.application.Platform.runLater(() => {
+            progressBar.progress = 0.0 // Reset to 0
+          })
+        } catch {
+          case _: InterruptedException => // Thread was interrupted
+        }
+      })
+      animationThread.setDaemon(true)
+      animationThread.start()
+    }
 
