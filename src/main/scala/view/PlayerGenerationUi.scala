@@ -13,6 +13,12 @@ import scala.util.Random
 
 object PlayerGenerationUi extends JFXApp3:
 
+  private var onPlayerCreated: Player => Unit = _ => ()
+
+  def launch(callback: Player => Unit): Unit =
+    onPlayerCreated = callback
+    main(Array.empty)
+
   private var selectedRace: Race = Race.Human
   private var selectedClass: ClassType = ClassType.Warrior
   private var selectedBehavior: BehaviorType = BehaviorType.Aggressive
@@ -120,8 +126,7 @@ object PlayerGenerationUi extends JFXApp3:
             val player = PlayerFactory.createDefaultPlayer(playerNameLabel.text.value.trim, identity, randomAttributes, selectedBehavior)
             val finalPlayer = PlayerBonusesApplication.applyRaceAndClassBonuses(player)
             println(s"Player Created: $finalPlayer")
-            GameUi.playerOpt = Some(finalPlayer)
-            GameUi.open()
+            onPlayerCreated(finalPlayer)
             stage.close()
       )
     stage = new JFXApp3.PrimaryStage:
