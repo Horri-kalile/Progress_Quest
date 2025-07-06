@@ -86,7 +86,9 @@ object GameController {
     stopGame()
     Platform.runLater(() => {
       // Show game over screen
-      println("GAME OVER - Player has died!")
+      val gameOverMessage = "GAME OVER - Player has died!"
+      println(gameOverMessage)
+      GameUi.addEventLog(gameOverMessage)
       // TODO: Show restart option in UI
     })
   }
