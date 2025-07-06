@@ -168,7 +168,6 @@ object GameUi:
     editable = false
     prefHeight = 230
     style = "-fx-font-family: monospace; -fx-font-size: 12; -fx-background-color: transparent"
-    mouseTransparent = true
     focusTraversable = false
 
 
