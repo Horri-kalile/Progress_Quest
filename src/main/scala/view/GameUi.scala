@@ -18,7 +18,7 @@ object GameUi:
   private val screenHeight: Double = screenBounds.height
   private var stageOpt: Option[Stage] = None
   var playerOpt: Option[Player] = None
-  
+
   // Event log storage
   private var eventMessages: List[String] = List.empty
   private var combatMessages: List[String] = List.empty
@@ -241,28 +241,33 @@ object GameUi:
 
   private def createMissionContent(player: Player): Node = new VBox:
     spacing = 5
-    children = 
-      val activeMissionsCount = player.activeMissions.size
-
-      if player.activeMissions.isEmpty then Seq(
-        new Label("No missions accepted"):
-          style = "-fx-font-weight: bold"
-        ,
-        new Label("No active missions"):
-          style = "-fx-font-style: italic; -fx-text-fill: #666666"
-      ) else 
-        val mission = player.activeMissions.head
+    children =
+      if player.activeMissions.isEmpty then
         Seq(
-          new Label(s"Current Missions: $activeMissionsCount"):
+          new Label("No missions accepted"):
             style = "-fx-font-weight: bold"
-          ,
-          new Label(mission.name):
-            style = "-fx-font-size: 12; -fx-font-weight: bold"
-          ,
-          new Label(mission.description):
-            style = "-fx-font-size: 11; -fx-text-fill: #555555; -fx-wrap-text: true"
-            maxWidth = 180
         )
+      else
+        val missionLabels = player.activeMissions.map { mission =>
+          new HBox:
+            spacing = 10
+            children = Seq(
+              new Label(s"• ${mission.name}"):
+                style = "-fx-font-size: 12; -fx-font-weight: bold"
+              ,
+              new Label(mission.description):
+                style = "-fx-font-size: 11; -fx-text-fill: #555555"
+              ,
+              new Label(f"${mission.progression}/${mission.goal}"):
+                style = "-fx-font-size: 11; -fx-text-fill: #888888"
+            )
+        }
+
+        Seq(
+          new Label(s"Current Missions: ${player.activeMissions.size}"):
+            style = "-fx-font-weight: bold"
+        ) ++ missionLabels
+
 
   private def createTableRow(label: String, value: String): HBox = new HBox:
     spacing = 10
@@ -302,10 +307,10 @@ object GameUi:
    */
   def addEventLog(message: String): Unit =
     eventMessages = (eventMessages :+ message).takeRight(30) // Keep last 30 messages
-    
+
     // Update UI first to get fresh progress bar reference
     updateCurrentUI()
-    
+
     // Then animate the progress bar after a small delay
     val animationTimer = new java.util.Timer()
     animationTimer.schedule(new java.util.TimerTask() {
@@ -338,10 +343,10 @@ object GameUi:
       progress = 0.0
       prefWidth = 150
       style = "-fx-accent:rgb(63, 147, 156)"
-    
+
     // Store the progress bar reference
     heroDiaryProgressBar = Some(progressBar)
-    
+
     new VBox:
       spacing = 0
       children = Seq(
@@ -370,7 +375,7 @@ object GameUi:
     heroDiaryProgressBar.foreach { progressBar =>
       // Reset to 0 and animate to 1.0
       progressBar.progress = 0.0
-      
+
       // Simple animation using a thread with Platform.runLater
       val animationThread = new Thread(() => {
         try {
