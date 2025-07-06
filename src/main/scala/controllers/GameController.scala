@@ -63,7 +63,7 @@ object GameController {
   private def triggerRandomEvent(): Unit = {
     currentPlayer.foreach { player =>
       val eventType = RandomFunctions.getRandomEventType(player.attributes.lucky)
-      val (updatedPlayer, messages) = EventFactory.executeEvent(eventType, player)
+      val (updatedPlayer, messages, result) = EventFactory.executeEvent(eventType, player)
 
       currentPlayer = Some(updatedPlayer)
 

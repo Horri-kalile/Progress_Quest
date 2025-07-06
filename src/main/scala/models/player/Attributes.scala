@@ -4,7 +4,7 @@ import scala.annotation.targetName
 import scala.util.Random
 
 // === Attributes === TODO battle management
-/*strength -> more physical dmg, constitution -> more defence, dexterity -> probability to dodge attack, intelligence -> more magical damage, wisdom -> more exp after battle, lucky -> probability for a special event/drop rate, */
+/*strength -> more physical dmg, constitution -> more defence, dexterity -> probability to dodge attack, intelligence -> more magical damage, wisdom -> more exp after battle/event, lucky -> probability for a special event/drop rate, */
 case class Attributes(strength: Int, constitution: Int, dexterity: Int, intelligence: Int, wisdom: Int, lucky: Int):
 
   def add(other: Attributes): Attributes = this + other
@@ -23,33 +23,32 @@ case class Attributes(strength: Int, constitution: Int, dexterity: Int, intellig
 
 extension (attr: Attributes)
   def incrementRandomAttributes(): Attributes =
-    val attributes = Seq("strength", "constitution", "intelligence", "wisdom", "dexterity", "lucky")
-    val count = scala.util.Random.between(1, attributes.size + 1)
-    val selected = scala.util.Random.shuffle(attributes).take(count)
-
-    selected.foldLeft(attr):
-      case (a, "strength") => a + Attributes(1, 0, 0, 0, 0, 0)
-      case (a, "constitution") => a + Attributes(0, 1, 0, 0, 0, 0)
-      case (a, "intelligence") => a + Attributes(0, 0, 0, 1, 0, 0)
-      case (a, "wisdom") => a + Attributes(0, 0, 0, 0, 1, 0)
-      case (a, "dexterity") => a + Attributes(0, 0, 1, 0, 0, 0)
-      case (a, "lucky") => a + Attributes(0, 0, 0, 0, 0, 1)
+    Random
+      .shuffle(Attributes.attributeNames)
+      .take(Random.between(1, Attributes.attributeNames.size + 1))
+      .foldLeft(attr)(_ + Attributes.increments(_))
 
   def decrementRandomAttributes(): Attributes =
-    val attributes = Seq("strength", "constitution", "intelligence", "wisdom", "dexterity", "lucky")
-    val count = scala.util.Random.between(1, attributes.size + 1)
-    val selected = scala.util.Random.shuffle(attributes).take(count)
-
-    selected.foldLeft(attr):
-      case (a, "strength") => a + Attributes(-1, 0, 0, 0, 0, 0)
-      case (a, "constitution") => a + Attributes(0, -1, 0, 0, 0, 0)
-      case (a, "intelligence") => a + Attributes(0, 0, 0, -1, 0, 0)
-      case (a, "wisdom") => a + Attributes(0, 0, 0, 0, -1, 0)
-      case (a, "dexterity") => a + Attributes(0, 0, -1, 0, 0, 0)
-      case (a, "lucky") => a + Attributes(0, 0, 0, 0, 0, -1)
+    Random
+      .shuffle(Attributes.attributeNames)
+      .take(Random.between(1, Attributes.attributeNames.size + 1))
+      .foldLeft(attr)(_ + Attributes.decrements(_))
 
 
 object Attributes:
+  val attributeNames: Seq[String] = Seq("strength", "constitution", "intelligence", "wisdom", "dexterity", "lucky")
+
+  private def singleAttribute(name: String, value: Int): Attributes = name match
+    case "strength" => Attributes(value, 0, 0, 0, 0, 0)
+    case "constitution" => Attributes(0, value, 0, 0, 0, 0)
+    case "dexterity" => Attributes(0, 0, value, 0, 0, 0)
+    case "intelligence" => Attributes(0, 0, 0, value, 0, 0)
+    case "wisdom" => Attributes(0, 0, 0, 0, value, 0)
+    case "lucky" => Attributes(0, 0, 0, 0, 0, value)
+
+  val increments: Map[String, Attributes] = attributeNames.map(n => n -> singleAttribute(n, 1)).toMap
+  val decrements: Map[String, Attributes] = attributeNames.map(n => n -> singleAttribute(n, -1)).toMap
+
   def random(): Attributes =
     Attributes(
       strength = Random.between(5, 16),

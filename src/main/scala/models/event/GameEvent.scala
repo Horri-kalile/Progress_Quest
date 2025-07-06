@@ -19,8 +19,8 @@ case object FightEvent extends GameEvent:
     val messages = combatLog.split("\n").toList
 
     if updatedPlayer.currentHp <= 0 then
-      val (finalPlayer, endMsgs) = GameOverEvent.action(updatedPlayer)
-      (finalPlayer, messages ++ endMsgs, Some(monster))
+      val (finalPlayer, endMsgs, result) = GameOverEvent.action(updatedPlayer)
+      (finalPlayer, messages ++ endMsgs, result)
     else
       (updatedPlayer, messages, Some(monster))
 
@@ -98,13 +98,13 @@ case object SpecialEvent extends GameEvent:
           val newPlayer = (1 to change).foldLeft(player)((p, _) => p.levelUp())
           val msg = s"Blessing! You leveled up $change times."
           println(msg)
-          (newPlayer.powerUpAttributes(), List(msg), None)
+          (newPlayer, List(msg), None)
         else
           val newLevel = math.max(1, player.level - change)
-          val newPlayer = player.powerDownAttributes(newLevel)
+          val newPlayer = (1 to change).foldLeft(player)((p, _) => p.levelDown())
           val msg = s"Curse! You lost $change levels."
           println(msg)
-          (newPlayer.copy(level = newLevel, exp = 0), List(msg), None)
+          (newPlayer, List(msg), None)
 
       case 1 =>
         val eq = EquipmentFactory.generateRandomEquipment(probabilityDrop = 1.0, playerLevel = player.level)
@@ -112,13 +112,13 @@ case object SpecialEvent extends GameEvent:
         val msg2 = s"You looted a rare item: ${eq.get.name}"
         println(msg1)
         println(msg2)
-        (player.replaceEquipment(eq.get), List(msg1, msg2))
+        (player.replaceEquipment(eq.get), List(msg1, msg2), None)
 
       case 2 =>
         val msg = "You were defeated by a powerful monster. Game over!"
         println(msg)
-        val (finalPlayer, endMsgs) = GameOverEvent.action(player)
-        (finalPlayer, msg :: endMsgs)
+        val (finalPlayer, endMsgs, result) = GameOverEvent.action(player)
+        (finalPlayer, msg :: endMsgs, result)
 
       case 3 =>
         val eq = EquipmentFactory.generateRandomEquipment(probabilityDrop = 1.0, playerLevel = player.level)
@@ -126,38 +126,38 @@ case object SpecialEvent extends GameEvent:
         val msg2 = s"You found: ${eq.get.name}"
         println(msg1)
         println(msg2)
-        (player.replaceEquipment(eq.get), List(msg1, msg2))
+        (player.replaceEquipment(eq.get), List(msg1, msg2), None)
 
       case 4 =>
         val msg = "You were injured in a dungeon trap! HP and MP halved."
         println(msg)
-        (player.copy(hp = math.max(1, player.hp / 2), mp = math.max(0, player.mp / 2)), List(msg))
+        (player.copy(hp = math.max(1, player.currentHp / 2), mp = math.max(0, player.currentMp / 2)), List(msg), None)
 
       case 5 =>
-        val gain = Random.between(50, 151)
+        val gain = Random.between(50, 151) * (1 + (player.attributes.wisdom / 100))
         val msg = s"You helped villagers and gained $gain EXP."
         println(msg)
-        (player.gainExp(gain), List(msg))
+        (player.gainExp(gain), List(msg), None)
 
       case 6 =>
         val msg = "It was a trap! You were killed. Game over!"
         println(msg)
-        val (finalPlayer, endMsgs) = GameOverEvent.action(player)
-        (finalPlayer, msg :: endMsgs)
+        val (finalPlayer, endMsgs, result) = GameOverEvent.action(player)
+        (finalPlayer, msg :: endMsgs, result)
 
       case 7 =>
         val result = player.stealFromInventory()
         println(result)
-        (player, List(result))
+        (player, List(result), None)
 
 case object GameOverEvent extends GameEvent:
-  override def action(player: Player): (Player, List[String]) =
+  override def action(player: Player): (Player, List[String], Option[Monster]) =
     val msg = "GAME OVER."
     println(msg)
-    (player.copy(currentHp = 0), List(msg))
+    (player.copy(currentHp = 0), List(msg), None)
 
 object EventFactory:
-  def executeEvent(eventType: EventType, player: Player): (Player, List[String]) =
+  def executeEvent(eventType: EventType, player: Player): (Player, List[String], Option[Monster]) =
     val event: GameEvent = eventType match
       case EventType.fight => FightEvent
       case EventType.mission => MissionEvent
@@ -167,7 +167,7 @@ object EventFactory:
       case EventType.special => SpecialEvent
       case EventType.gameOver => GameOverEvent
 
-    val (updatedPlayer, messages) = event.action(player)
+    val (updatedPlayer, messages, result) = event.action(player)
     val header = s"${eventType.toString.capitalize} Event triggered:"
-    (updatedPlayer, header +: messages)
+    (updatedPlayer, header +: messages, result)
 

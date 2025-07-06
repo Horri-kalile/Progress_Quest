@@ -53,11 +53,11 @@ case class Player(
 
   def levelDown(): Player =
     this.copy(
-      level = level - 1,
+      level = (level - 1).max(1),
       exp = 0,
       currentHp = hp,
       currentMp = mp
-    ).powerUpAttributes()  
+    ).powerDownAttributes()
 
   /*TODO calcolo danno*/
   override def receiveDamage(amount: Int): Player =
