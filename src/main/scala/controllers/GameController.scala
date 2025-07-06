@@ -67,10 +67,12 @@ object GameController {
 
       currentPlayer = Some(updatedPlayer)
 
-      // Send combat messages to UI
+      // Send messages to UI
       Platform.runLater(() => {
         if (eventType == EventType.fight) {
           messages.foreach(GameUi.addCombatLog)
+        } else {
+          messages.foreach(GameUi.addEventLog)
         }
         updateUI()
       })
