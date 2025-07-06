@@ -16,7 +16,7 @@ case object FightEvent extends GameEvent:
     println(combatLog)
     val messages = combatLog.split("\n").toList
 
-    if updatedPlayer.hp <= 0 then
+    if updatedPlayer.currentHp <= 0 then
       val (finalPlayer, endMsgs) = GameOverEvent.action(updatedPlayer)
       (finalPlayer, messages ++ endMsgs)
     else
@@ -30,7 +30,7 @@ case object MissionEvent extends GameEvent:
       println(msg)
       (player.progressMission(mission), List(msg))
     else
-      val mission = MissionFactory.random()
+      val mission = MissionFactory.randomMission()
       val msg = s"You accepted a new mission: ${mission.description}"
       println(msg)
       (player.addMission(mission), List(msg))
@@ -150,7 +150,7 @@ case object GameOverEvent extends GameEvent:
   override def action(player: Player): (Player, List[String]) =
     val msg = "GAME OVER."
     println(msg)
-    (player.copy(hp = 0), List(msg))
+    (player.copy(currentHp = 0), List(msg))
 
 object EventFactory:
   def executeEvent(eventType: EventType, player: Player): (Player, List[String]) =
@@ -162,4 +162,8 @@ object EventFactory:
       case EventType.sell => SellEvent
       case EventType.special => SpecialEvent
       case EventType.gameOver => GameOverEvent
-    event.action(player)
+
+    val (updatedPlayer, messages) = event.action(player)
+    val header = s"${eventType.toString.capitalize} Event triggered:"
+    (updatedPlayer, header +: messages)
+

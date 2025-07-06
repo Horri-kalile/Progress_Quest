@@ -29,7 +29,7 @@ case class Mission(
 object MissionFactory:
   private val missions: List[MissionData] = MissionLoader.loadMissions()
 
-  def random(): Mission =
+  def randomMission(): Mission =
     val mission = Random.shuffle(missions).head
     Mission(
       id = UUID.randomUUID().toString,

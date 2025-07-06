@@ -9,7 +9,7 @@ import controllers.PlayerController
 object MissionController{
 
  def createRandomMission(): Mission = {
-    MissionFactory.random()
+    MissionFactory.randomMission()
   }
 
 
