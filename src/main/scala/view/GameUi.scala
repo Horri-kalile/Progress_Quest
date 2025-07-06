@@ -243,10 +243,9 @@ object GameUi:
     spacing = 5
     children = 
       val activeMissionsCount = player.activeMissions.size
-      val maxMissions = 3
-      
+
       if player.activeMissions.isEmpty then Seq(
-        new Label(s"Current Mission: 0/$maxMissions"):
+        new Label("No missions accepted"):
           style = "-fx-font-weight: bold"
         ,
         new Label("No active missions"):
@@ -254,7 +253,7 @@ object GameUi:
       ) else 
         val mission = player.activeMissions.head
         Seq(
-          new Label(s"Current Mission: $activeMissionsCount/$maxMissions"):
+          new Label(s"Current Missions: $activeMissionsCount"):
             style = "-fx-font-weight: bold"
           ,
           new Label(mission.name):

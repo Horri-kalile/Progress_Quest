@@ -13,11 +13,11 @@ object PlayerController {
 
   def takeDamage(player: Player, damage: Int): Player = {
     val newHp = (player.currentHp - damage).max(0)
-    player.copy(hp = newHp)
+    player.copy(currentHp = newHp)
   }
 
   def heal(player: Player, amount: Int): Player = {
-    player.copy(hp = player.currentHp + amount)
+    player.copy(currentHp = player.currentHp + amount)
   }
 
 
@@ -39,7 +39,7 @@ object PlayerController {
   }
 
 
-  def removeItem(player: Player, item: Item, quantity: Int = 1): Player = {
+  private def removeItem(player: Player, item: Item, quantity: Int = 1): Player = {
     val currentQty = player.inventory.getOrElse(item, 0) - quantity
     val updatedInventory =
       if (currentQty > 0) player.inventory.updated(item, currentQty)
