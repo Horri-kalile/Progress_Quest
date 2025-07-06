@@ -61,7 +61,7 @@ object GameUi:
       ))
 
       bottom = createSectionRow(Seq(
-        createPanelWithHeader("Hero Diary", createDiaryContent()),
+        createHeroDiaryPanel(),
         createPanelWithHeader("Combat Log", createCombatLogContent())
       ))
 
@@ -312,4 +312,29 @@ object GameUi:
   def showGameOver(): Unit =
     // TODO: Show game over dialog with restart option
     println("GAME OVER - Show restart dialog")
+
+  private def createHeroDiaryPanel(): VBox =
+    new VBox:
+      spacing = 0
+      children = Seq(
+        new HBox:
+          style = "-fx-background-color: #a9a9a9; -fx-padding: 5 10 5 10"
+          prefHeight = 30
+          alignment = Pos.CenterLeft
+          spacing = 10
+          children = Seq(
+            new Label("Hero Diary"):
+              style = "-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 14"
+            ,
+            new ProgressBar:
+              progress = 0.3
+              prefWidth = 150
+              style = "-fx-accent:rgb(63, 147, 156)"
+          )
+        ,
+        new VBox:
+          style = "-fx-background-color: white; -fx-border-color: #ccc; -fx-border-width: 0 1 1 1"
+          padding = Insets(10)
+          children = Seq(createDiaryContent())
+      )
 
