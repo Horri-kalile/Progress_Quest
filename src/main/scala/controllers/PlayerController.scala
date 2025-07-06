@@ -91,4 +91,7 @@ object PlayerController {
 
   def changeIdentity(player: Player, newIdentity: Identity): Player =
     player.copy(identity = newIdentity)
+
+  def levelDownAndDecreaseStats(player: Player, levels: Int): Player =
+    player.copy()
 }

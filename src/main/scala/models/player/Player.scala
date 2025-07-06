@@ -47,9 +47,17 @@ case class Player(
     this.copy(
       level = level + 1,
       exp = 0,
-      hp = hp,
-      mp = mp
-    )
+      currentHp = hp,
+      currentMp = mp
+    ).powerUpAttributes()
+
+  def levelDown(): Player =
+    this.copy(
+      level = level - 1,
+      exp = 0,
+      currentHp = hp,
+      currentMp = mp
+    ).powerUpAttributes()  
 
   /*TODO calcolo danno*/
   override def receiveDamage(amount: Int): Player =
@@ -157,8 +165,11 @@ case class Player(
     }
     this.copy(missions = updatedMissions)
 
-  def powerUp(): Player =
-    this.copy(baseAttributes = baseAttributes.incrementAll(1))
+  def powerUpAttributes(): Player =
+    this.copy(baseAttributes = baseAttributes.incrementRandomAttributes())
+
+  def powerDownAttributes(): Player =
+    this.copy(baseAttributes = baseAttributes.decrementRandomAttributes())
 
 object PlayerFactory:
   def createDefaultPlayer(name: String, identity: Identity, attributes: Attributes, behavior: BehaviorType): Player =

@@ -3,8 +3,8 @@ package models.player
 import scala.annotation.targetName
 import scala.util.Random
 
-// === Attributes ===
-/*strength -> more dmg, constitution -> more defence, dexterity -> probability to dodge attack, intelligence -> mana, wisdom -> how many hp restore after a fight, lucky -> probability for a special event/drop rate, */
+// === Attributes === TODO battle management
+/*strength -> more physical dmg, constitution -> more defence, dexterity -> probability to dodge attack, intelligence -> more magical damage, wisdom -> more exp after battle, lucky -> probability for a special event/drop rate, */
 case class Attributes(strength: Int, constitution: Int, dexterity: Int, intelligence: Int, wisdom: Int, lucky: Int):
 
   def add(other: Attributes): Attributes = this + other
@@ -22,15 +22,31 @@ case class Attributes(strength: Int, constitution: Int, dexterity: Int, intellig
   )
 
 extension (attr: Attributes)
-  def incrementAll(amount: Int): Attributes =
-    attr.copy(
-      strength = attr.strength + amount,
-      constitution = attr.constitution + amount,
-      intelligence = attr.intelligence + amount,
-      wisdom = attr.wisdom + amount,
-      dexterity = attr.dexterity + amount,
-      lucky = attr.lucky + amount
-    )
+  def incrementRandomAttributes(): Attributes =
+    val attributes = Seq("strength", "constitution", "intelligence", "wisdom", "dexterity", "lucky")
+    val count = scala.util.Random.between(1, attributes.size + 1)
+    val selected = scala.util.Random.shuffle(attributes).take(count)
+
+    selected.foldLeft(attr):
+      case (a, "strength") => a + Attributes(1, 0, 0, 0, 0, 0)
+      case (a, "constitution") => a + Attributes(0, 1, 0, 0, 0, 0)
+      case (a, "intelligence") => a + Attributes(0, 0, 0, 1, 0, 0)
+      case (a, "wisdom") => a + Attributes(0, 0, 0, 0, 1, 0)
+      case (a, "dexterity") => a + Attributes(0, 0, 1, 0, 0, 0)
+      case (a, "lucky") => a + Attributes(0, 0, 0, 0, 0, 1)
+
+  def decrementRandomAttributes(): Attributes =
+    val attributes = Seq("strength", "constitution", "intelligence", "wisdom", "dexterity", "lucky")
+    val count = scala.util.Random.between(1, attributes.size + 1)
+    val selected = scala.util.Random.shuffle(attributes).take(count)
+
+    selected.foldLeft(attr):
+      case (a, "strength") => a + Attributes(-1, 0, 0, 0, 0, 0)
+      case (a, "constitution") => a + Attributes(0, -1, 0, 0, 0, 0)
+      case (a, "intelligence") => a + Attributes(0, 0, 0, -1, 0, 0)
+      case (a, "wisdom") => a + Attributes(0, 0, 0, 0, -1, 0)
+      case (a, "dexterity") => a + Attributes(0, 0, -1, 0, 0, 0)
+      case (a, "lucky") => a + Attributes(0, 0, 0, 0, 0, -1)
 
 
 object Attributes:
