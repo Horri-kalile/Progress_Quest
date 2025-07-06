@@ -18,6 +18,10 @@ object GameUi:
   private val screenHeight: Double = screenBounds.height
   private var stageOpt: Option[Stage] = None
   var playerOpt: Option[Player] = None
+  
+  // Event log storage
+  private var eventMessages: List[String] = List.empty
+  private var combatMessages: List[String] = List.empty
 
   /** Call this to open the main game UI window */
   def open(): Unit =
@@ -157,7 +161,7 @@ object GameUi:
     }
 
   private def createDiaryContent(): Node = new TextArea:
-    text = "Hero entered the dungeon...\nFound a mysterious sword\nMet a friendly merchant"
+    text = if eventMessages.isEmpty then "Waiting for adventures..." else eventMessages.mkString("\n")
     editable = false
     prefHeight = 230
     style = "-fx-font-family: monospace; -fx-font-size: 12; -fx-background-color: transparent"
@@ -167,14 +171,14 @@ object GameUi:
 
   private def createCombatLogContent(): Node =
     val combatLogArea = new TextArea:
-      text = "Fought a goblin!\nTook 5 damage!\nDefeated the goblin!\nGained 10 XP!"
+      text = if combatMessages.isEmpty then "No combat yet..." else combatMessages.mkString("\n")
       editable = false
       style = "-fx-font-family: monospace; -fx-font-size: 12; -fx-background-color: transparent"
       mouseTransparent = true
       focusTraversable = false
 
     val monsterInfoArea = new TextArea:
-      text = "Goblin" //TODO MANAGE SHOW INFO
+      text = "Monster Info" //TODO MANAGE SHOW INFO
       editable = false
       style = "-fx-font-family: monospace; -fx-font-size: 12; -fx-background-color: transparent"
       mouseTransparent = true
@@ -281,8 +285,26 @@ object GameUi:
    * Add a message to the combat log
    */
   def addCombatLog(message: String): Unit =
-    // TODO: Add message to combat log panel
-    println(s"Combat Log: $message")
+    combatMessages = (combatMessages :+ message).takeRight(20) // Keep last 20 messages
+    updateCurrentUI()
+
+  /**
+   * Add a message to the event diary
+   */
+  def addEventLog(message: String): Unit =
+    eventMessages = (eventMessages :+ message).takeRight(30) // Keep last 30 messages
+    updateCurrentUI()
+
+  /**
+   * Update the current UI if it's open
+   */
+  private def updateCurrentUI(): Unit =
+    playerOpt.foreach { player =>
+      stageOpt.foreach { stage =>
+        val newRoot = createRoot(player)
+        stage.scene().root = newRoot
+      }
+    }
 
   /**
    * Show game over screen
