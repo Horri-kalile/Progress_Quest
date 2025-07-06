@@ -63,12 +63,17 @@ object GameController {
   private def triggerRandomEvent(): Unit = {
     currentPlayer.foreach { player =>
       val eventType = Random.shuffle(EventType.values.toList).head
-      val updatedPlayer = EventFactory.executeEvent(eventType, player)
+      val (updatedPlayer, messages) = EventFactory.executeEvent(eventType, player)
 
-      currentPlayer = Some(updatedPlayer._1)
+      currentPlayer = Some(updatedPlayer)
 
-      // Update UI on JavaFX Application Thread
-      Platform.runLater(() => updateUI())
+      // Send combat messages to UI
+      Platform.runLater(() => {
+        if (eventType == EventType.fight) {
+          messages.foreach(GameUi.addCombatLog)
+        }
+        updateUI()
+      })
     }
   }
 
