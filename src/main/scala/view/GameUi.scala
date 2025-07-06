@@ -242,21 +242,29 @@ object GameUi:
 
   private def createMissionContent(player: Player): Node = new VBox:
     spacing = 5
-    children = Seq(
-      new Label("Current Mission:"):
-        style = "-fx-font-weight: bold"
-      ,
-      new Label("Defeat the Dragon"):
-        style = "-fx-font-size: 12"
-      ,
-      new Label("Progress:"):
-        style = "-fx-font-weight: bold; -fx-padding: 5 0 0 0"
-      ,
-      new ProgressBar:
-        progress = 0.3
-        prefWidth = 150
-        style = "-fx-accent: #4CAF50"
-    )
+    children = 
+      val activeMissionsCount = player.activeMissions.size
+      val maxMissions = 3
+      
+      if player.activeMissions.isEmpty then Seq(
+        new Label(s"Current Mission: 0/$maxMissions"):
+          style = "-fx-font-weight: bold"
+        ,
+        new Label("No active missions"):
+          style = "-fx-font-style: italic; -fx-text-fill: #666666"
+      ) else 
+        val mission = player.activeMissions.head
+        Seq(
+          new Label(s"Current Mission: $activeMissionsCount/$maxMissions"):
+            style = "-fx-font-weight: bold"
+          ,
+          new Label(mission.name):
+            style = "-fx-font-size: 12; -fx-font-weight: bold"
+          ,
+          new Label(mission.description):
+            style = "-fx-font-size: 11; -fx-text-fill: #555555; -fx-wrap-text: true"
+            maxWidth = 180
+        )
 
   private def createTableRow(label: String, value: String): HBox = new HBox:
     spacing = 10
