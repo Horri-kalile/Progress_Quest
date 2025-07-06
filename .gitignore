@@ -11,4 +11,4 @@ out/
 .metals/
 .bloop/
 .bsp/
-
+.vscode/
