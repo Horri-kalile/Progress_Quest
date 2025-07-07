@@ -2,6 +2,7 @@ package view
 
 import models.player.{EquipmentSlot, Player, Skill, SkillEffectType}
 import models.world.World
+import models.monster.Monster
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.{Node, Scene}
 import scalafx.scene.control.*
@@ -22,6 +23,9 @@ object GameUi:
   // Event log storage
   private var eventMessages: List[String] = List.empty
   private var combatMessages: List[String] = List.empty
+  
+  // Current monster info storage
+  private var currentMonster: Option[models.monster.Monster] = None
 
   // Hero Diary progress bar reference
   private var heroDiaryProgressBar: Option[ProgressBar] = None
@@ -181,8 +185,24 @@ object GameUi:
       focusTraversable = false
 
   private def createMonsterInfoContent(): Node =
+    val monsterText = currentMonster match
+      case Some(monster) =>
+        s"""${monster.name} (Level ${monster.level})
+           |Type: ${monster.monsterType}
+           |Zone: ${monster.originZone}
+           |HP: ${monster.attributes.hp}
+           |Attack: ${monster.attributes.attack}
+           |Defense: ${monster.attributes.defense}
+           |Behavior: ${monster.behavior}
+           |Gold Reward: ${monster.goldReward}
+           |EXP Reward: ${monster.experienceReward}
+           |
+           |${monster.description}""".stripMargin
+      case None =>
+        "No monster encountered yet..."
+    
     new TextArea:
-      text = "Monster Info" //TODO MANAGE SHOW INFO
+      text = monsterText
       editable = false
       style = "-fx-font-family: monospace; -fx-font-size: 12; -fx-background-color: transparent"
       mouseTransparent = true
@@ -310,6 +330,13 @@ object GameUi:
         animationTimer.cancel()
       }
     }, 100) // Small delay to ensure UI is fully updated
+
+  /**
+   * Update the current monster info
+   */
+  def updateMonsterInfo(monster: Option[Monster]): Unit =
+    currentMonster = monster
+    updateCurrentUI()
 
   /**
    * Update the current UI if it's open
