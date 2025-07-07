@@ -38,13 +38,18 @@ jobs:
           apps: sbt
 
       - name: Run tests & coverage
-        run: sbt coverage test coverageReport
+        run: sbt clean coverage test coverageReport
 
-      - name: Check formatting
-        run: sbt scalafmtCheck
+      - name: List coverage report directory
+        run: ls -l ./target/scala-*/scoverage-report/
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
           files: ./target/scala-*/scoverage-report/scoverage.xml
           fail_ci_if_error: true
+
+      - name: Check formatting
+        run: sbt scalafmtCheck
+
+
