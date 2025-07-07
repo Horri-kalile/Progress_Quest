@@ -18,7 +18,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # Required for accessing full Git history & tags
+
+      - name: Fetch main branch
+        run: git fetch origin main:refs/remotes/origin/main
 
       - name: Check tag is from main branch
         run: |
@@ -44,13 +47,18 @@ jobs:
       - name: Package project
         run: sbt package
 
-      - name: List JAR files
-        run: ls -l target/scala-*/
+      - name: Rename JAR using Git tag
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          JAR_PATH=$(find target/scala-* -name "progressquest_*.jar")
+          cp "$JAR_PATH" "progressquest-${TAG}.jar"
+
+      - name: Confirm renamed file
+        run: ls -lh progressquest-${{ github.ref_name }}.jar
 
       - name: Upload JAR to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            target/scala-*/progressquest_*.jar
+          files: progressquest-${{ github.ref_name }}.jar
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
