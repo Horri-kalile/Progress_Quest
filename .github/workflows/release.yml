@@ -34,6 +34,11 @@ jobs:
           distribution: 'temurin'
           java-version: 21
 
+      - name: Install sbt
+        uses: coursier/setup-action@v1
+        with:
+          apps: sbt
+
       - name: Package project
         run: sbt package
 

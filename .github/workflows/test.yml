@@ -32,6 +32,11 @@ jobs:
           restore-keys: |
             sbt-${{ runner.os }}-
 
+      - name: Install sbt
+        uses: coursier/setup-action@v1
+        with:
+          apps: sbt
+
       - name: Run tests & coverage
         run: sbt coverage test coverageReport
 
