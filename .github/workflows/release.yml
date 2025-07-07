@@ -1,0 +1,46 @@
+name: Scala Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  call-tests:
+    uses: ./.github/workflows/test.yml
+
+  release:
+    needs: call-tests
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check tag is from main branch
+        run: |
+          TAG_COMMIT=$(git rev-list -n 1 ${{ github.ref_name }})
+          MAIN_COMMIT=$(git rev-parse origin/main)
+
+          if [ "$TAG_COMMIT" != "$MAIN_COMMIT" ]; then
+            echo "::error ::Release tags must point to the latest commit on 'main'"
+            exit 1
+          fi
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 21
+
+      - name: Package project
+        run: sbt package
+
+      - name: Upload JAR to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            target/scala-*/ProgressQuest*.jar  # replace as needed
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
