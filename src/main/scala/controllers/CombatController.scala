@@ -50,27 +50,20 @@ object CombatController {
   }
   
   /**
-   * Generate a random monster for player's level
+   * Generate a random monster for player's level using MonstersFactory
    */
   def getRandomMonster(playerLevel: Int): Monster = {
-    // TODO: Implement proper monster selection based on level
-    // For now, return a simple monster
-    Monster(
-      name = "Goblin",
-      attributes = models.monster.MonsterAttributes(
-        hp = 50 + (playerLevel * 5),
-        attack = 15 + (playerLevel * 2),
-        defense = 10 + playerLevel,
-
-      ),
-      behavior = models.monster.Aggressive,
-      originZone = models.monster.OriginZone.Forest,
-      monsterType = models.monster.MonsterType.Beast,
-      level = playerLevel,
-      experienceReward= 25 + (playerLevel * 5),
-      goldReward = 10 + (playerLevel * 2),
-      description = "A sneaky goblin of level $playerLevel"
-
-    )
+    // Use the factory to get a random monster from a random zone
+    val zones = models.monster.OriginZone.values
+    val randomZone = zones(Random.nextInt(zones.length))
+    
+    MonstersFactory.randomMonsterForZone(randomZone, playerLevel)
+  }
+  
+  /**
+   * Generate a random monster for player's level and zone using MonstersFactory
+   */
+  def getRandomMonsterForZone(playerLevel: Int, zone: models.monster.OriginZone): Monster = {
+    MonstersFactory.randomMonsterForZone(zone, playerLevel)
   }
 }
