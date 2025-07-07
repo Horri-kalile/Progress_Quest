@@ -44,10 +44,13 @@ jobs:
       - name: Package project
         run: sbt package
 
+      - name: List JAR files
+        run: ls -l target/scala-*/
+
       - name: Upload JAR to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            target/scala-*/ProgressQuest*.jar  # replace as needed
+            target/scala-*/progressquest_*.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
