@@ -65,7 +65,8 @@ object GameUi:
 
       bottom = createSectionRow(Seq(
         createHeroDiaryPanel(),
-        createPanelWithHeader("Combat Log", createCombatLogContent())
+        createPanelWithHeader("Combat Log", createCombatLogContent()),
+        createPanelWithHeader("Monster Info", createMonsterInfoContent())
       ))
 
   private def createSectionRow(panels: Seq[Node]): HBox =
@@ -172,30 +173,20 @@ object GameUi:
 
 
   private def createCombatLogContent(): Node =
-    val combatLogArea = new TextArea:
+    new TextArea:
       text = if combatMessages.isEmpty then "No combat yet..." else combatMessages.mkString("\n")
       editable = false
       style = "-fx-font-family: monospace; -fx-font-size: 12; -fx-background-color: transparent"
       mouseTransparent = true
       focusTraversable = false
 
-    val monsterInfoArea = new TextArea:
+  private def createMonsterInfoContent(): Node =
+    new TextArea:
       text = "Monster Info" //TODO MANAGE SHOW INFO
       editable = false
       style = "-fx-font-family: monospace; -fx-font-size: 12; -fx-background-color: transparent"
       mouseTransparent = true
       focusTraversable = false
-
-    val container = new HBox:
-      padding = Insets(5)
-      spacing = 10
-      children = Seq(combatLogArea, monsterInfoArea)
-
-    // Bind preferred widths proportionally to container width
-    combatLogArea.prefWidth <== container.width * 0.7
-    monsterInfoArea.prefWidth <== container.width * 0.3
-
-    container
 
   private def createWorldContent(player: Player): Node =
     new VBox:
