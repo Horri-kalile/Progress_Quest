@@ -1,5 +1,6 @@
 package models.event
 
+import controllers.PlayerController
 import models.monster.Monster
 import models.player.{EquipmentFactory, Item, Player}
 
@@ -42,7 +43,7 @@ case object TrainingEvent extends GameEvent:
     val exp = player.level * Random.between(1, 100)
     val msg = s"Training completed: +$exp EXP"
     println(msg)
-    (player.gainExp(exp), List(msg), None)
+    (PlayerController.gainXP(player, exp), List(msg), None)
 
 case object RestoreEvent extends GameEvent:
   override def action(player: Player): (Player, List[String], Option[Monster]) =
@@ -137,7 +138,7 @@ case object SpecialEvent extends GameEvent:
         val gain = Random.between(50, 151) * (1 + (player.attributes.wisdom / 100))
         val msg = s"You helped villagers and gained $gain EXP."
         println(msg)
-        (player.gainExp(gain), List(msg), None)
+        (PlayerController.gainXP(player, gain), List(msg), None)
 
       case 6 =>
         val msg = "It was a trap! You were killed. Game over!"

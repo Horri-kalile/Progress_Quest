@@ -6,9 +6,9 @@ import models.player.Item
 import controllers.PlayerController
 
 
-object MissionController{
+object MissionController {
 
- def createRandomMission(): Mission = {
+  def createRandomMission(): Mission = {
     MissionFactory.randomMission()
   }
 
@@ -17,14 +17,14 @@ object MissionController{
     mission.progressed()
   }
 
- 
+
   def isCompleted(mission: Mission): Boolean = {
     mission.isCompleted
   }
 
- 
+
   def completeMission(player: Player, mission: Mission): Player = {
-    var updatedPlayer = player.gainExp(mission.rewardExp)
+    var updatedPlayer = PlayerController.gainXP(player, mission.rewardExp)
 
     mission.rewardGold.foreach { gold =>
       updatedPlayer = updatedPlayer.earnGold(gold)
@@ -36,7 +36,7 @@ object MissionController{
     }
 
     updatedPlayer
-  } 
+  }
 }
 
 
