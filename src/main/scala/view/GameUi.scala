@@ -181,7 +181,6 @@ object GameUi:
       text = if combatMessages.isEmpty then "No combat yet..." else combatMessages.mkString("\n")
       editable = false
       style = "-fx-font-family: monospace; -fx-font-size: 12; -fx-background-color: transparent"
-      mouseTransparent = true
       focusTraversable = false
 
   private def createMonsterInfoContent(): Node =
