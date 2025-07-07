@@ -4,6 +4,18 @@ ThisBuild / version := "0.1.0-SNAPSHOT"
 ThisBuild / scalaVersion := "3.3.6"
 ThisBuild / fork := true
 assembly / assemblyJarName := s"${name.value}-${version.value}.jar"
+assembly / assemblyMergeStrategy := ()
+  case "reference.conf" => MergeStrategy.concat // Concatenate all reference.conf files
+  case PathList("META-INF", xs@_*) => MergeStrategy.discard // Discard all META-INF files
+  case _ => MergeStrategy.first // For all others, take the first occurrence
+}
+
+assembly / assemblyExcludedJars := {
+  val cp = (assembly / fullClasspath).value
+  cp filter { jar =>
+    jar.data.getName.contains("scoverage") // Exclude any jars related to scoverage (code coverage tool)
+  }
+}
 
 lazy val root = (project in file("."))
   .settings(
