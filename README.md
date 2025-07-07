@@ -17,5 +17,5 @@ Il progetto appartiene al genere dei zero-player game (ZPG), in cui il personagg
 [Vai alla Documentazione](https://horri-kalile.github.io/Progress_Quest/)
 
 [![CI](https://github.com/Horri-kalile/Progress_Quest/actions/workflows/test.yml/badge.svg)](https://github.com/Horri-kalile/Progress_Quest/actions/workflows/test.yml)
-[![codecov](https://codecov.io/gh/YOUR_USERNAME/YOUR_REPO/branch/main/graph/badge.svg)](https://codecov.io/gh/YOUR_USERNAME/YOUR_REPO)
+[![codecov](https://codecov.io/gh/Horri-kalile/Progress_Quest/branch/main/graph/badge.svg)](https://codecov.io/gh/Horri-kalile/Progress_Quest)
 
