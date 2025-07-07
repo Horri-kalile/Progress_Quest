@@ -7,12 +7,8 @@ ThisBuild / fork := true
 lazy val root = (project in file("."))
   .settings(
     name := "ProgressQuest",
-
-    coverageMinimum := 50,
-    coverageFailOnMinimum := false,
-
     scalafmtOnCompile := true,
-
+    coverageEnabled := true,
     libraryDependencies ++= Seq(
       "org.scalafx" %% "scalafx" % "21.0.0-R32",
       "com.typesafe.akka" %% "akka-actor-typed" % "2.8.5",
