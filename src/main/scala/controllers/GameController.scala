@@ -71,8 +71,12 @@ object GameController {
       Platform.runLater(() => {
         if (eventType == EventType.fight) {
           messages.foreach(GameUi.addCombatLog)
+          // Update monster info for fight events
+          GameUi.updateMonsterInfo(result)
         } else {
           messages.foreach(GameUi.addEventLog)
+          // Clear monster info for non-fight events
+          GameUi.updateMonsterInfo(None)
         }
         updateUI()
       })
@@ -117,8 +121,16 @@ object GameController {
    */
   def triggerEvent(eventType: EventType): Unit =
     currentPlayer.foreach { player =>
-      val updatedPlayer = EventFactory.executeEvent(eventType, player)
-      currentPlayer = Some(updatedPlayer._1)
+      val (updatedPlayer, messages, result) = EventFactory.executeEvent(eventType, player)
+      currentPlayer = Some(updatedPlayer)
+      
+      // Update monster info based on event type
+      if (eventType == EventType.fight) {
+        GameUi.updateMonsterInfo(result)
+      } else {
+        GameUi.updateMonsterInfo(None)
+      }
+      
       updateUI()
     }
 }
