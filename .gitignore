@@ -4,5 +4,5 @@
 streams/
 ProgressQuest/.bsp/
 ProgressQuest/.idea/
-ProgressQuest/project/
-ProgressQuest/target/
+project/
+target/
