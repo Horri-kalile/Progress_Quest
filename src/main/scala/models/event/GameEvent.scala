@@ -13,7 +13,7 @@ sealed trait GameEvent:
 
 case object FightEvent extends GameEvent:
   override def action(player: Player): (Player, List[String], Option[Monster]) =
-    val monster = controllers.CombatController.getRandomMonster(player.level)
+    val monster = controllers.CombatController.getRandomMonsterForZone(player.level, player.currentZone)
     val (updatedPlayer, combatLog) = controllers.CombatController.simulateFight(player, monster)
     println(combatLog)
     val messages = combatLog.split("\n").toList
