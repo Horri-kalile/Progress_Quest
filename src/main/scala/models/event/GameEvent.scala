@@ -39,7 +39,9 @@ case object MissionEvent extends GameEvent:
 
 case object TrainingEvent extends GameEvent:
   override def action(player: Player): (Player, List[String], Option[Monster]) =
-    val exp = Random.between((player.exp * 0.25).toInt, (player.exp * 0.5).toInt)
+    val minExp = math.max(1, (player.exp * 0.25).toInt)
+    val maxExp = math.max(minExp + 1, (player.exp * 0.5).toInt)
+    val exp = Random.between(minExp, maxExp)
     val msg = s"Training completed: +$exp EXP"
     println(msg)
     (player.gainExp(exp), List(msg), None)
