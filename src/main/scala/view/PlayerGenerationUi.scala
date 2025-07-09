@@ -9,6 +9,7 @@ import scalafx.scene.control.{Button, Label, TextField}
 import scalafx.scene.layout.{BorderPane, HBox, VBox}
 import scalafx.scene.paint.Color
 import scalafx.scene.paint.Color.*
+import scalafx.stage.Stage
 
 import scala.util.Random
 
@@ -19,6 +20,21 @@ object PlayerGenerationUi extends JFXApp3:
   def launch(callback: Player => Unit): Unit =
     onPlayerCreated = callback
     main(Array.empty)
+
+  /**
+   * Open player generation UI directly without using launch() - for restarts
+   */
+  def openPlayerGeneration(callback: Player => Unit): Unit =
+    onPlayerCreated = callback
+    // Reset selections to defaults
+    selectedRace = Race.Human
+    selectedClass = ClassType.Warrior
+    selectedBehavior = BehaviorType.Aggressive
+    randomAttributes = Attributes.random()
+    identity = Identity(race = selectedRace, classType = selectedClass)
+  
+    // For now, use the existing start() method
+    start()
 
   private var selectedRace: Race = Race.Human
   private var selectedClass: ClassType = ClassType.Warrior
