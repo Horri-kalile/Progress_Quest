@@ -35,6 +35,12 @@ object PlayerGenerationUi extends JFXApp3:
     // Create the UI directly with a regular Stage instead of JFXApp3.PrimaryStage
     createPlayerGenerationWindow()
 
+  private var selectedRace: Race = Race.Human
+  private var selectedClass: ClassType = ClassType.Warrior
+  private var selectedBehavior: BehaviorType = BehaviorType.Aggressive
+  private var randomAttributes: Attributes = Attributes.random()
+  private var identity: Identity = Identity(race = selectedRace, classType = selectedClass)
+
   private def createPlayerGenerationWindow(): Unit =
     val raceLabel = new Label(selectedRace.toString):
       style = "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
@@ -221,12 +227,6 @@ object PlayerGenerationUi extends JFXApp3:
           )
 
     newStage.show()
-
-  private var selectedRace: Race = Race.Human
-  private var selectedClass: ClassType = ClassType.Warrior
-  private var selectedBehavior: BehaviorType = BehaviorType.Aggressive
-  private var randomAttributes: Attributes = Attributes.random()
-  private var identity: Identity = Identity(race = selectedRace, classType = selectedClass)
 
   override def start(): Unit =
     val raceLabel = new Label(selectedRace.toString):
