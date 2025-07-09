@@ -1,6 +1,6 @@
 package models.event
 
-import controllers.PlayerController
+import controllers.{CombatController, PlayerController}
 import models.monster.Monster
 import models.player.{EquipmentFactory, Item, Player}
 
@@ -14,7 +14,7 @@ sealed trait GameEvent:
 
 case object FightEvent extends GameEvent:
   override def action(player: Player): (Player, List[String], Option[Monster]) =
-    val monster = controllers.CombatController.getRandomMonsterForZone(player.level, player.currentZone)
+    val monster = CombatController.getRandomMonsterForZone(player.level, player.attributes.lucky, player.currentZone)
     val (updatedPlayer, combatLog) = controllers.CombatController.simulateFight(player, monster)
     println(combatLog)
     val messages = combatLog.split("\n").toList
@@ -108,7 +108,7 @@ case object SpecialEvent extends GameEvent:
           (newPlayer, List(msg), None)
 
       case 1 =>
-        val eq = EquipmentFactory.generateRandomEquipment(probabilityDrop = 1.0, playerLevel = player.level)
+        val eq = EquipmentFactory.generateRandomEquipment(probabilityDrop = 1.0, player.attributes.lucky, playerLevel = player.level)
         val msg1 = "You defeated a powerful monster!"
         val msg2 = s"You looted a rare item: ${eq.get.name}"
         println(msg1)
@@ -122,7 +122,7 @@ case object SpecialEvent extends GameEvent:
         (finalPlayer, msg :: endMsgs, result)
 
       case 3 =>
-        val eq = EquipmentFactory.generateRandomEquipment(probabilityDrop = 1.0, playerLevel = player.level)
+        val eq = EquipmentFactory.generateRandomEquipment(probabilityDrop = 1.0, player.attributes.lucky, playerLevel = player.level)
         val msg1 = "You discovered a hidden dungeon and found rare equipment!"
         val msg2 = s"You found: ${eq.get.name}"
         println(msg1)

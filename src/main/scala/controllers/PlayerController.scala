@@ -10,6 +10,11 @@ object PlayerController {
   def isAlive(player: Player): Boolean =
     player.currentHp > 0
 
+  def calculatePlayerAttack(player: Player): Int =
+    // Base attack from level + equipment bonuses
+    val str = player.attributes.strength
+    val equip = player.equipment.values.flatten.map(_.statBonus.strength).sum
+    str + equip + player.level
 
   def takeDamage(player: Player, damage: Int): Player = {
     val newHp = (player.currentHp - damage).max(0)
@@ -87,4 +92,6 @@ object PlayerController {
 
   def levelDownAndDecreaseStats(player: Player, levels: Int): Player =
     player.copy()
+
+
 }

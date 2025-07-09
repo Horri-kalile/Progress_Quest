@@ -22,7 +22,7 @@ class TestModels extends AnyFunSuite:
   // TestItem
   test("randomItem should create an item with valid name, gold > 0, and valid rarity"):
     assert(itemNames.nonEmpty)
-    val item = ItemFactory.randomItem(itemNames)
+    val item = ItemFactory.randomItem(itemNames, 10)
 
     assert(itemNames.contains(item.name), "Item name should be from base list")
     assert(item.gold > 0, "Gold value should be positive")

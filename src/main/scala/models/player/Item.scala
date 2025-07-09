@@ -1,7 +1,8 @@
 package models.player
 
 import scala.util.Random
-
+import util.ItemNameLoader
+import util.GameConfig.specialBonusPerLucky
 
 enum Rarity:
   case Common, Uncommon, Rare, Epic, Legendary
@@ -11,29 +12,32 @@ case class ItemNames(items: List[String])
 case class Item(name: String, gold: Double, rarity: Rarity)
 
 object ItemFactory:
-
+  private val preFabItems: List[String] = ItemNameLoader.loadItemNames()
   private val rarityMultipliers: Map[Rarity, Double] = Map(
     Rarity.Common -> 1.0,
     Rarity.Uncommon -> 1.5,
-    Rarity.Rare -> 2.5,
-    Rarity.Epic -> 5.0,
-    Rarity.Legendary -> 10.0
+    Rarity.Rare -> 2.0,
+    Rarity.Epic -> 3.0,
+    Rarity.Legendary -> 5.0
   )
 
-  private def randomRarity(): Rarity =
+  private def randomRarity(playerLucky: Int): Rarity =
     val roll = Random.nextDouble()
-    if roll < 0.5 then Rarity.Common
-    else if roll < 0.75 then Rarity.Uncommon
-    else if roll < 0.9 then Rarity.Rare
-    else if roll < 0.98 then Rarity.Epic
-    else Rarity.Legendary
+    val bonus = specialBonusPerLucky * playerLucky
+    roll match
+      case common if common < 0.5 => Rarity.Common
+      case uncommon if uncommon < 0.80 => Rarity.Uncommon
+      case rare if rare < 0.90 + bonus => Rarity.Rare
+      case epic if epic < 0.96 + bonus => Rarity.Epic
+      case legendary if legendary < 0.96 + bonus.min(0.03) => Rarity.Legendary
 
-  private def createItem(name: String): Item =
-    val rarity = randomRarity()
+
+  private def createItem(name: String, playerLucky: Int): Item =
+    val rarity = randomRarity(playerLucky)
     val baseGold = Random.between(1, 50)
     val gold = baseGold * rarityMultipliers(rarity)
     Item(name, gold, rarity)
 
-  def randomItem(itemNames: List[String]): Item =
-    val name = itemNames(Random.nextInt(itemNames.length))
-    createItem(name)
+  def randomItem(playerLucky: Int): Item =
+    val name = preFabItems(Random.nextInt(preFabItems.length))
+    createItem(name, playerLucky)

@@ -1,19 +1,24 @@
 package controllers
 
-import models.monster._
+import models.monster.*
+import models.player.*
+import util.RandomFunctions
+
 import scala.math.max
 
 object MonsterController:
 
 
-  def isAlive(monster: Monster): Boolean = monster.attributes.hp > 0
+  def isAlive(monster: Monster): Boolean = monster.attributes.currentHp > 0
 
 
-  def takeDamage(monster: Monster, damage: Int): Monster = {
-    val newHp = max(0, monster.attributes.hp - damage)
-    monster.copy(attributes = monster.attributes.copy(hp = newHp))
-  }
+  def takeDamage(monster: Monster, damage: Int): Monster =
+    monster.receiveDamage(damage)
 
+  def attackPlayer(monster: Monster, playerLevel: Int): Int =
+    val baseDamage = monster.attributes.attack + (playerLevel * 2)
+    val bonus = if monster.berserk then (monster.attributes.hp - monster.attributes.currentHp) / 10 else 0
+    (baseDamage + bonus).max(0)
 
   def heal(monster: Monster, amount: Int): Monster = {
     monster.copy(attributes = monster.attributes.copy(hp = monster.attributes.hp + amount))
@@ -31,17 +36,19 @@ object MonsterController:
   }
 
 
-  def createMonster(
-                     name: String,
-                     level: Int,
-                     monsterType: MonsterType,
-                     originZone: OriginZone,
-                     attributes: MonsterAttributes,
-                     goldReward: Int,
-                     experienceReward: Int,
-                     behavior: MonsterBehavior,
-                     description: String
-                   ): Monster = {
+  def createMonster(player: Player,
+                    name: String,
+                    level: Int,
+                    monsterType: MonsterType,
+                    originZone: OriginZone,
+                    attributes: MonsterAttributes,
+                    goldReward: Int,
+                    experienceReward: Int,
+                    itemReward: Option[Item],
+                    equipReward: Option[Equipment],
+                    behavior: MonsterBehavior,
+                    description: String
+                   ): Monster =
 
     require(name.nonEmpty, "Monster name must not be empty")
     require(level > 0, "Level must be positive")
@@ -50,16 +57,5 @@ object MonsterController:
     require(experienceReward >= 0, "Experience reward cannot be negative")
     require(description.nonEmpty, "Description must not be empty")
 
-    Monster(
-      name = name,
-      level = level,
-      monsterType = monsterType,
-      originZone = originZone,
-      attributes = attributes,
-      goldReward = goldReward,
-      experienceReward = experienceReward,
-      behavior = behavior,
-      description = description
-    )
+    MonstersFactory.randomMonsterForZone(player.currentZone, player.level, player.attributes.lucky, RandomFunctions.tryGenerateStrongMonster())
 
-  }
