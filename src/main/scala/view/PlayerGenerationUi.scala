@@ -21,9 +21,8 @@ object PlayerGenerationUi extends JFXApp3:
     onPlayerCreated = callback
     main(Array.empty)
 
-  /**
-   * Open player generation UI directly without using launch() - for restarts
-   */
+  /** Open player generation UI directly without using launch() - for restarts
+    */
   def openPlayerGeneration(callback: Player => Unit): Unit =
     onPlayerCreated = callback
     // Reset selections to defaults
@@ -32,31 +31,25 @@ object PlayerGenerationUi extends JFXApp3:
     selectedBehavior = BehaviorType.Aggressive
     randomAttributes = Attributes.random()
     identity = Identity(race = selectedRace, classType = selectedClass)
-  
-    // For now, use the existing start() method
-    start()
 
-  private var selectedRace: Race = Race.Human
-  private var selectedClass: ClassType = ClassType.Warrior
-  private var selectedBehavior: BehaviorType = BehaviorType.Aggressive
-  private var randomAttributes: Attributes = Attributes.random()
-  private var identity: Identity = Identity(race = selectedRace, classType = selectedClass)
+    // Create the UI directly with a regular Stage instead of JFXApp3.PrimaryStage
+    createPlayerGenerationWindow()
 
-  override def start(): Unit =
+  private def createPlayerGenerationWindow(): Unit =
     val raceLabel = new Label(selectedRace.toString):
       style = "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
     val classLabel = new Label(selectedClass.toString):
       style = "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
     val behaviorLabel = new Label(selectedBehavior.toString):
       style = "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
-    
+
     val playerNameLabel = new TextField {
       promptText = "Enter your Player name"
       text = "Player"
       style = "-fx-font-size: 14px; -fx-padding: 8px; -fx-border-radius: 5px; -fx-background-radius: 5px;"
       prefWidth = 200
     }
-    
+
     val strengthLabel = new Label(s"Strength: ${randomAttributes.strength}"):
       style = "-fx-font-size: 13px; -fx-text-fill: #34495e;"
     val constitutionLabel = new Label(s"Constitution: ${randomAttributes.constitution}"):
@@ -74,17 +67,20 @@ object PlayerGenerationUi extends JFXApp3:
     val characterSection = new VBox:
       spacing = 15
       padding = Insets(20)
-      style = "-fx-background-color: white; -fx-border-color: #bdc3c7; -fx-border-width: 1px; -fx-border-radius: 8px; -fx-background-radius: 8px;"
+      style =
+        "-fx-background-color: white; -fx-border-color: #bdc3c7; -fx-border-width: 1px; -fx-border-radius: 8px; -fx-background-radius: 8px;"
       children = Seq(
         new Label("Character Creation"):
-          style = "-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
+          style =
+            "-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
         ,
         // Name
         new VBox:
           spacing = 8
           children = Seq(
             new Label("Player Name:"):
-              style = "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
+              style =
+                "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
             ,
             playerNameLabel
           )
@@ -94,7 +90,8 @@ object PlayerGenerationUi extends JFXApp3:
           spacing = 8
           children = Seq(
             new Label("Race:"):
-              style = "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
+              style =
+                "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
             ,
             new HBox:
               spacing = 10
@@ -102,7 +99,8 @@ object PlayerGenerationUi extends JFXApp3:
               children = Seq(
                 raceLabel,
                 new Button("🎲 Roll"):
-                  style = "-fx-background-color: #8B8B8B; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5 10; -fx-border-radius: 5px; -fx-background-radius: 5px;"
+                  style =
+                    "-fx-background-color: #8B8B8B; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5 10; -fx-border-radius: 5px; -fx-background-radius: 5px;"
                   onAction = _ =>
                     selectedRace = Random.shuffle(Race.values.toList).head
                     identity = Identity(race = selectedRace, classType = selectedClass)
@@ -115,7 +113,8 @@ object PlayerGenerationUi extends JFXApp3:
           spacing = 8
           children = Seq(
             new Label("Class:"):
-              style = "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
+              style =
+                "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
             ,
             new HBox:
               spacing = 10
@@ -123,7 +122,8 @@ object PlayerGenerationUi extends JFXApp3:
               children = Seq(
                 classLabel,
                 new Button("🎲 Roll"):
-                  style = "-fx-background-color: #8B8B8B; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5 10; -fx-border-radius: 5px; -fx-background-radius: 5px;"
+                  style =
+                    "-fx-background-color: #8B8B8B; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5 10; -fx-border-radius: 5px; -fx-background-radius: 5px;"
                   onAction = _ =>
                     selectedClass = Random.shuffle(ClassType.values.toList).head
                     identity = Identity(race = selectedRace, classType = selectedClass)
@@ -136,7 +136,8 @@ object PlayerGenerationUi extends JFXApp3:
           spacing = 8
           children = Seq(
             new Label("Behavior:"):
-              style = "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
+              style =
+                "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
             ,
             new HBox:
               spacing = 10
@@ -144,7 +145,8 @@ object PlayerGenerationUi extends JFXApp3:
               children = Seq(
                 behaviorLabel,
                 new Button("🎲 Roll"):
-                  style = "-fx-background-color: #8B8B8B; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5 10; -fx-border-radius: 5px; -fx-background-radius: 5px;"
+                  style =
+                    "-fx-background-color: #8B8B8B; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5 10; -fx-border-radius: 5px; -fx-background-radius: 5px;"
                   onAction = _ =>
                     selectedBehavior = Random.shuffle(BehaviorType.values.toList).head
                     behaviorLabel.text = selectedBehavior.toString
@@ -156,10 +158,12 @@ object PlayerGenerationUi extends JFXApp3:
     val attributesSection = new VBox:
       spacing = 15
       padding = Insets(20)
-      style = "-fx-background-color: white; -fx-border-color: #bdc3c7; -fx-border-width: 1px; -fx-border-radius: 8px; -fx-background-radius: 8px;"
+      style =
+        "-fx-background-color: white; -fx-border-color: #bdc3c7; -fx-border-width: 1px; -fx-border-radius: 8px; -fx-background-radius: 8px;"
       children = Seq(
         new Label("Attributes"):
-          style = "-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
+          style =
+            "-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
         ,
         new VBox:
           spacing = 8
@@ -173,7 +177,201 @@ object PlayerGenerationUi extends JFXApp3:
           )
         ,
         new Button("🎲 Roll All Attributes"):
-          style = "-fx-background-color: #8B8B8B; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 15; -fx-border-radius: 5px; -fx-background-radius: 5px; -fx-font-weight: bold;"
+          style =
+            "-fx-background-color: #8B8B8B; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 15; -fx-border-radius: 5px; -fx-background-radius: 5px; -fx-font-weight: bold;"
+          onAction = _ =>
+            randomAttributes = Attributes.random()
+            strengthLabel.text = s"Strength: ${randomAttributes.strength}"
+            constitutionLabel.text = s"Constitution: ${randomAttributes.constitution}"
+            dexterityLabel.text = s"Dexterity: ${randomAttributes.dexterity}"
+            intelligenceLabel.text = s"Intelligence: ${randomAttributes.intelligence}"
+            wisdomLabel.text = s"Wisdom: ${randomAttributes.wisdom}"
+            luckyLabel.text = s"Lucky: ${randomAttributes.lucky}"
+      )
+
+    val mainContent = new HBox:
+      spacing = 20
+      padding = Insets(20)
+      children = Seq(characterSection, attributesSection)
+
+    // Create a regular Stage (not JFXApp3.PrimaryStage)
+    val newStage = new Stage()
+    newStage.title = "Progress Quest - Player Generation"
+    newStage.width = 600
+    newStage.height = 500
+    newStage.scene = new Scene:
+      root = new BorderPane:
+        center = mainContent
+        bottom = new HBox:
+          spacing = 15
+          padding = Insets(20)
+          alignment = Pos.Center
+          style = "-fx-background-color: #ecf0f1;"
+          children = Seq(
+            new Button("✨ Create Hero"):
+              style =
+                "-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 12 25; -fx-border-radius: 8px; -fx-background-radius: 8px; -fx-font-weight: bold;"
+              onAction = _ =>
+                val player = PlayerFactory.createDefaultPlayer(playerNameLabel.text.value.trim, identity,
+                  randomAttributes, selectedBehavior)
+                val finalPlayer = PlayerBonusesApplication.applyRaceAndClassBonuses(player)
+                println(s"Player Created: $finalPlayer")
+                onPlayerCreated(finalPlayer)
+                newStage.close()
+          )
+
+    newStage.show()
+
+  private var selectedRace: Race = Race.Human
+  private var selectedClass: ClassType = ClassType.Warrior
+  private var selectedBehavior: BehaviorType = BehaviorType.Aggressive
+  private var randomAttributes: Attributes = Attributes.random()
+  private var identity: Identity = Identity(race = selectedRace, classType = selectedClass)
+
+  override def start(): Unit =
+    val raceLabel = new Label(selectedRace.toString):
+      style = "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
+    val classLabel = new Label(selectedClass.toString):
+      style = "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
+    val behaviorLabel = new Label(selectedBehavior.toString):
+      style = "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
+
+    val playerNameLabel = new TextField {
+      promptText = "Enter your Player name"
+      text = "Player"
+      style = "-fx-font-size: 14px; -fx-padding: 8px; -fx-border-radius: 5px; -fx-background-radius: 5px;"
+      prefWidth = 200
+    }
+
+    val strengthLabel = new Label(s"Strength: ${randomAttributes.strength}"):
+      style = "-fx-font-size: 13px; -fx-text-fill: #34495e;"
+    val constitutionLabel = new Label(s"Constitution: ${randomAttributes.constitution}"):
+      style = "-fx-font-size: 13px; -fx-text-fill: #34495e;"
+    val dexterityLabel = new Label(s"Dexterity: ${randomAttributes.dexterity}"):
+      style = "-fx-font-size: 13px; -fx-text-fill: #34495e;"
+    val intelligenceLabel = new Label(s"Intelligence: ${randomAttributes.intelligence}"):
+      style = "-fx-font-size: 13px; -fx-text-fill: #34495e;"
+    val wisdomLabel = new Label(s"Wisdom: ${randomAttributes.wisdom}"):
+      style = "-fx-font-size: 13px; -fx-text-fill: #34495e;"
+    val luckyLabel = new Label(s"Lucky: ${randomAttributes.lucky}"):
+      style = "-fx-font-size: 13px; -fx-text-fill: #34495e;"
+
+    // Character Section
+    val characterSection = new VBox:
+      spacing = 15
+      padding = Insets(20)
+      style =
+        "-fx-background-color: white; -fx-border-color: #bdc3c7; -fx-border-width: 1px; -fx-border-radius: 8px; -fx-background-radius: 8px;"
+      children = Seq(
+        new Label("Character Creation"):
+          style =
+            "-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
+        ,
+        // Name
+        new VBox:
+          spacing = 8
+          children = Seq(
+            new Label("Player Name:"):
+              style =
+                "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
+            ,
+            playerNameLabel
+          )
+        ,
+        // Race
+        new VBox:
+          spacing = 8
+          children = Seq(
+            new Label("Race:"):
+              style =
+                "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
+            ,
+            new HBox:
+              spacing = 10
+              alignment = Pos.CenterLeft
+              children = Seq(
+                raceLabel,
+                new Button("🎲 Roll"):
+                  style =
+                    "-fx-background-color: #8B8B8B; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5 10; -fx-border-radius: 5px; -fx-background-radius: 5px;"
+                  onAction = _ =>
+                    selectedRace = Random.shuffle(Race.values.toList).head
+                    identity = Identity(race = selectedRace, classType = selectedClass)
+                    raceLabel.text = selectedRace.toString
+              )
+          )
+        ,
+        // Class
+        new VBox:
+          spacing = 8
+          children = Seq(
+            new Label("Class:"):
+              style =
+                "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
+            ,
+            new HBox:
+              spacing = 10
+              alignment = Pos.CenterLeft
+              children = Seq(
+                classLabel,
+                new Button("🎲 Roll"):
+                  style =
+                    "-fx-background-color: #8B8B8B; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5 10; -fx-border-radius: 5px; -fx-background-radius: 5px;"
+                  onAction = _ =>
+                    selectedClass = Random.shuffle(ClassType.values.toList).head
+                    identity = Identity(race = selectedRace, classType = selectedClass)
+                    classLabel.text = selectedClass.toString
+              )
+          )
+        ,
+        // Behavior
+        new VBox:
+          spacing = 8
+          children = Seq(
+            new Label("Behavior:"):
+              style =
+                "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
+            ,
+            new HBox:
+              spacing = 10
+              alignment = Pos.CenterLeft
+              children = Seq(
+                behaviorLabel,
+                new Button("🎲 Roll"):
+                  style =
+                    "-fx-background-color: #8B8B8B; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5 10; -fx-border-radius: 5px; -fx-background-radius: 5px;"
+                  onAction = _ =>
+                    selectedBehavior = Random.shuffle(BehaviorType.values.toList).head
+                    behaviorLabel.text = selectedBehavior.toString
+              )
+          )
+      )
+
+    // Attributes Section
+    val attributesSection = new VBox:
+      spacing = 15
+      padding = Insets(20)
+      style =
+        "-fx-background-color: white; -fx-border-color: #bdc3c7; -fx-border-width: 1px; -fx-border-radius: 8px; -fx-background-radius: 8px;"
+      children = Seq(
+        new Label("Attributes"):
+          style =
+            "-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
+        ,
+        new VBox:
+          spacing = 8
+          children = Seq(
+            strengthLabel,
+            constitutionLabel,
+            dexterityLabel,
+            intelligenceLabel,
+            wisdomLabel,
+            luckyLabel
+          )
+        ,
+        new Button("🎲 Roll All Attributes"):
+          style =
+            "-fx-background-color: #8B8B8B; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 15; -fx-border-radius: 5px; -fx-background-radius: 5px; -fx-font-weight: bold;"
           onAction = _ =>
             randomAttributes = Attributes.random()
             strengthLabel.text = s"Strength: ${randomAttributes.strength}"
@@ -197,9 +395,11 @@ object PlayerGenerationUi extends JFXApp3:
       style = "-fx-background-color: #ecf0f1;"
       children = Seq(
         new Button("✨ Create Hero"):
-          style = "-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 12 25; -fx-border-radius: 8px; -fx-background-radius: 8px; -fx-font-weight: bold;"
+          style =
+            "-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 12 25; -fx-border-radius: 8px; -fx-background-radius: 8px; -fx-font-weight: bold;"
           onAction = _ =>
-            val player = PlayerFactory.createDefaultPlayer(playerNameLabel.text.value.trim, identity, randomAttributes, selectedBehavior)
+            val player = PlayerFactory.createDefaultPlayer(playerNameLabel.text.value.trim, identity, randomAttributes,
+              selectedBehavior)
             val finalPlayer = PlayerBonusesApplication.applyRaceAndClassBonuses(player)
             println(s"Player Created: $finalPlayer")
             onPlayerCreated(finalPlayer)
