@@ -3,7 +3,7 @@ package controllers
 import models.player.Player
 import models.event.{EventFactory, EventType}
 import util.RandomFunctions
-import view.GameUi
+import view.{GameUi, PlayerGenerationUi}
 import scalafx.application.Platform
 import java.util.{Timer, TimerTask}
 import scala.util.Random
@@ -89,11 +89,11 @@ object GameController {
   private def handleGameOver(): Unit = {
     stopGame()
     Platform.runLater(() => {
-      // Show game over screen
-      val gameOverMessage = "GAME OVER - Player has died!"
-      println(gameOverMessage)
-      GameUi.addEventLog(gameOverMessage)
-      // TODO: Show restart option in UI
+      GameUi.showGameOverWithRestart(() => {
+        // Close current game window
+        // Open PlayerGenerationUi again
+        PlayerGenerationUi.openPlayerGeneration(newPlayer => startGame(newPlayer))
+      })
     })
   }
 
