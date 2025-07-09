@@ -336,7 +336,55 @@ object GameUi:
   def updateMonsterInfo(monster: Option[Monster]): Unit =
     currentMonster = monster
     updateCurrentUI()
-
+  
+  def showGameOverWithRestart(onRestart: () => Unit): Unit = {
+    // Create a simple game over window with restart option
+    val gameOverStage = new Stage:
+      title = "Game Over"
+      width = 400
+      height = 200
+      
+    val gameOverScene = new Scene:
+      root = new VBox:
+        spacing = 20
+        padding = Insets(20)
+        alignment = Pos.Center
+        children = Seq(
+          new Label("Game Over!"):
+            style = "-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #d32f2f"
+          ,
+          new Label("Your hero has fallen..."):
+            style = "-fx-font-size: 16px; -fx-text-fill: #666666"
+          ,
+          new HBox:
+            spacing = 15
+            alignment = Pos.Center
+            children = Seq(
+              new Button("Restart Game"):
+                style = "-fx-background-color: #4caf50; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20"
+                onAction = _ =>
+                  gameOverStage.close()
+                  // Close current game window
+                  stageOpt.foreach(_.close())
+                  stageOpt = None
+                  playerOpt = None
+                  // Call restart callback
+                  onRestart()
+              ,
+              new Button("Exit"):
+                style = "-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20"
+                onAction = _ =>
+                  gameOverStage.close()
+                  // Close current game window
+                  stageOpt.foreach(_.close())
+                  stageOpt = None
+                  playerOpt = None
+            )
+        )
+    
+    gameOverStage.scene = gameOverScene
+    gameOverStage.show()
+  }
   /**
    * Update the current UI if it's open
    */
