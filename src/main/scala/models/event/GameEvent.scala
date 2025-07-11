@@ -166,11 +166,22 @@ case object SpecialEvent extends GameEvent:
         println(msg)
         (player.copy(hp = math.max(1, player.currentHp / 2), mp = math.max(0, player.currentMp / 2)), List(msg), None)
 
-      case 5 =>
-        val gain = Random.between(50, 151) * (1 + (player.attributes.wisdom / 100))
-        val msg = s"You helped villagers and gained $gain EXP."
-        println(msg)
-        (player.gainExp(gain), List(msg), None)
+      case 5 => // Help Villagers
+        import view.SpecialEventDialog
+        SpecialEventDialog.showVillagerHelpDialog() match
+          case Some(true) => // Player chose to help
+            val gain = Random.between(50, 151) * (1 + (player.attributes.wisdom / 100))
+            val msg = s"You helped villagers and gained $gain EXP."
+            println(msg)
+            (player.gainExp(gain), List(msg), None)
+          case Some(false) => // Player chose to ignore
+            val msg = "You ignored the villagers and continued on your way."
+            println(msg)
+            (player, List(msg), None)
+          case None => // Timed out
+            val msg = "You hesitated too long and the villagers found someone else to help them."
+            println(msg)
+            (player, List(msg), None)
 
       case 6 =>
         val msg = "It was a trap! You were killed. Game over!"
