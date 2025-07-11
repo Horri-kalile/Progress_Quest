@@ -83,6 +83,16 @@ object SpecialEventDialog:
     )
 
   /**
+   * Show theft notification
+   */
+  def showTheftDialog(): Unit =
+    showInfoDialog(
+      title = "Thieves!",
+      header = "You were robbed!",
+      content = "Sneaky thieves appeared and stole some of your items!\n\nCheck your inventory to see what's missing."
+    )
+
+  /**
    * Private helper method to show timed dialog with 5-second auto-close
    */
   private def showTimedDialog(
