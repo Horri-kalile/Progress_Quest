@@ -136,7 +136,9 @@ case object SpecialEvent extends GameEvent:
             println(msg)
             (player, List(msg), None)
 
-      case 2 =>
+      case 2 => // Powerful Monster Defeat (Game Over)
+        import view.SpecialEventDialog
+        SpecialEventDialog.showGameOverMonsterDialog()
         val msg = "You were defeated by a powerful monster. Game over!"
         println(msg)
         val (finalPlayer, endMsgs, result) = GameOverEvent.action(player)
@@ -183,7 +185,9 @@ case object SpecialEvent extends GameEvent:
             println(msg)
             (player, List(msg), None)
 
-      case 6 =>
+      case 6 => // Deadly Trap (Game Over)
+        import view.SpecialEventDialog
+        SpecialEventDialog.showGameOverTrapDialog()
         val msg = "It was a trap! You were killed. Game over!"
         println(msg)
         val (finalPlayer, endMsgs, result) = GameOverEvent.action(player)
