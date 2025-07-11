@@ -33,7 +33,15 @@ object SpecialEventDialog:
       yesText = "Fight",
       noText = "Flee"
     )
-  
+    
+  def showHiddenDungeonDialog(): Option[Boolean] =
+  showTimedDialog(
+    title = "Hidden Dungeon", 
+    header = "You discovered a hidden dungeon!",
+    content = "Do you want to explore it?\n(Might contain rare equipment or traps!)",
+    yesText = "Explore",
+    noText = "Leave"
+  )
   /**
    * Private helper method to show timed dialog with 5-second auto-close
    */
