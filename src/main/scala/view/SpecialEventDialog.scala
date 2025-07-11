@@ -20,6 +20,19 @@ object SpecialEventDialog:
       yesText = "Pray",
       noText = "Ignore"
     )
+
+  /**
+   * Show powerful monster dialog with 5-second auto-flee timer
+   * @return Some(true) if player chooses to fight, Some(false) if flee, None if timeout
+   */
+  def showPowerfulMonsterDialog(): Option[Boolean] =
+    showTimedDialog(
+      title = "Powerful Monster",
+      header = "A powerful monster blocks your path!",
+      content = "Do you want to fight it?\n(High risk, but might drop rare equipment!)",
+      yesText = "Fight",
+      noText = "Flee"
+    )
   
   /**
    * Private helper method to show timed dialog with 5-second auto-close
