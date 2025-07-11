@@ -5,6 +5,7 @@ import scalafx.scene.control.{Alert, ButtonType}
 import scalafx.scene.control.ButtonBar.ButtonData
 import scalafx.application.Platform
 import java.util.{Timer, TimerTask}
+import java.util.concurrent.CountDownLatch
 
 object SpecialEventDialog:
   
@@ -61,28 +62,45 @@ object SpecialEventDialog:
     yesText: String,
     noText: String
   ): Option[Boolean] =
-    val dialog = new Alert(AlertType.Confirmation)
+  
+    // Use a blocking approach to wait for dialog result
+    @volatile var dialogResult: Option[Boolean] = null
+    val latch = new java.util.concurrent.CountDownLatch(1)
     
-    // Set properties after creation to avoid ambiguity
-    dialog.title = title
-    dialog.headerText = header
-    dialog.contentText = s"$content\n\n⏰ Auto-ignore in 5 seconds..."
+    // Execute dialog on JavaFX Application Thread
+    Platform.runLater { () =>
+      try {
+        val dialog = new Alert(AlertType.Confirmation)
+        
+        // Set properties after creation to avoid ambiguity
+        dialog.title = title
+        dialog.headerText = header
+        dialog.contentText = s"$content\n\n⏰ Auto-ignore in 5 seconds..."
 
-    val yesButton = new ButtonType(yesText, ButtonData.Yes)
-    val noButton = new ButtonType(noText, ButtonData.No)
-    dialog.buttonTypes = Seq(yesButton, noButton)
+        val yesButton = new ButtonType(yesText, ButtonData.Yes)
+        val noButton = new ButtonType(noText, ButtonData.No)
+        dialog.buttonTypes = Seq(yesButton, noButton)
 
-    // 5-second timer for auto-close
-    val timer = new Timer()
-    timer.schedule(new TimerTask {
-        def run(): Unit = Platform.runLater(() => dialog.close())
-      }, 5000)
+        // 5-second timer for auto-close
+        val timer = new Timer()
+        timer.schedule(new TimerTask {
+            def run(): Unit = Platform.runLater(() => dialog.close())
+          }, 5000)
 
-    val result = dialog.showAndWait()
-    timer.cancel() // Cancel timer if user made a choice
+        val result = dialog.showAndWait()
+        timer.cancel() // Cancel timer if user made a choice
 
-    result match
-      case Some(`yesButton`) => Some(true)  // Player chose "yes" action
-      case Some(`noButton`) => Some(false)  // Player chose "no" action
-      case Some(_) => None                  // Any other button = treat as timeout
-      case None => None                     // Timed out = auto-ignore
+        dialogResult = result match
+          case Some(`yesButton`) => Some(true) // Player chose "yes" action
+          case Some(`noButton`) => Some(false) // Player chose "no" action
+          case Some(_) => None // Any other button = treat as timeout
+          case None => None // Timed out = auto-ignore
+          
+      } finally {
+        latch.countDown() // Signal that dialog is done
+      }
+    }
+    
+    // Wait for dialog to complete (blocks the Timer thread)
+    latch.await()
+    dialogResult
