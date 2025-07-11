@@ -195,7 +195,9 @@ case object SpecialEvent extends GameEvent:
         val (finalPlayer, endMsgs, result) = GameOverEvent.action(player)
         (finalPlayer, msg :: endMsgs, result)
 
-      case 7 =>
+      case 7 => // Theft
+        import view.SpecialEventDialog
+        SpecialEventDialog.showTheftDialog()
         val result = player.stealFromInventory()
         println(result)
         (player, List(result), None)
