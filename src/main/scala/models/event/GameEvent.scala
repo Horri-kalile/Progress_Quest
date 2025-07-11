@@ -94,19 +94,28 @@ case object SellEvent extends GameEvent:
 case object SpecialEvent extends GameEvent:
   override def action(player: Player): (Player, List[String], Option[Monster]) =
     Random.nextInt(8) match
-      case 0 =>
-        val change = Random.between(1, 4)
-        if Random.nextBoolean() then
-          val newPlayer = (1 to change).foldLeft(player)((p, _) => p.levelUp())
-          val msg = s"Blessing! You leveled up $change times."
-          println(msg)
-          (newPlayer, List(msg), None)
-        else
-          val newLevel = math.max(1, player.level - change)
-          val newPlayer = (1 to change).foldLeft(player)((p, _) => p.levelDown())
-          val msg = s"Curse! You lost $change levels."
-          println(msg)
-          (newPlayer, List(msg), None)
+      case 0 => // Blessing/Curse
+        import view.SpecialEventDialog
+        SpecialEventDialog.showBlessingCurseDialog() match
+          case Some(true) => // Player chose to pray
+            val change = Random.between(1, 4)
+            if Random.nextBoolean() then
+              val newPlayer = (1 to change).foldLeft(player)((p, _) => p.levelUp())
+              val msg = s"Blessing! You leveled up $change times."
+              println(msg)
+              (newPlayer, List(msg), None)
+            else
+              val newLevel = math.max(1, player.level - change)
+              val newPlayer = (1 to change).foldLeft(player)((p, _) => p.levelDown())
+              val msg = s"Curse! You lost $change levels."
+              println(msg)
+              (newPlayer, List(msg), None)
+          case Some(false) => // Player chose to ignore
+            val msg = "You ignored the shrine and continued on your path."
+            (player, List(msg), None)
+          case None => // Timed out
+            val msg = "You hesitated too long and the shrine vanished. You continued on your path."
+            (player, List(msg), None)
 
       case 1 =>
         val eq = EquipmentFactory.generateRandomEquipment(probabilityDrop = 1.0, playerLevel = player.level)
