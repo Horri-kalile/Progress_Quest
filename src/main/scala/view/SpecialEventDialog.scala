@@ -55,32 +55,34 @@ object SpecialEventDialog:
    * Private helper method to show timed dialog with 5-second auto-close
    */
   private def showTimedDialog(
-    title: String, 
-    header: String, 
-    content: String, 
-    yesText: String, 
+    title: String,
+    header: String,
+    content: String,
+    yesText: String,
     noText: String
   ): Option[Boolean] =
-    val dialog = new Alert(AlertType.Confirmation):
-      this.title = title
-      headerText = header
-      contentText = s"$content\n\n⏰ Auto-ignore in 5 seconds..."
-      
-    val yesButton = new ButtonType(yesText, ButtonData.YesButton)
-    val noButton = new ButtonType(noText, ButtonData.NoButton)
-    dialog.buttonTypes = Seq(yesButton, noButton)
+    val dialog = new Alert(AlertType.Confirmation)
     
+    // Set properties after creation to avoid ambiguity
+    dialog.title = title
+    dialog.headerText = header
+    dialog.contentText = s"$content\n\n⏰ Auto-ignore in 5 seconds..."
+
+    val yesButton = new ButtonType(yesText, ButtonData.Yes)
+    val noButton = new ButtonType(noText, ButtonData.No)
+    dialog.buttonTypes = Seq(yesButton, noButton)
+
     // 5-second timer for auto-close
     val timer = new Timer()
     timer.schedule(new TimerTask {
-      def run(): Unit = Platform.runLater(() => dialog.close())
-    }, 5000)
-    
+        def run(): Unit = Platform.runLater(() => dialog.close())
+      }, 5000)
+
     val result = dialog.showAndWait()
     timer.cancel() // Cancel timer if user made a choice
-    
-    result match
-      case Some(`yesButton`) => Some(true)   // Player chose "yes" action
-      case Some(`noButton`) => Some(false)   // Player chose "no" action  
-      case None => None                      // Timed out = auto-ignore
 
+    result match
+      case Some(`yesButton`) => Some(true)  // Player chose "yes" action
+      case Some(`noButton`) => Some(false)  // Player chose "no" action
+      case Some(_) => None                  // Any other button = treat as timeout
+      case None => None                     // Timed out = auto-ignore
