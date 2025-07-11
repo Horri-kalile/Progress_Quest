@@ -73,6 +73,16 @@ object SpecialEventDialog:
     )
 
   /**
+   * Show dungeon trap notification
+   */
+  def showDungeonTrapDialog(): Unit =
+    showInfoDialog(
+      title = "Dungeon Trap!",
+      header = "You triggered a dangerous trap!",
+      content = "You stepped on a hidden pressure plate!\n\nYour HP and MP have been halved!"
+    )
+
+  /**
    * Private helper method to show timed dialog with 5-second auto-close
    */
   private def showTimedDialog(
