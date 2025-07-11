@@ -117,13 +117,24 @@ case object SpecialEvent extends GameEvent:
             val msg = "You hesitated too long and the shrine vanished. You continued on your path."
             (player, List(msg), None)
 
-      case 1 =>
-        val eq = EquipmentFactory.generateRandomEquipment(probabilityDrop = 1.0, playerLevel = player.level)
-        val msg1 = "You defeated a powerful monster!"
-        val msg2 = s"You looted a rare item: ${eq.get.name}"
-        println(msg1)
-        println(msg2)
-        (player.replaceEquipment(eq.get), List(msg1, msg2), None)
+      case 1 => // Powerful Monster
+        import view.SpecialEventDialog
+        SpecialEventDialog.showPowerfulMonsterDialog() match
+          case Some(true) => // Player chose to fight
+            val eq = EquipmentFactory.generateRandomEquipment(probabilityDrop = 1.0, playerLevel = player.level)
+            val msg1 = "You defeated a powerful monster!"
+            val msg2 = s"You looted a rare item: ${eq.get.name}"
+            println(msg1)
+            println(msg2)
+            (player.replaceEquipment(eq.get), List(msg1, msg2), None)
+          case Some(false) => // Player chose to flee
+            val msg = "You fled from the powerful monster and continued safely."
+            println(msg)
+            (player, List(msg), None)
+          case None => // Timed out
+            val msg = "You hesitated too long! The monster attacked, but you managed to escape."
+            println(msg)
+            (player, List(msg), None)
 
       case 2 =>
         val msg = "You were defeated by a powerful monster. Game over!"
