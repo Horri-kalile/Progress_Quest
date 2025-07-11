@@ -163,7 +163,9 @@ case object SpecialEvent extends GameEvent:
             println(msg)
             (player, List(msg), None)
 
-      case 4 =>
+      case 4 => // Dungeon Trap
+        import view.SpecialEventDialog
+        SpecialEventDialog.showDungeonTrapDialog()
         val msg = "You were injured in a dungeon trap! HP and MP halved."
         println(msg)
         (player.copy(hp = math.max(1, player.currentHp / 2), mp = math.max(0, player.currentMp / 2)), List(msg), None)
