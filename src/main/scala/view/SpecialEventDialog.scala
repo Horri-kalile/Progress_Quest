@@ -156,7 +156,7 @@ object SpecialEventDialog:
       dialog.headerText = header
       dialog.contentText = content
       
-      val okButton = new ButtonType("OK", ButtonData.OkDone)
+      val okButton = new ButtonType("OK", ButtonData.OKDone)
       dialog.buttonTypes = Seq(okButton)
       
       dialog.showAndWait()
