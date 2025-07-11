@@ -33,15 +33,24 @@ object SpecialEventDialog:
       yesText = "Fight",
       noText = "Flee"
     )
-    
+
   def showHiddenDungeonDialog(): Option[Boolean] =
-  showTimedDialog(
-    title = "Hidden Dungeon", 
-    header = "You discovered a hidden dungeon!",
-    content = "Do you want to explore it?\n(Might contain rare equipment or traps!)",
-    yesText = "Explore",
-    noText = "Leave"
-  )
+    showTimedDialog(
+      title = "Hidden Dungeon", 
+      header = "You discovered a hidden dungeon!",
+      content = "Do you want to explore it?\n(Might contain rare equipment or traps!)",
+      yesText = "Explore",
+      noText = "Leave"
+    )
+  
+  def showVillagerHelpDialog(): Option[Boolean] =
+    showTimedDialog(
+      title = "Villagers in Need",
+      header = "You encounter villagers who need help!",
+      content = "Do you want to help them?\n(May reward experience based on your wisdom!)",
+      yesText = "Help",
+      noText = "Ignore"
+    )
   /**
    * Private helper method to show timed dialog with 5-second auto-close
    */
