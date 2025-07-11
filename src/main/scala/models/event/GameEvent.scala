@@ -142,13 +142,24 @@ case object SpecialEvent extends GameEvent:
         val (finalPlayer, endMsgs, result) = GameOverEvent.action(player)
         (finalPlayer, msg :: endMsgs, result)
 
-      case 3 =>
-        val eq = EquipmentFactory.generateRandomEquipment(probabilityDrop = 1.0, playerLevel = player.level)
-        val msg1 = "You discovered a hidden dungeon and found rare equipment!"
-        val msg2 = s"You found: ${eq.get.name}"
-        println(msg1)
-        println(msg2)
-        (player.replaceEquipment(eq.get), List(msg1, msg2), None)
+      case 3 => // Hidden Dungeon
+        import view.SpecialEventDialog
+        SpecialEventDialog.showHiddenDungeonDialog() match
+          case Some(true) => // Player chose to explore
+            val eq = EquipmentFactory.generateRandomEquipment(probabilityDrop = 1.0, playerLevel = player.level)
+            val msg1 = "You discovered a hidden dungeon and found rare equipment!"
+            val msg2 = s"You found: ${eq.get.name}"
+            println(msg1)
+            println(msg2)
+            (player.replaceEquipment(eq.get), List(msg1, msg2), None)
+          case Some(false) => // Player chose to leave
+            val msg = "You decided not to explore the dangerous dungeon and continued safely."
+            println(msg)
+            (player, List(msg), None)
+          case None => // Timed out
+            val msg = "You hesitated too long and the dungeon entrance collapsed. You continued on your path."
+            println(msg)
+            (player, List(msg), None)
 
       case 4 =>
         val msg = "You were injured in a dungeon trap! HP and MP halved."
