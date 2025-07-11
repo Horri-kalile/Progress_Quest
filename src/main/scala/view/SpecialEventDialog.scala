@@ -53,6 +53,26 @@ object SpecialEventDialog:
       noText = "Ignore"
     )
   /**
+   * Show game over notification for powerful monster defeat
+   */
+  def showGameOverMonsterDialog(): Unit =
+    showInfoDialog(
+      title = "Defeated!",
+      header = "💀 You were defeated by a powerful monster!",
+      content = "The powerful monster was too strong for you.\n\nGame Over!"
+    )
+
+  /**
+   * Show game over notification for trap
+   */
+  def showGameOverTrapDialog(): Unit =
+    showInfoDialog(
+      title = "Deadly Trap!",
+      header = "💀 It was a trap!",
+      content = "You fell into a deadly trap and were killed!\n\nGame Over!"
+    )
+
+  /**
    * Private helper method to show timed dialog with 5-second auto-close
    */
   private def showTimedDialog(
@@ -104,3 +124,20 @@ object SpecialEventDialog:
     // Wait for dialog to complete (blocks the Timer thread)
     latch.await()
     dialogResult
+
+  /**
+   * Private helper method to show info-only dialog (no choices)
+   */
+  private def showInfoDialog(title: String, header: String, content: String): Unit =
+    Platform.runLater { () =>
+      val dialog = new Alert(AlertType.Information)
+      
+      dialog.title = title
+      dialog.headerText = header
+      dialog.contentText = content
+      
+      val okButton = new ButtonType("OK", ButtonData.OkDone)
+      dialog.buttonTypes = Seq(okButton)
+      
+      dialog.showAndWait()
+    }
