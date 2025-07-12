@@ -8,9 +8,7 @@ import scala.math.max
 
 object MonsterController:
 
-
   def isAlive(monster: Monster): Boolean = monster.attributes.currentHp > 0
-
 
   def takeDamage(monster: Monster, damage: Int): (Monster, Option[Int]) =
     monster.takeDamage(damage)
@@ -28,11 +26,21 @@ object MonsterController:
     s"${monster.name} (Level ${monster.level}) - ${monster.monsterType} from ${monster.originZone}: ${monster.description}"
   }
 
+  def getEquipReward(monster: Monster): Option[Equipment] =
+    monster.equipReward
 
-  def applyBehavior(monster: Monster): Monster = {
+  def getItemReward(monster: Monster): Option[Item] =
+    monster.itemReward
+
+  def getExpReward(monster: Monster): Int =
+    monster.experienceReward
+
+  def getGoldReward(monster: Monster): Int =
+    monster.goldReward
+
+  def applyBehavior(monster: Monster): Monster =
     monster.behavior.apply(monster)
     monster
-  }
 
 
   def createMonster(player: Player,

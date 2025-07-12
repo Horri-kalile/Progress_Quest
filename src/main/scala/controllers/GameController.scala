@@ -86,8 +86,8 @@ object GameController {
           val finalMonster = fightSteps.lastOption.flatMap(_._2)
 
           // Post-fight check: game over or other events
-          // val (_, postFightMessages, _) = EventFactory.executeEvent(EventType.fight, finalPlayer)
-          // val postFightSteps = postFightMessages.map(msg => (finalPlayer, finalMonster, msg))
+         // val (_, postFightMessages, _) = EventFactory.executeEvent(EventType.fight, finalPlayer)
+         // val postFightSteps = postFightMessages.map(msg => (finalPlayer, finalMonster, msg))
 
           showFightStepsSequentially(fightSteps, finalPlayer)
 

@@ -4,7 +4,7 @@ import models.event.Mission
 import models.player.*
 
 
-object PlayerController {
+object PlayerController:
 
 
   def isAlive(player: Player): Boolean =
@@ -88,4 +88,3 @@ object PlayerController {
     player.copy()
 
 
-}

@@ -12,6 +12,12 @@ import scala.util.Random
  * TODO: This needs to be implemented to complete the FightEvent
  */
 object CombatController:
+  private var _lastMonster: Option[Monster] = None
+
+  def lastMonster: Option[Monster] = _lastMonster
+
+  def setLastMonster(monster: Monster): Unit =
+    _lastMonster = Some(monster)
 
   /**
    * Simulate a fight between player and monster

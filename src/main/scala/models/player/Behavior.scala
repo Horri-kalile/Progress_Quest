@@ -64,7 +64,7 @@ object InvulnerableOnce extends Behavior:
     else
       damage
 
-// OneShotChance could instant kill monster
+// OneShotChance could instantly kill monster
 object OneShotChance extends Behavior:
   override def onBattleDamage(player: Player, damage: Int): Int =
     if Random.nextBoolean() then 9999999 else damage
