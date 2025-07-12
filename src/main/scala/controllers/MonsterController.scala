@@ -12,17 +12,16 @@ object MonsterController:
   def isAlive(monster: Monster): Boolean = monster.attributes.currentHp > 0
 
 
-  def takeDamage(monster: Monster, damage: Int): Monster =
-    monster.receiveDamage(damage)
+  def takeDamage(monster: Monster, damage: Int): (Monster, Option[Int]) =
+    monster.takeDamage(damage)
 
   def attackPlayer(monster: Monster, playerLevel: Int): Int =
     val baseDamage = monster.attributes.attack + (playerLevel * 2)
     val bonus = if monster.berserk then (monster.attributes.hp - monster.attributes.currentHp) / 10 else 0
     (baseDamage + bonus).max(0)
 
-  def heal(monster: Monster, amount: Int): Monster = {
+  def heal(monster: Monster, amount: Int): Monster =
     monster.copy(attributes = monster.attributes.copy(hp = monster.attributes.hp + amount))
-  }
 
 
   def describe(monster: Monster): String = {

@@ -14,16 +14,11 @@ sealed trait GameEvent:
 
 case object FightEvent extends GameEvent:
   override def action(player: Player): (Player, List[String], Option[Monster]) =
-    val monster = CombatController.getRandomMonsterForZone(player.level, player.attributes.lucky, player.currentZone)
-    val (updatedPlayer, combatLog) = controllers.CombatController.simulateFight(player, monster)
-    println(combatLog)
-    val messages = combatLog.split("\n").toList
-
-    if updatedPlayer.currentHp <= 0 then
-      val (finalPlayer, endMsgs, result) = GameOverEvent.action(updatedPlayer)
-      (finalPlayer, messages ++ endMsgs, result)
+    if !PlayerController.isAlive(player) then
+      val (gameOverPlayer, gameOverMessages, result) = GameOverEvent.action(player)
+      (gameOverPlayer, gameOverMessages, result)
     else
-      (updatedPlayer, messages, Some(monster))
+      (player, List("You have won!"), None)
 
 case object MissionEvent extends GameEvent:
   override def action(player: Player): (Player, List[String], Option[Monster]) =
@@ -132,10 +127,10 @@ case object SpecialEvent extends GameEvent:
       case 4 =>
         val msg = "You were injured in a dungeon trap! HP and MP halved."
         println(msg)
-        (player.copy(hp = math.max(1, player.currentHp / 2), mp = math.max(0, player.currentMp / 2)), List(msg), None)
+        (player.copy(currentHp = math.max(1, player.currentHp / 2), currentMp = math.max(0, player.currentMp / 2)), List(msg), None)
 
       case 5 =>
-        val gain = Random.between(50, 151) * (1 + (player.attributes.wisdom / 100))
+        val gain = Random.between(50, 151) + (player.level * player.attributes.wisdom)
         val msg = s"You helped villagers and gained $gain EXP."
         println(msg)
         (PlayerController.gainXP(player, gain), List(msg), None)

@@ -23,9 +23,9 @@ object GameUi:
   // Event log storage
   private var eventMessages: List[String] = List.empty
   private var combatMessages: List[String] = List.empty
-  
+
   // Current monster info storage
-  private var currentMonster: Option[models.monster.Monster] = None
+  private var currentMonster: Option[Monster] = None
 
   // Hero Diary progress bar reference
   private var heroDiaryProgressBar: Option[ProgressBar] = None
@@ -64,13 +64,16 @@ object GameUi:
         createPanelWithHeader("Inventory", createInventoryContent(player)),
         createPanelWithHeader("World", createWorldContent(player)),
         createPanelWithHeader("Skills", createSkillsContent(player)),
-        createPanelWithHeader("Mission", createMissionContent(player))
+        createPanelWithHeader("Mission", createMissionContent(player)),
+
       ))
 
       bottom = createSectionRow(Seq(
         createHeroDiaryPanel(),
         createPanelWithHeader("Combat Log", createCombatLogContent()),
-        createPanelWithHeader("Monster Info", createMonsterInfoContent())
+        createPanelWithHeader("Monster Info", new VBox:
+          children = createMonsterInfoContent()
+        )
       ))
 
   private def createSectionRow(panels: Seq[Node]): HBox =
@@ -183,29 +186,40 @@ object GameUi:
       style = "-fx-font-family: monospace; -fx-font-size: 12; -fx-background-color: transparent"
       focusTraversable = false
 
-  private def createMonsterInfoContent(): Node =
-    val monsterText = currentMonster match
+  private def createMonsterInfoContent(): Seq[Node] =
+    currentMonster match
       case Some(monster) =>
-        s"""${monster.name} (Level ${monster.level})
-           |Type: ${monster.monsterType}
-           |Zone: ${monster.originZone}
-           |HP: ${monster.attributes.hp}
-           |Attack: ${monster.attributes.attack}
-           |Defense: ${monster.attributes.defense}
-           |Behavior: ${monster.behavior}
-           |Gold Reward: ${monster.goldReward}
-           |EXP Reward: ${monster.experienceReward}
-           |
-           |${monster.description}""".stripMargin
+        val hpLabel = new Label(s"HP: ${monster.attributes.currentHp}/${monster.attributes.hp}")
+        val hpBar = new ProgressBar:
+          progress = monster.attributes.currentHp.toDouble / monster.attributes.hp
+          prefWidth = 150
+          style = "-fx-accent: #4682b4"
+
+        val infoGrid = new GridPane:
+          hgap = 8
+          vgap = 4
+
+          add(new Label(s"${monster.name} (Level ${monster.level})"), 0, 0)
+          add(new Label(s"Type: ${monster.monsterType}"), 0, 1)
+          add(new Label(s"Zone: ${monster.originZone}"), 0, 2)
+
+          add(hpLabel, 0, 3)
+          add(hpBar, 1, 3)
+
+          add(new Label(s"Attack: ${monster.attributes.attack}"), 0, 4)
+          add(new Label(s"Defense: ${monster.attributes.defense}"), 0, 5)
+          add(new Label(s"Behavior: ${monster.behavior}"), 0, 6)
+          add(new Label(s"Gold Reward: ${monster.goldReward}"), 0, 7)
+          add(new Label(s"EXP Reward: ${monster.experienceReward}"), 0, 8)
+          add(new Label(s"Item Reward: ${monster.itemReward}"), 0, 9)
+          add(new Label(s"Equipment Reward: ${monster.equipReward}"), 0, 10)
+          add(new Label(monster.description), 0, 11, 2, 1) // span 2 columns
+
+        Seq(infoGrid)
+
       case None =>
-        "No monster encountered yet..."
-    
-    new TextArea:
-      text = monsterText
-      editable = false
-      style = "-fx-font-family: monospace; -fx-font-size: 12; -fx-background-color: transparent"
-      mouseTransparent = true
-      focusTraversable = false
+        Seq(new Label("No monster encountered yet..."))
+
 
   private def createWorldContent(player: Player): Node =
     new VBox:

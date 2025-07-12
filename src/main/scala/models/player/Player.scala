@@ -67,14 +67,6 @@ case class Player(
     case a if mp >= skill.manaCost => this.copy(mp = mp - skill.manaCost); true
     case _ => false
 
-  def equip(item: Equipment): Player =
-    val updated = equipment.updated(item.slot, Some(item))
-    this.copy(equipment = updated)
-
-  def unequip(slot: EquipmentSlot): Player =
-    val updated = equipment.updated(slot, None)
-    this.copy(equipment = updated)
-
   def learnSkill(skill: Skill): Player =
     if skills.exists(_.name == skill.name) then this
     else this.copy(skills = skill :: skills)

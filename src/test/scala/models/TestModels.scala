@@ -22,7 +22,7 @@ class TestModels extends AnyFunSuite:
   // TestItem
   test("randomItem should create an item with valid name, gold > 0, and valid rarity"):
     assert(itemNames.nonEmpty)
-    val item = ItemFactory.randomItem(itemNames, 10)
+    val item = ItemFactory.randomItem(10)
 
     assert(itemNames.contains(item.name), "Item name should be from base list")
     assert(item.gold > 0, "Gold value should be positive")
@@ -35,7 +35,7 @@ class TestModels extends AnyFunSuite:
   test("generate random equipment with correct structure"):
     assert(equipmentNames.nonEmpty)
     println(equipmentNames)
-    val equip = EquipmentFactory.generateRandomEquipment(probabilityDrop = 1.0, playerLevel = 10)
+    val equip = EquipmentFactory.generateRandomEquipment(probabilityDrop = 1.0, playerLevel = 10, playerLucky = 10)
     assert(equip.get.name.nonEmpty, "Equipment name must not be empty")
     assert(equip.get.value > 0, "Equipment value should be greater than 0")
     assert(equip.get.statBonus.total == equip.get.value, "Stat value should match total attributes")
@@ -54,7 +54,7 @@ class TestModels extends AnyFunSuite:
   test("Generate normal monster for a given zone and player level") {
     val zone = OriginZone.Forest
     val playerLevel = 5
-    val monster = MonstersFactory.randomMonsterForZone(zone, playerLevel)
+    val monster = MonstersFactory.randomMonsterForZone(zone, playerLevel, 10)
 
     assert(monster.originZone == zone)
     assert(monster.level >= 1)
@@ -69,8 +69,8 @@ class TestModels extends AnyFunSuite:
     val zone = OriginZone.Volcano
     val playerLevel = 10
 
-    val normal = MonstersFactory.randomMonsterForZone(zone, playerLevel)
-    val strong = MonstersFactory.randomMonsterForZone(zone, playerLevel, strong = true)
+    val normal = MonstersFactory.randomMonsterForZone(zone, playerLevel, 10)
+    val strong = MonstersFactory.randomMonsterForZone(zone, playerLevel, 10, strong = true)
 
     assert(strong.level >= normal.level)
     assert(strong.attributes.hp >= normal.attributes.hp)

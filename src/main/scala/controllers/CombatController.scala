@@ -3,6 +3,7 @@ package controllers
 import models.player.Player
 import models.monster.{Monster, MonstersFactory, OriginZone}
 
+import scala.annotation.tailrec
 import scala.util.Random
 
 
@@ -16,39 +17,47 @@ object CombatController:
    * Simulate a fight between player and monster
    * Returns (updatedPlayer, combatLog)
    */
-  def simulateFight(player: Player, monster: Monster): (Player, String) =
+  def simulateFight(player: Player, monster: Monster): List[(Player, Option[Monster], String)] =
 
-    val useSkill = player.skills.nonEmpty && Random.nextBoolean()
-
-    val (playerAfterAction, monsterAfterAction, log1) =
-      if useSkill then
-        val skill = Random.shuffle(player.skills).head
-        val (pAfterSkill, mAfterSkill) = skill.use(player, monster)
-        val skillLog =
-          if pAfterSkill == player then s"Not enough mana to use ${skill.name}, attack instead."
-          else s"You used ${skill.name} on ${monster.name}."
-        (pAfterSkill, mAfterSkill.asInstanceOf[Monster], skillLog)
+    @tailrec
+    def loop(p: Player, m: Monster, acc: List[(Player, Option[Monster], String)], turn: Int): List[(Player, Option[Monster], String)] =
+      if !PlayerController.isAlive(p) || !MonsterController.isAlive(m) then acc.reverse
       else
-        val baseDamage = PlayerController.calculatePlayerAttack(player)
-        val (mAfterAttack, maybeExplosionDmg) = monster.takeDamage(baseDamage)
-        val playerAfterExplosion = maybeExplosionDmg.fold(player)(PlayerController.takeDamage(player, _))
-        val attackLog = s"You attacked ${monster.name} for $baseDamage physical damage." +
-          maybeExplosionDmg.map(dmg => s" ${monster.name} exploded for $dmg damage!").getOrElse("")
-        (playerAfterExplosion, mAfterAttack, attackLog)
+        val turnHeader = (p, Some(m), s"Turn $turn:")
 
-    // Monster retaliates only if still alive
-    val (finalPlayer, log2) =
-      if !MonsterController.isAlive(monsterAfterAction) then
-        val monsterAttack = MonsterController.attackPlayer(monsterAfterAction, playerAfterAction.level)
-        val playerDefense = playerAfterAction.attributes.constitution
-        val damageToPlayer = (monsterAttack - playerDefense).max(0)
-        val updatedPlayer = PlayerController.takeDamage(playerAfterAction, damageToPlayer)
-        (updatedPlayer, s"${monster.name} attacked you for $damageToPlayer damage.")
-      else (playerAfterAction, s"${monster.name} was defeated!")
+        val useSkill = p.skills.nonEmpty && Random.nextBoolean()
+        val (p1, m1, playerLog) =
+          if useSkill then
+            val skill = Random.shuffle(p.skills).head
+            val (pp, mm) = skill.use(p, m)
+            (pp, mm.asInstanceOf[Monster], s"You used ${skill.name}.")
+          else
+            val damage = PlayerController.calculatePlayerAttack(p)
+            val (mm, maybeExplosion) = MonsterController.takeDamage(m, damage)
+            val pp = maybeExplosion.fold(p)(PlayerController.takeDamage(p, _))
+            val log = s"You attacked ${m.name} for $damage." + maybeExplosion.map(d => s" ${m.name} exploded for $d!").getOrElse("")
+            (pp, mm, log)
 
-    val fullLog = s"$log1\n$log2"
+        val accWithTurnHeader = turnHeader :: acc
+        val accWithPlayer = (p1, Some(m1), playerLog) :: accWithTurnHeader
 
-    (finalPlayer, fullLog)
+        if !MonsterController.isAlive(m1) then
+          val monsterLog = s"${m1.name} was defeated!"
+          val accWithMonster = (p1, None, monsterLog) :: accWithPlayer
+          accWithMonster.reverse
+        else
+          val dmg = MonsterController.attackPlayer(m1, p1.level)
+          val defence = p1.attributes.constitution
+          val finalDmg = (dmg - defence).max(0)
+          val p2 = PlayerController.takeDamage(p1, finalDmg)
+          val monsterLog = s"${m1.name} attacked for $finalDmg."
+
+          val accWithMonster = (p2, Some(m1), monsterLog) :: accWithPlayer
+
+          if !PlayerController.isAlive(p2) then accWithMonster.reverse
+          else loop(p2, m1, accWithMonster, turn + 1)
+
+    loop(player, monster, Nil, 1)
 
 
   /**

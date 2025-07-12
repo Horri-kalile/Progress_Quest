@@ -5,14 +5,18 @@ import models.event.{EventFactory, EventType}
 import util.RandomFunctions
 import view.GameUi
 import scalafx.application.Platform
+
 import java.util.{Timer, TimerTask}
-import scala.util.Random
+import scalafx.animation.PauseTransition
+import javafx.util.Duration
+import models.monster.Monster
+import scalafx.Includes.*
 
 /**
  * Main Game Controller - Handles the game loop and coordinates between models and views
  */
 object GameController {
-
+  @volatile private var eventInProgress: Boolean = false
   private var currentPlayer: Option[Player] = None
   private var gameTimer: Option[Timer] = None
   private var isGameRunning: Boolean = false
@@ -45,7 +49,7 @@ object GameController {
 
     gameTimer.foreach(_.scheduleAtFixedRate(new TimerTask {
       override def run(): Unit = {
-        if (isGameRunning) {
+        if isGameRunning && !eventInProgress then
           currentPlayer.foreach { player =>
             if (PlayerController.isAlive(player)) {
               triggerRandomEvent()
@@ -53,35 +57,78 @@ object GameController {
               handleGameOver()
             }
           }
-        }
       }
     }, eventInterval, eventInterval))
 
   /**
    * Trigger a random event and update the game state
    */
-  private def triggerRandomEvent(): Unit = {
-    currentPlayer.foreach { player =>
-      val eventType = RandomFunctions.getRandomEventType(player.attributes.lucky)
-      val (updatedPlayer, messages, result) = EventFactory.executeEvent(eventType, player)
 
-      currentPlayer = Some(updatedPlayer)
 
-      // Send messages to UI
-      Platform.runLater(() => {
-        if (eventType == EventType.fight) {
-          messages.foreach(GameUi.addCombatLog)
-          // Update monster info for fight events
-          GameUi.updateMonsterInfo(result)
-        } else {
-          messages.foreach(GameUi.addEventLog)
-          // Clear monster info for non-fight events
-          GameUi.updateMonsterInfo(None)
+  private def triggerRandomEvent(): Unit =
+    if eventInProgress then return
+
+    eventInProgress = true
+
+    currentPlayer match
+      case Some(player) =>
+        val eventType = RandomFunctions.getRandomEventType(player.attributes.lucky)
+
+        if eventType == EventType.fight then
+          val monster = CombatController.getRandomMonsterForZone(
+            player.level,
+            player.attributes.lucky,
+            player.currentZone
+          )
+
+          val fightSteps = CombatController.simulateFight(player, monster)
+          val finalPlayer = fightSteps.lastOption.map(_._1).getOrElse(player)
+          val finalMonster = fightSteps.lastOption.flatMap(_._2)
+
+          // Post-fight check: game over or other events
+          // val (_, postFightMessages, _) = EventFactory.executeEvent(EventType.fight, finalPlayer)
+          // val postFightSteps = postFightMessages.map(msg => (finalPlayer, finalMonster, msg))
+
+          showFightStepsSequentially(fightSteps, finalPlayer)
+
+        else
+          val (updatedPlayer, messages, _) = EventFactory.executeEvent(eventType, player)
+
+          Platform.runLater {
+            currentPlayer = Some(updatedPlayer)
+            messages.foreach(GameUi.addEventLog)
+            GameUi.updateMonsterInfo(None)
+            updateUI()
+            eventInProgress = false
+          }
+
+      case None =>
+        // No player loaded yet — nothing to do
+        eventInProgress = false
+
+
+  private def showFightStepsSequentially(steps: List[(Player, Option[Monster], String)], finalPlayer: Player): Unit =
+    steps match
+      case Nil =>
+        Platform.runLater {
+          currentPlayer = Some(finalPlayer) // Update to final player state here
+          GameUi.updateMonsterInfo(None) // Clear monster info after fight
+          updateUI()
+          eventInProgress = false
         }
-        updateUI()
-      })
-    }
-  }
+
+      case (player, maybeMonster, log) :: tail =>
+        Platform.runLater {
+          currentPlayer = Some(player)
+          GameUi.addCombatLog(log)
+          GameUi.updateMonsterInfo(maybeMonster)
+          updateUI()
+        }
+
+        val pause = new PauseTransition(Duration.seconds(1))
+        pause.setOnFinished(_ => showFightStepsSequentially(tail, finalPlayer))
+        pause.play()
+
 
   /**
    * Handle game over scenario
@@ -100,11 +147,10 @@ object GameController {
   /**
    * Update the UI with current player state
    */
-  private def updateUI(): Unit = {
+  private def updateUI(): Unit =
     currentPlayer.foreach { player =>
       GameUi.updatePlayerInfo(player)
     }
-  }
 
   /**
    * Get current player state
@@ -123,14 +169,14 @@ object GameController {
     currentPlayer.foreach { player =>
       val (updatedPlayer, messages, result) = EventFactory.executeEvent(eventType, player)
       currentPlayer = Some(updatedPlayer)
-      
+
       // Update monster info based on event type
       if (eventType == EventType.fight) {
         GameUi.updateMonsterInfo(result)
       } else {
         GameUi.updateMonsterInfo(None)
       }
-      
+
       updateUI()
     }
 }

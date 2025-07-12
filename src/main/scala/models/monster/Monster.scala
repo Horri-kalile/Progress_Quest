@@ -93,9 +93,9 @@ object MonstersFactory:
 
   private def generateAttributes(level: Int, strong: Boolean): MonsterAttributes =
     val factor = if strong then 2.0 else 1.0
-    val hp = (Random.between(100 * level, 200 * level) * factor).toInt
-    val attack = (Random.between(10 * level, 50 * level) * factor).toInt
-    val defense = (Random.between(10 * level, 50 * level) * factor).toInt
+    val hp = (Random.between(50 * level, 100 * level) * factor).toInt
+    val attack = (Random.between(10 * level, 20 * level) * factor).toInt
+    val defense = (Random.between(5 * level, 10 * level) * factor).toInt
     MonsterAttributes(hp, hp, attack, defense)
 
   private def generateRewards(level: Int, playerLevel: Int, playerLucky: Int, strong: Boolean): (Int, Int, Option[Item], Option[Equipment]) =
