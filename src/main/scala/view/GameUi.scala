@@ -30,6 +30,19 @@ object GameUi:
   // Hero Diary progress bar reference
   private var heroDiaryProgressBar: Option[ProgressBar] = None
 
+  // Css elements
+  private val baseFont = "-fx-font-family: monospace; -fx-font-size: 12; -fx-background-color: transparent"
+  private val labelBold = "-fx-font-weight: bold"
+  private val labelHeader = "-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: black"
+  private val panelHeaderStyle = "-fx-background-color: #a9a9a9; -fx-padding: 5 10 5 10"
+  private val panelBodyStyle = "-fx-background-color: white; -fx-border-color: #ccc; -fx-border-width: 0 1 1 1"
+  private val borderPaneStyleBackground = "-fx-background-color: #e0e0e0"
+
+  private def styledLabel(text: String, styles: String*): Label =
+    new Label(text):
+      style = styles.mkString("; ")
+
+
   /** Call this to open the main game UI window */
   def open(): Unit =
     val player = playerOpt.getOrElse(throw new Exception("Player not set"))
@@ -46,7 +59,7 @@ object GameUi:
   private def createRoot(player: Player): BorderPane =
     new BorderPane:
       padding = Insets(15)
-      style = "-fx-background-color: #e0e0e0"
+      style = borderPaneStyleBackground
 
       top = createSectionRow(Seq(
         createPanelWithHeader("Character Player", new VBox:
@@ -95,9 +108,7 @@ object GameUi:
           prefHeight = 30
           alignment = Pos.CenterLeft
           children = Seq(
-            new Label(title):
-              style = "-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 14"
-          )
+            styledLabel(title, labelHeader))
         ,
         new VBox:
           style = "-fx-background-color: white; -fx-border-color: #ccc; -fx-border-width: 0 1 1 1"
@@ -131,8 +142,8 @@ object GameUi:
       createTableRow("LUK", player.attributes.lucky.toString)
     )
 
-    val hpLabel = new Label(s"${player.currentHp} / ${player.hp}")
-    val mpLabel = new Label(s"${player.currentMp} / ${player.mp}")
+    val hpLabel = styledLabel(s"${player.currentHp} / ${player.hp}", labelHeader)
+    val mpLabel = styledLabel(s"${player.currentMp} / ${player.mp}", labelHeader)
 
     attrRows ++ Seq(
       createTableRow("HP", ""),
@@ -167,8 +178,8 @@ object GameUi:
     add(createTableHeader("Quantity"), 1, 0)
 
     player.inventory.toSeq.zipWithIndex.foreach { case ((item, qty), idx) =>
-      add(new Label(item.name), 0, idx + 1)
-      add(new Label(qty.toString), 1, idx + 1)
+      add(styledLabel(item.name), 0, idx + 1)
+      add(styledLabel(qty.toString), 1, idx + 1)
     }
 
   private def createDiaryContent(): Node = new TextArea:
@@ -189,7 +200,7 @@ object GameUi:
   private def createMonsterInfoContent(): Seq[Node] =
     currentMonster match
       case Some(monster) =>
-        val hpLabel = new Label(s"HP: ${monster.attributes.currentHp}/${monster.attributes.hp}")
+        val hpLabel = styledLabel(s"HP: ${monster.attributes.currentHp}/${monster.attributes.hp}")
         val hpBar = new ProgressBar:
           progress = monster.attributes.currentHp.toDouble / monster.attributes.hp
           prefWidth = 150
@@ -225,9 +236,8 @@ object GameUi:
     new VBox:
       spacing = 10
       children = Seq(
-        new Label("Current World:"):
-          style = "-fx-font-weight: bold"
-        ,
+        styledLabel("Current World:", labelBold),
+
         new Label(player.currentZone.toString):
           style = "-fx-font-size: 14; -fx-font-weight: bold"
         ,

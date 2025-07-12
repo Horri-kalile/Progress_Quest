@@ -17,8 +17,8 @@ object ItemFactory:
     Rarity.Common -> 1.0,
     Rarity.Uncommon -> 1.5,
     Rarity.Rare -> 2.0,
-    Rarity.Epic -> 3.0,
-    Rarity.Legendary -> 5.0
+    Rarity.Epic -> 2.5,
+    Rarity.Legendary -> 3.0
   )
 
   private def randomRarity(playerLucky: Int): Rarity =
@@ -30,6 +30,7 @@ object ItemFactory:
       case rare if rare < 0.90 + bonus => Rarity.Rare
       case epic if epic < 0.96 + bonus => Rarity.Epic
       case legendary if legendary < 0.96 + bonus.min(0.03) => Rarity.Legendary
+      case _ => Rarity.Common
 
 
   private def createItem(name: String, playerLucky: Int): Item =
