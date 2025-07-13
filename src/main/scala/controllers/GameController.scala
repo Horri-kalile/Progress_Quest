@@ -81,15 +81,16 @@ object GameController {
             player.currentZone
           )
 
+          CombatController.setLastMonster(monster)
           val fightSteps = CombatController.simulateFight(player, monster)
           val finalPlayer = fightSteps.lastOption.map(_._1).getOrElse(player)
           val finalMonster = fightSteps.lastOption.flatMap(_._2)
 
           // Post-fight check: game over or other events
-          // val (_, postFightMessages, _) = EventFactory.executeEvent(EventType.fight, finalPlayer)
-          // val postFightSteps = postFightMessages.map(msg => (finalPlayer, finalMonster, msg))
+          val (updatedPlayer, postFightMessages, _) = EventFactory.executeEvent(EventType.fight, finalPlayer)
+          val postFightSteps = postFightMessages.map(msg => (updatedPlayer, finalMonster, msg))
 
-          showFightStepsSequentially(fightSteps, finalPlayer)
+          showFightStepsSequentially(fightSteps ++ postFightSteps, updatedPlayer)
 
         else
           val (updatedPlayer, messages, _) = EventFactory.executeEvent(eventType, player)
@@ -130,7 +131,7 @@ object GameController {
           updateUI()
         }
 
-        val pause = new PauseTransition(Duration.seconds(1))
+        val pause = new PauseTransition(Duration.millis(500))
         pause.setOnFinished(_ => showFightStepsSequentially(tail, finalPlayer))
         pause.play()
 
@@ -153,9 +154,9 @@ object GameController {
    * Update the UI with current player state
    */
   private def updateUI(): Unit =
-    currentPlayer.foreach { player =>
-      GameUi.updatePlayerInfo(player)
-    }
+    currentPlayer match
+      case Some(player) => GameUi.updatePlayerInfo(player)
+      case None => handleGameOver()
 
   /**
    * Get current player state

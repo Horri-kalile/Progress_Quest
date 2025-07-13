@@ -10,6 +10,7 @@ import scalafx.scene.layout.*
 import scalafx.stage.Stage
 import scalafx.stage.Screen
 import scalafx.Includes.jfxNode2sfx
+import scalafx.application.Platform
 import scalafx.scene.SceneIncludes.jfxScene2sfx
 
 object GameUi:
@@ -191,11 +192,19 @@ object GameUi:
 
 
   private def createCombatLogContent(): Node =
-    new TextArea:
+    val area = new TextArea:
       text = if combatMessages.isEmpty then "No combat yet..." else combatMessages.mkString("\n")
       editable = false
       style = "-fx-font-family: monospace; -fx-font-size: 12; -fx-background-color: transparent"
       focusTraversable = false
+      wrapText = true
+
+    Platform.runLater {
+      area.positionCaret(area.text.value.length)
+    }
+
+    area
+
 
   private def createMonsterInfoContent(): Seq[Node] =
     currentMonster match

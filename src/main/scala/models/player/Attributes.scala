@@ -51,7 +51,7 @@ object Attributes:
 
   def random(): Attributes =
     Attributes(
-      strength = Random.between(5, 16),
+      strength = Random.between(10, 16),
       constitution = Random.between(5, 16),
       dexterity = Random.between(5, 16),
       intelligence = Random.between(5, 16),
