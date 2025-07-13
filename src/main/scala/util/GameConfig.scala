@@ -9,3 +9,5 @@ object GameConfig:
   val maxDropChance: Double = 1.00
   val baseGameOverChance: Double = 0.03 // 3%
   val minGameOverChance: Double = 0.01
+  val maxBuffByZone: Double = 0.20 // 20% maximum buff
+

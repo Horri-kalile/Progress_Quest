@@ -1,11 +1,12 @@
 package models.world
 
 import models.monster.{Monster, OriginZone}
+import util.GameConfig
+
 import scala.util.Random
 
 object World:
 
-  private val MaxBuff = 0.30 // 30% maximum buff
 
   /** Applies buffs if monster is in its home zone */
   def applyZoneBuffs(monster: Monster, currentZone: OriginZone): Monster =
@@ -15,20 +16,21 @@ object World:
 
     val buffedAttributes = currentZone match
       case OriginZone.Forest =>
-        val defenseBuff = 1.0 + Random.nextDouble() * MaxBuff
+        val defenseBuff = 1.0 + Random.nextDouble() * GameConfig.maxBuffByZone
         attrs.copy(defense = (attrs.defense * defenseBuff).toInt)
 
       case OriginZone.Desert =>
-        val attackBuff = 1.0 + Random.nextDouble() * MaxBuff
+        val attackBuff = 1.0 + Random.nextDouble() * GameConfig.maxBuffByZone
         attrs.copy(attack = (attrs.attack * attackBuff).toInt)
 
       case OriginZone.Volcano =>
-        val hpBuff = 1.0 + Random.nextDouble() * MaxBuff
-        attrs.copy(hp = (attrs.hp * hpBuff).toInt)
+        val hpBuff = 1.0 + Random.nextDouble() * GameConfig.maxBuffByZone
+        val newHp = (attrs.hp * hpBuff).toInt
+        attrs.copy(currentHp = newHp, hp = newHp)
 
       case OriginZone.Swamp =>
-        val physicalBuff = 1.0 + Random.nextDouble() * MaxBuff
-        val magicBuff = 1.0 + Random.nextDouble() * MaxBuff
+        val physicalBuff = 1.0 + Random.nextDouble() * GameConfig.maxBuffByZone
+        val magicBuff = 1.0 + Random.nextDouble() * GameConfig.maxBuffByZone
         attrs.copy(
           weaknessPhysical = attrs.weaknessPhysical * physicalBuff,
           weaknessMagic = attrs.weaknessMagic * magicBuff

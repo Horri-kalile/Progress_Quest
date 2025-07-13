@@ -1,8 +1,10 @@
 package models.monster
 
-import models.player.{Entity, Equipment, Item, ItemFactory, Player, EquipmentFactory}
+import models.player.{Entity, Equipment, EquipmentFactory, Item, ItemFactory, Player}
+import models.world.World
 import util.MonsterLoader
 import util.RandomFunctions
+
 import scala.util.Random
 
 enum MonsterType:
@@ -21,21 +23,10 @@ case class Monster(
                     itemReward: Option[Item],
                     equipReward: Option[Equipment],
                     behavior: MonsterBehavior,
-                    description: String
+                    description: String,
+                    berserk: Boolean = false,
+                    regenerating: Boolean = false
                   ) extends Entity:
-  var regenerating: Boolean = false
-  var berserk: Boolean = false
-
-  behavior.apply(this) // Apply directly the behavior of the monster
-
-  def takeDamage(amount: Int): (Monster, Option[Int]) =
-    val damaged = this.receiveDamage(amount)
-
-    val explosion =
-      if damaged.behavior == Explosive && damaged.isDead then Some(damaged.explosionDamage)
-      else None
-
-    (damaged, explosion)
 
   override def receiveDamage(amount: Int): Monster =
     val newHP = (this.attributes.currentHp - amount).max(0)
@@ -43,22 +34,18 @@ case class Monster(
     this.copy(attributes = newAttributes)
 
   override def receiveHealing(amount: Int): Monster =
-    val newHP = (this.attributes.currentHp + Random.between(10 * level, 50 * level)).min(attributes.hp)
+    val newHP = (this.attributes.currentHp + amount).min(attributes.hp)
     val newAttributes = attributes.copy(currentHp = newHP)
     this.copy(attributes = newAttributes)
 
 
-  private def explosionDamage: Int =
+  def explosionDamage: Int =
     this.attributes.attack
 
-
-  private def isDead: Boolean = attributes.currentHp <= 0
-
-  def dropLoot(): String =
-    s"${name} ha droppato un oggetto raro!"
+  def isDead: Boolean = attributes.currentHp <= 0
 
   def regenerate(): Unit =
-    if regenerating && !isDead then receiveHealing(1)
+    if regenerating && !isDead then receiveHealing(Random.between(1 * level, 5 * level))
 
 object MonstersFactory:
   private val monsterNames: Map[String, List[String]] = MonsterLoader.loadMonsters()
@@ -71,20 +58,9 @@ object MonstersFactory:
     val rewards: (Int, Int, Option[Item], Option[Equipment]) = generateRewards(monsterLevel, playerLevel, playerLucky, strong)
     val monsterType = Random.shuffle(MonsterType.values.toList).head
     val behavior = MonsterBehavior.randomBehavior
-
-    Monster(
-      name = name,
-      level = monsterLevel,
-      monsterType = monsterType,
-      originZone = zone,
-      attributes = attributes,
-      goldReward = rewards._1,
-      experienceReward = rewards._2,
-      itemReward = rewards._3,
-      equipReward = rewards._4,
-      behavior = behavior,
-      description = s"A ${if strong then "powerful " else ""}$name from the $zone"
-    )
+    val monster = Monster(name = name, level = monsterLevel, monsterType = monsterType, originZone = zone, attributes = attributes, goldReward = rewards._1, experienceReward = rewards._2, itemReward = rewards._3, equipReward = rewards._4, behavior = behavior, description = s"A ${if strong then "powerful " else ""}$name from the $zone")
+    println(monster)
+    World.applyZoneBuffs(behavior(monster), zone)
 
   private def scaleLevel(playerLevel: Int, strong: Boolean): Int =
     val base = if strong then playerLevel + Random.between(2, 5)

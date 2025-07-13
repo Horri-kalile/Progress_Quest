@@ -67,19 +67,13 @@ object GameController {
 
   private def triggerRandomEvent(): Unit =
     if eventInProgress then return
-
     eventInProgress = true
 
     currentPlayer match
       case Some(player) =>
         val eventType = RandomFunctions.getRandomEventType(player.attributes.lucky)
-
         if eventType == EventType.fight then
-          val monster = CombatController.getRandomMonsterForZone(
-            player.level,
-            player.attributes.lucky,
-            player.currentZone
-          )
+          val monster = CombatController.getRandomMonsterForZone(player.level, player.attributes.lucky, player.currentZone)
 
           CombatController.setLastMonster(monster)
           val fightSteps = CombatController.simulateFight(player, monster)
