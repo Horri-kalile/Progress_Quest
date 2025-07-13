@@ -86,8 +86,8 @@ object GameController {
           val finalMonster = fightSteps.lastOption.flatMap(_._2)
 
           // Post-fight check: game over or other events
-         // val (_, postFightMessages, _) = EventFactory.executeEvent(EventType.fight, finalPlayer)
-         // val postFightSteps = postFightMessages.map(msg => (finalPlayer, finalMonster, msg))
+          // val (_, postFightMessages, _) = EventFactory.executeEvent(EventType.fight, finalPlayer)
+          // val postFightSteps = postFightMessages.map(msg => (finalPlayer, finalMonster, msg))
 
           showFightStepsSequentially(fightSteps, finalPlayer)
 
@@ -111,9 +111,14 @@ object GameController {
     steps match
       case Nil =>
         Platform.runLater {
-          currentPlayer = Some(finalPlayer) // Update to final player state here
-          GameUi.updateMonsterInfo(None) // Clear monster info after fight
-          updateUI()
+          currentPlayer = Some(finalPlayer)
+          GameUi.updateMonsterInfo(None)
+
+          if !PlayerController.isAlive(finalPlayer) then
+            GameUi.showGameOver()
+          else
+            updateUI()
+
           eventInProgress = false
         }
 

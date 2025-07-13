@@ -1,7 +1,11 @@
 package controllers
 
 import models.event.Mission
+import models.monster.Monster
 import models.player.*
+import util.GameConfig
+
+import scala.util.Random
 
 
 object PlayerController:
@@ -10,11 +14,12 @@ object PlayerController:
   def isAlive(player: Player): Boolean =
     player.currentHp > 0
 
-  def calculatePlayerAttack(player: Player): Int =
+  def calculatePlayerAttack(player: Player, monster: Monster): Int =
     // Base attack from level + equipment bonuses
     val str = player.attributes.strength
     val equip = player.equipment.values.flatten.map(_.statBonus.strength).sum
-    str + equip + player.level
+    val (defence, physical, _) = MonsterController.getMonsterDefenceAndWeakness(monster)
+    ((str + equip + player.level - defence) * physical).max(1).toInt
 
   def takeDamage(player: Player, damage: Int): Player =
     val newHp = (player.currentHp - damage).max(0)
@@ -25,9 +30,21 @@ object PlayerController:
 
 
   def gainXP(player: Player, xpGained: Int): Player =
-    val newExp = player.exp + xpGained
-    if newExp >= player.level * 100 then player.levelUp()
-    else player.copy(exp = newExp)
+    val totalXP = player.exp + xpGained
+    val levelUpThreshold = player.level * 100
+
+    if totalXP >= levelUpThreshold then
+      val leveledPlayer = player.levelUp()
+      val learnChance = GameConfig.baseLearnSkillChance + GameConfig.specialBonusPerLucky * leveledPlayer.attributes.lucky
+
+      if Random.nextDouble() < learnChance then
+        val newSkill = SkillFactory.randomSkill()
+        PlayerController.addSkill(leveledPlayer, newSkill)
+      else
+        leveledPlayer
+    else
+      player.copy(exp = totalXP)
+
 
   def addItem(player: Player, item: Item, quantity: Int = 1): Player =
     val updatedInventory = player.inventory + (item -> (player.inventory.getOrElse(item, 0) + quantity))
@@ -41,7 +58,7 @@ object PlayerController:
       else player.inventory - item
     player.copy(inventory = updatedInventory)
 
-
+  //TODO DA TESTARE
   def equipmentOn(player: Player, slot: EquipmentSlot, equipment: Equipment): Player =
     val updatedEquipment = player.equipment + (slot -> Some(equipment))
     player.copy(equipment = updatedEquipment)
@@ -50,15 +67,6 @@ object PlayerController:
   def equipmentOff(player: Player, slot: EquipmentSlot): Player =
     val updatedEquipment = player.equipment + (slot -> None)
     player.copy(equipment = updatedEquipment)
-
-
-  def useItem(player: Player, itemName: String): Player = {
-    val maybeItem = player.inventory.keys.find(_.name == itemName)
-    maybeItem match {
-      case Some(item) => removeItem(player, item, 1)
-      case None => player
-    }
-  }
 
 
   def addGold(player: Player, amount: Double): Player =
@@ -73,8 +81,20 @@ object PlayerController:
     player.copy(missions = player.missions :+ mission)
 
 
-  def addSkill(player: Player, skill: Skill): Player =
-    player.copy(skills = player.skills :+ skill)
+  def addSkill(player: Player, newSkill: Skill): Player =
+    val maybeExisting = player.skills.find(_.name == newSkill.name)
+
+    val updatedSkills = maybeExisting match
+      case Some(existing: GenericSkill) =>
+        val upgraded = existing.copy(powerLevel = existing.powerLevel + 1)
+        player.skills.map {
+          case s if s.name == existing.name => upgraded
+          case s => s
+        }
+      case None =>
+        player.skills :+ newSkill
+
+    player.copy(skills = updatedSkills)
 
 
   def changeBehavior(player: Player, newBehavior: BehaviorType): Player =

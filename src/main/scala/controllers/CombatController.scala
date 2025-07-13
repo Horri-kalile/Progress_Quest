@@ -38,7 +38,7 @@ object CombatController:
             val (pp, mm) = skill.use(p, m)
             (pp, mm.asInstanceOf[Monster], s"You used ${skill.name}.")
           else
-            val damage = PlayerController.calculatePlayerAttack(p)
+            val damage = PlayerController.calculatePlayerAttack(p, m)
             val (mm, maybeExplosion) = MonsterController.takeDamage(m, damage)
             val pp = maybeExplosion.fold(p)(PlayerController.takeDamage(p, _))
             val log = s"You attacked ${m.name} for $damage." + maybeExplosion.map(d => s" ${m.name} exploded for $d!").getOrElse("")
@@ -52,7 +52,7 @@ object CombatController:
           val accWithMonster = (p1, None, monsterLog) :: accWithPlayer
           accWithMonster.reverse
         else
-          val dmg = MonsterController.attackPlayer(m1, p1.level)
+          val dmg = MonsterController.attackPlayer(m1, p1)
           val defence = p1.attributes.constitution
           val finalDmg = (dmg - defence).max(0)
           val p2 = PlayerController.takeDamage(p1, finalDmg)

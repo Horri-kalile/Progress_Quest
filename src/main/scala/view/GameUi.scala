@@ -222,8 +222,8 @@ object GameUi:
           add(new Label(s"Behavior: ${monster.behavior}"), 0, 6)
           add(new Label(s"Gold Reward: ${monster.goldReward}"), 0, 7)
           add(new Label(s"EXP Reward: ${monster.experienceReward}"), 0, 8)
-          add(new Label(s"Item Reward: ${monster.itemReward}"), 0, 9)
-          add(new Label(s"Equipment Reward: ${monster.equipReward}"), 0, 10)
+          add(new Label(s"Item Reward: ${monster.itemReward.get}"), 0, 9)
+          add(new Label(s"Equipment Reward: ${monster.equipReward.get}"), 0, 10)
           add(new Label(monster.description), 0, 11, 2, 1) // span 2 columns
 
         Seq(infoGrid)

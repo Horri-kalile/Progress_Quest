@@ -13,10 +13,10 @@ object MonsterController:
   def takeDamage(monster: Monster, damage: Int): (Monster, Option[Int]) =
     monster.takeDamage(damage)
 
-  def attackPlayer(monster: Monster, playerLevel: Int): Int =
-    val baseDamage = monster.attributes.attack + (playerLevel * 2)
+  def attackPlayer(monster: Monster, player: Player): Int =
+    val baseDamage = monster.attributes.attack + (player.level * 2)
     val bonus = if monster.berserk then (monster.attributes.hp - monster.attributes.currentHp) / 10 else 0
-    (baseDamage + bonus).max(0)
+    (baseDamage + bonus - player.attributes.constitution).max(0)
 
   def heal(monster: Monster, amount: Int): Monster =
     monster.copy(attributes = monster.attributes.copy(hp = monster.attributes.hp + amount))
@@ -38,9 +38,8 @@ object MonsterController:
   def getGoldReward(monster: Monster): Int =
     monster.goldReward
 
-  def applyBehavior(monster: Monster): Monster =
-    monster.behavior.apply(monster)
-    monster
+  def getMonsterDefenceAndWeakness(monster: Monster): (Int, Double, Double) =
+    (monster.attributes.defense, monster.attributes.weaknessPhysical, monster.attributes.weaknessMagic)
 
 
   def createMonster(player: Player,
