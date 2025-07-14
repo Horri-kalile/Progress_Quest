@@ -71,6 +71,25 @@ object CombatController:
 
     loop(player, monster, Nil, 1)
 
+  def handleEquipDrop(player: Player, monster: Monster): (Player, String) =
+    MonsterController.getEquipReward(monster) match
+      case Some(newEquip) =>
+        val slot = newEquip.slot
+        player.equipment.getOrElse(slot, None) match
+          case Some(old) if old.value >= newEquip.value =>
+            val updated = PlayerController.addGold(player, newEquip.value)
+            (updated, s"You found ${newEquip.name}, sold for ${newEquip.value} gold.")
+          case _ =>
+            val updated = PlayerController.equipmentOn(player, slot, newEquip)
+            (updated, s"You equipped: ${newEquip.name} ($slot).")
+      case None => (player, "No equipment drop.")
+
+  def handleItemDrop(player: Player, monster: Monster): (Player, String) =
+    MonsterController.getItemReward(monster) match
+      case Some(item) =>
+        val updated = PlayerController.addItem(player, item)
+        (updated, s"You found item: ${item.name}.")
+      case None => (player, "No item drop.")
 
   /**
    * Generate a random monster for player's level using MonstersFactory

@@ -57,25 +57,24 @@ object MonstersFactory:
     val monsterType = Random.shuffle(MonsterType.values.toList).head
     val behavior = MonsterBehavior.randomBehavior
     val monster = Monster(name = name, level = monsterLevel, monsterType = monsterType, originZone = zone, attributes = attributes, goldReward = rewards._1, experienceReward = rewards._2, itemReward = rewards._3, equipReward = rewards._4, behavior = behavior, description = s"A ${if strong then "powerful " else ""}$name from the $zone")
-    println(monster)
     World.applyZoneBuffs(behavior(monster), zone)
 
   private def scaleLevel(playerLevel: Int, strong: Boolean): Int =
-    val base = if strong then playerLevel + Random.between(2, 5)
+    val base = if strong then playerLevel + Random.between(0, 2)
     else playerLevel + Random.between(-1, 1)
     Math.max(base, 1)
 
   private def generateAttributes(level: Int, strong: Boolean): MonsterAttributes =
-    val factor = if strong then 2.0 else 1.0
-    val hp = (Random.between(20 * level, 80 * level) * factor).toInt
-    val attack = (Random.between(10 * level, 20 * level) * factor).toInt
-    val defense = (Random.between(5 * level, 10 * level) * factor).toInt
-    MonsterAttributes(hp, hp, attack, defense, factor, factor)
+    val (physicalWeakness, magicalWeakness) = if strong then (Random.between(0.5, 1.0), Random.between(0.5, 1.0)) else (Random.between(1.0, 1.5), Random.between(1.0, 1.5))
+    val hp = Random.between(20, 50) * level
+    val attack = Random.between(1, 10) * level
+    val defense = Random.between(1, 10) * level
+    MonsterAttributes(hp, hp, attack, defense, physicalWeakness, magicalWeakness)
 
   private def generateRewards(level: Int, playerLevel: Int, playerLucky: Int, strong: Boolean): (Int, Int, Option[Item], Option[Equipment]) =
     val factor = if strong then 2 else 1
-    val gold = Random.between(1 * level, 50 * level) * factor
-    val exp = Random.between(1 * level, 50 * level) * factor
+    val gold = Random.between(1 * level, 20 * level) * factor
+    val exp = Random.between(1 * level, 20 * level) * factor
     var randomItem: Option[Item] = None
     if RandomFunctions.randomDropFlags(playerLucky) then
       randomItem = Some(ItemFactory.randomItem(playerLucky))

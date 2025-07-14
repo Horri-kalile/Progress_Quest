@@ -20,8 +20,12 @@ object MonsterController:
 
   def attackPlayer(monster: Monster, player: Player): Int =
     val baseDamage = monster.attributes.attack + (player.level * 2)
-    val bonus = if monster.berserk then (monster.attributes.hp - monster.attributes.currentHp) / 10 else 0
-    (baseDamage + bonus - player.attributes.constitution).max(0)
+    if monster.berserk then
+      val bonus: Int = Random.between(1, 5 + monster.attributes.attack)
+      monster.copy(attributes = monster.attributes.copy(currentHp = (monster.attributes.currentHp - bonus).min(0)))
+      (baseDamage + bonus - player.attributes.constitution).max(1)
+    else
+      (baseDamage - player.attributes.constitution).max(1)
 
   def handleRegeneration(monster: Monster): (Monster, Option[String]) =
     if monster.regenerating && !monster.isDead then
@@ -32,7 +36,7 @@ object MonsterController:
 
 
   def heal(monster: Monster, amount: Int): Monster =
-    monster.copy(attributes = monster.attributes.copy(hp = monster.attributes.hp + amount))
+    monster.copy(attributes = monster.attributes.copy(currentHp = (monster.attributes.currentHp + amount).min(monster.attributes.hp)))
 
   def describe(monster: Monster): String = {
     s"${monster.name} (Level ${monster.level}) - ${monster.monsterType} from ${monster.originZone}: ${monster.description}"

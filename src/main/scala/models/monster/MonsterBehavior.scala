@@ -17,7 +17,7 @@ case object Defensive extends MonsterBehavior:
       defense = (monster.attributes.defense * 1.25).toInt
     ))
 
-case object DoubleHP extends MonsterBehavior:
+case object MoreHp extends MonsterBehavior:
   def apply(monster: Monster): Monster =
     val newHP = (monster.attributes.hp * 1.25).toInt
     monster.copy(attributes = monster.attributes.copy(hp = newHP, currentHp = newHP))
@@ -28,7 +28,7 @@ case object Berserk extends MonsterBehavior:
 
 case object OneShot extends MonsterBehavior:
   def apply(monster: Monster): Monster = // Behavior managed automatically when creating
-    monster.copy(attributes = monster.attributes.copy(attack = monster.attributes.attack * 10))
+    monster.copy(attributes = monster.attributes.copy(attack = monster.attributes.attack * 2))
 
 case object Explosive extends MonsterBehavior:
   def apply(monster: Monster): Monster = monster // Behavior used after death
@@ -39,7 +39,7 @@ case object Regenerating extends MonsterBehavior:
 
 object MonsterBehavior:
   private val allBehaviors: List[MonsterBehavior] = List(
-    Aggressive, Defensive, DoubleHP,
+    Aggressive, Defensive, MoreHp,
     Berserk, OneShot, Explosive, Regenerating
   )
 

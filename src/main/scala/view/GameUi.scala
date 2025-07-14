@@ -227,12 +227,14 @@ object GameUi:
           add(hpBar, 1, 3)
 
           add(new Label(s"Attack: ${monster.attributes.attack}"), 0, 4)
+          add(new Label(f"Physical weakness: ${monster.attributes.weaknessPhysical}%.2f"), 1, 4)
           add(new Label(s"Defense: ${monster.attributes.defense}"), 0, 5)
+          add(new Label(f"Magical weakness: ${monster.attributes.weaknessMagic}%.2f"), 1, 5)
           add(new Label(s"Behavior: ${monster.behavior}"), 0, 6)
           add(new Label(s"Gold Reward: ${monster.goldReward}"), 0, 7)
           add(new Label(s"EXP Reward: ${monster.experienceReward}"), 0, 8)
-          add(new Label(s"Item Reward: ${monster.itemReward.get}"), 0, 9)
-          add(new Label(s"Equipment Reward: ${monster.equipReward.get}"), 0, 10)
+          add(new Label(s"Item Reward: ${monster.itemReward.fold("None")(_.toString)}"), 0, 9)
+          add(new Label(s"Equipment Reward: ${monster.equipReward.fold("None")(_.toString)}"), 0, 10)
           add(new Label(monster.description), 0, 11, 2, 1) // span 2 columns
 
         Seq(infoGrid)

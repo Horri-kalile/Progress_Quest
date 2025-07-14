@@ -98,7 +98,6 @@ object GameController {
           }
 
       case None =>
-        // No player loaded yet — nothing to do
         eventInProgress = false
 
 

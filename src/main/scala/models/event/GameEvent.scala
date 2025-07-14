@@ -14,43 +14,17 @@ sealed trait GameEvent:
 
 case object FightEvent extends GameEvent:
   override def action(player: Player): (Player, List[String], Option[Monster]) =
-    if !player.isAlive then
-      val (deadPlayer, deathMessages, _) = GameOverEvent.action(player)
-      (deadPlayer, deathMessages, None)
-    else
-      val monster = CombatController.lastMonster.get
-      var updatedPlayer = player
-      val messages = scala.collection.mutable.ListBuffer[String]()
+    if !player.isAlive then return GameOverEvent.action(player)
 
-      // === 1. Handle Equipment Drop ===
-      MonsterController.getEquipReward(monster) match
-        case Some(newEquip) =>
-          val slot = newEquip.slot
-          val currentEquipOpt = player.equipment.getOrElse(slot, None)
+    val monster = CombatController.lastMonster.get
+    val (p1, equipMsg) = CombatController.handleEquipDrop(player, monster)
+    val (p2, itemMsg) = CombatController.handleItemDrop(p1, monster)
+    val withXp = PlayerController.gainXP(p2, MonsterController.getExpReward(monster))
+    val finalPlayer = PlayerController.addGold(withXp, MonsterController.getGoldReward(monster))
 
-          currentEquipOpt match
-            case Some(oldEquip) if oldEquip.value >= newEquip.value =>
-              updatedPlayer = PlayerController.addGold(player = updatedPlayer, amount = newEquip.value)
-              messages += s"You found a ${newEquip.name}, but it's worse than your current gear. Sold it for ${newEquip.value} gold."
-            case _ =>
-              updatedPlayer = PlayerController.equipmentOn(updatedPlayer, slot, newEquip)
-              messages += s"You equipped a new item: ${newEquip.name} ($slot)."
+    val summary = List(equipMsg, itemMsg, s"You earned ${monster.goldReward} gold and ${monster.experienceReward} XP.", "You have won!")
 
-        case None => messages += "No equipment drop."
-
-      // === 2. Handle Item Drop (Separate) ===
-      MonsterController.getItemReward(monster) match
-        case Some(newItem) =>
-          updatedPlayer = PlayerController.addItem(updatedPlayer, newItem)
-          messages += s"You found an item: ${newItem.name}."
-        case None => messages += "No item drop."
-      // === 3. Add Gold and Experience ===
-      updatedPlayer = PlayerController.gainXP(updatedPlayer, MonsterController.getExpReward(monster))
-      updatedPlayer = PlayerController.addGold(updatedPlayer, MonsterController.getGoldReward(monster))
-      messages += s"You earned ${monster.goldReward} gold and ${monster.experienceReward} XP."
-
-      // === 4. Return updated state ===
-      (updatedPlayer, messages.toList :+ "You have won!", None)
+    (finalPlayer, summary, None)
 
 
 case object MissionEvent extends GameEvent:
