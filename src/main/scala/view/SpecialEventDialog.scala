@@ -52,6 +52,7 @@ object SpecialEventDialog:
       yesText = "Help",
       noText = "Ignore"
     )
+
   /**
    * Show game over notification for powerful monster defeat
    */
@@ -108,8 +109,8 @@ object SpecialEventDialog:
     val latch = new java.util.concurrent.CountDownLatch(1)
     
     // Execute dialog on JavaFX Application Thread
-    Platform.runLater { () =>
-      try {
+    Platform.runLater: () =>
+      try
         val dialog = new Alert(AlertType.Confirmation)
         
         // Set properties after creation to avoid ambiguity
@@ -123,9 +124,9 @@ object SpecialEventDialog:
 
         // 5-second timer for auto-close
         val timer = new Timer()
-        timer.schedule(new TimerTask {
+        timer.schedule(new TimerTask:
             def run(): Unit = Platform.runLater(() => dialog.close())
-          }, 5000)
+          , 5000)
 
         val result = dialog.showAndWait()
         timer.cancel() // Cancel timer if user made a choice
@@ -136,10 +137,8 @@ object SpecialEventDialog:
           case Some(_) => None // Any other button = treat as timeout
           case None => None // Timed out = auto-ignore
           
-      } finally {
+      finally
         latch.countDown() // Signal that dialog is done
-      }
-    }
     
     // Wait for dialog to complete (blocks the Timer thread)
     latch.await()
@@ -149,7 +148,7 @@ object SpecialEventDialog:
    * Private helper method to show info-only dialog (no choices)
    */
   private def showInfoDialog(title: String, header: String, content: String): Unit =
-    Platform.runLater { () =>
+    Platform.runLater: () =>
       val dialog = new Alert(AlertType.Information)
       
       dialog.title = title
@@ -160,4 +159,3 @@ object SpecialEventDialog:
       dialog.buttonTypes = Seq(okButton)
       
       dialog.showAndWait()
-    }
