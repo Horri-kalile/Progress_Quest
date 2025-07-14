@@ -44,8 +44,6 @@ case class Monster(
 
   def isDead: Boolean = attributes.currentHp <= 0
 
-  def regenerate(): Unit =
-    if regenerating && !isDead then receiveHealing(Random.between(1 * level, 5 * level))
 
 object MonstersFactory:
   private val monsterNames: Map[String, List[String]] = MonsterLoader.loadMonsters()

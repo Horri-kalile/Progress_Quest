@@ -28,40 +28,46 @@ object CombatController:
 
     @tailrec
     def loop(p: Player, m: Monster, acc: List[(Player, Option[Monster], String)], turn: Int): List[(Player, Option[Monster], String)] =
-      if !PlayerController.isAlive(p) || m.isDead then acc.reverse
+      if !p.isAlive || m.isDead then acc.reverse
       else
         val turnHeader = (p, Some(m), s"Turn $turn:")
 
-        val useSkill = p.skills.nonEmpty && Random.nextBoolean()
-        val (p1, m1, playerLog) =
-          if useSkill then
+        val (pAfterAttack, mAfterAttack, attackLogs) =
+          if p.skills.nonEmpty && Random.nextBoolean() then
             val skill = Random.shuffle(p.skills).head
             val (pp, mm) = skill.use(p, m)
-            (pp, mm.asInstanceOf[Monster], s"You used ${skill.name}.")
+            (pp, mm.asInstanceOf[Monster], List(s"You used ${skill.name}."))
           else
             val damage = PlayerController.calculatePlayerAttack(p, m)
-            // TODO Explosive managed here done
-            val (mm, maybeExplosion) = MonsterController.takeDamage(m, damage)
-            val pp = maybeExplosion.fold(p)(PlayerController.takeDamage(p, _))
-            val log = s"You attacked ${m.name} for $damage." + maybeExplosion.map(d => s" ${m.name} exploded for $d!").getOrElse("")
-            (pp, mm, log)
+            val (damagedM, maybeExplosion) = MonsterController.takeDamage(m, damage)
+            val damagedP = maybeExplosion.fold(p)(PlayerController.takeDamage(p, _))
+            val logs = List(s"You attacked ${m.name} for $damage.") ++ maybeExplosion.map(d => s"[Explosive] ${m.name} exploded for $d!").toList
+            (damagedP, damagedM, logs)
 
-        val accWithTurnHeader = turnHeader :: acc
-        val accWithPlayer = (p1, Some(m1), playerLog) :: accWithTurnHeader
+        val accWithHeader = turnHeader :: acc
+        val accWithPlayer = attackLogs.reverse.foldLeft(accWithHeader) {
+          case (logs, msg) => (pAfterAttack, Some(mAfterAttack), msg) :: logs
+        }
 
-        if !m1.isDead then
-          val monsterLog = s"${m1.name} was defeated!"
-          val accWithMonster = (p1, None, monsterLog) :: accWithPlayer
-          accWithMonster.reverse
+
+        if mAfterAttack.isDead then
+          val monsterLog = s"${mAfterAttack.name} was defeated!"
+          ((pAfterAttack, None, monsterLog) :: accWithPlayer).reverse
         else
-          val dmg = MonsterController.attackPlayer(m1, p1)
-          val p2 = PlayerController.takeDamage(p1, dmg)
-          val monsterLog = s"${m1.name} attacked for $dmg."
-          // TODO manage regenerate, explosive, oneshot done
-          val accWithMonster = (p2, Some(m1), monsterLog) :: accWithPlayer
+          val (regeneratedM, regenLogOpt) = MonsterController.handleRegeneration(mAfterAttack)
+          val monsterDmg = MonsterController.attackPlayer(regeneratedM, pAfterAttack)
+          val damagedPlayer = PlayerController.takeDamage(pAfterAttack, monsterDmg)
 
-          if !PlayerController.isAlive(p2) then accWithMonster.reverse
-          else loop(p2, m1, accWithMonster, turn + 1)
+          val monsterAttackLog = s"${regeneratedM.name} attacked for $monsterDmg."
+          val regenLogs = regenLogOpt.toList
+
+          val allLogs = regenLogs :+ monsterAttackLog
+          val accWithMonsterLogs = allLogs.reverse.foldLeft(accWithPlayer) {
+            case (logsAcc, msg) => (damagedPlayer, Some(regeneratedM), msg) :: logsAcc
+          }
+
+          if !damagedPlayer.isAlive then accWithMonsterLogs.reverse
+          else loop(damagedPlayer, regeneratedM, accWithMonsterLogs, turn + 1)
 
     loop(player, monster, Nil, 1)
 

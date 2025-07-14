@@ -51,7 +51,7 @@ object GameController {
       override def run(): Unit = {
         if isGameRunning && !eventInProgress then
           currentPlayer.foreach { player =>
-            if (PlayerController.isAlive(player)) {
+            if (player.isAlive) {
               triggerRandomEvent()
             } else {
               handleGameOver()
@@ -109,7 +109,7 @@ object GameController {
           currentPlayer = Some(finalPlayer)
           GameUi.updateMonsterInfo(None)
 
-          if !PlayerController.isAlive(finalPlayer) then
+          if !finalPlayer.isAlive then
             GameUi.showGameOver()
           else
             updateUI()

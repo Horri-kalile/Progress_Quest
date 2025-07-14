@@ -5,6 +5,7 @@ import models.player.*
 import util.RandomFunctions
 
 import scala.math.max
+import scala.util.Random
 
 object MonsterController:
 
@@ -21,6 +22,14 @@ object MonsterController:
     val baseDamage = monster.attributes.attack + (player.level * 2)
     val bonus = if monster.berserk then (monster.attributes.hp - monster.attributes.currentHp) / 10 else 0
     (baseDamage + bonus - player.attributes.constitution).max(0)
+
+  def handleRegeneration(monster: Monster): (Monster, Option[String]) =
+    if monster.regenerating && !monster.isDead then
+      val healAmount = Random.between(monster.level, 3 * monster.level)
+      val healed = monster.receiveHealing(healAmount)
+      (healed, Some(s"[Regenerating] ${monster.name} recovered $healAmount HP."))
+    else (monster, None)
+
 
   def heal(monster: Monster, amount: Int): Monster =
     monster.copy(attributes = monster.attributes.copy(hp = monster.attributes.hp + amount))

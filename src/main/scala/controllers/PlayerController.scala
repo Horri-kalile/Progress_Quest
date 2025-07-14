@@ -10,10 +10,6 @@ import scala.util.Random
 
 object PlayerController:
 
-
-  def isAlive(player: Player): Boolean =
-    player.currentHp > 0
-
   def calculatePlayerAttack(player: Player, monster: Monster): Int =
     // Base attack from level + equipment bonuses
     val str = player.attributes.strength

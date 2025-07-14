@@ -14,7 +14,7 @@ sealed trait GameEvent:
 
 case object FightEvent extends GameEvent:
   override def action(player: Player): (Player, List[String], Option[Monster]) =
-    if !PlayerController.isAlive(player) then
+    if !player.isAlive then
       val (deadPlayer, deathMessages, _) = GameOverEvent.action(player)
       (deadPlayer, deathMessages, None)
     else

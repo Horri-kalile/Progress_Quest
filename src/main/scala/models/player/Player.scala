@@ -35,7 +35,10 @@ case class Player(
     bonuses.foldLeft(baseAttributes)(_ + _)
 
   def inventorySize: Int = inventory.size
-  
+
+
+  def isAlive: Boolean =
+    this.currentHp > 0
 
   def levelUp(): Player =
     this.copy(
