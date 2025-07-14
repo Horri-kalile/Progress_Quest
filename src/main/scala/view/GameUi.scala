@@ -123,6 +123,7 @@ object GameUi:
     createTableRow("Class", player.identity.classType.toString),
     createTableRow("Level", player.level.toString),
     createTableRow("Gold", player.gold.toString),
+    createTableRow("Behavior", player.behaviorType.toString),
     createTableRow("Exp/NextLevel", s"${player.exp} / ${player.level * 100}")
   )
 
