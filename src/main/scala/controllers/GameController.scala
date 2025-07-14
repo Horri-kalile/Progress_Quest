@@ -11,7 +11,7 @@ import scala.util.Random
 /**
  * Main Game Controller - Handles the game loop and coordinates between models and views
  */
-object GameController {
+object GameController:
 
   private var currentPlayer: Option[Player] = None
   private var gameTimer: Option[Timer] = None
@@ -21,21 +21,19 @@ object GameController {
   /**
    * Initialize the game with a player
    */
-  def startGame(player: Player): Unit = {
+  def startGame(player: Player): Unit =
     currentPlayer = Some(player)
     isGameRunning = true
     startGameLoop()
     updateUI()
-  }
 
   /**
    * Stop the game loop
    */
-  def stopGame(): Unit = {
+  def stopGame(): Unit =
     isGameRunning = false
     gameTimer.foreach(_.cancel())
     gameTimer = None
-  }
 
   /**
    * Main game loop - triggers events automatically
@@ -43,68 +41,58 @@ object GameController {
   private def startGameLoop(): Unit =
     gameTimer = Some(new Timer(true))
 
-    gameTimer.foreach(_.scheduleAtFixedRate(new TimerTask {
-      override def run(): Unit = {
-        if (isGameRunning) {
-          currentPlayer.foreach { player =>
-            if (PlayerController.isAlive(player)) {
+    gameTimer.foreach(_.scheduleAtFixedRate(new TimerTask:
+      override def run(): Unit =
+        if isGameRunning then
+          currentPlayer.foreach: player =>
+            if PlayerController.isAlive(player) then
               triggerRandomEvent()
-            } else {
+            else
               handleGameOver()
-            }
-          }
-        }
-      }
-    }, eventInterval, eventInterval))
+    , eventInterval, eventInterval))
 
   /**
    * Trigger a random event and update the game state
    */
-  private def triggerRandomEvent(): Unit = {
-    currentPlayer.foreach { player =>
+  private def triggerRandomEvent(): Unit =
+    currentPlayer.foreach: player =>
       val eventType = RandomFunctions.getRandomEventType(player.attributes.lucky)
       val (updatedPlayer, messages, result) = EventFactory.executeEvent(eventType, player)
 
       currentPlayer = Some(updatedPlayer)
 
       // Send messages to UI
-      Platform.runLater(() => {
-        if (eventType == EventType.fight) {
+      Platform.runLater(() =>
+        if eventType == EventType.fight then
           messages.foreach(GameUi.addCombatLog)
           // Update monster info for fight events
           GameUi.updateMonsterInfo(result)
-        } else {
+        else
           messages.foreach(GameUi.addEventLog)
           // Clear monster info for non-fight events
           GameUi.updateMonsterInfo(None)
-        }
         updateUI()
-      })
-    }
-  }
+      )
 
   /**
    * Handle game over scenario
    */
-  private def handleGameOver(): Unit = {
+  private def handleGameOver(): Unit =
     stopGame()
-    Platform.runLater(() => {
-      GameUi.showGameOverWithRestart(() => {
+    Platform.runLater(() =>
+      GameUi.showGameOverWithRestart(() =>
         // Close current game window
         // Open PlayerGenerationUi again
         PlayerGenerationUi.openPlayerGeneration(newPlayer => startGame(newPlayer))
-      })
-    })
-  }
+      )
+    )
 
   /**
    * Update the UI with current player state
    */
-  private def updateUI(): Unit = {
-    currentPlayer.foreach { player =>
+  private def updateUI(): Unit =
+    currentPlayer.foreach: player =>
       GameUi.updatePlayerInfo(player)
-    }
-  }
 
   /**
    * Get current player state
@@ -120,17 +108,14 @@ object GameController {
    * Manual event trigger for testing
    */
   def triggerEvent(eventType: EventType): Unit =
-    currentPlayer.foreach { player =>
+    currentPlayer.foreach: player =>
       val (updatedPlayer, messages, result) = EventFactory.executeEvent(eventType, player)
       currentPlayer = Some(updatedPlayer)
       
       // Update monster info based on event type
-      if (eventType == EventType.fight) {
+      if eventType == EventType.fight then
         GameUi.updateMonsterInfo(result)
-      } else {
+      else
         GameUi.updateMonsterInfo(None)
-      }
       
       updateUI()
-    }
-}
