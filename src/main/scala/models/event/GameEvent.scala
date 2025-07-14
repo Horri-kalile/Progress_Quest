@@ -178,7 +178,7 @@ case object SpecialEvent extends GameEvent:
             val gain = Random.between(50, 151) * (1 + (player.attributes.wisdom / 100))
             val msg = s"You helped villagers and gained $gain EXP."
             println(msg)
-            (player.gainExp(gain), List(msg), None)
+            (PlayerController.gainXP(player, gain), List(msg), None)
           case Some(false) => // Player chose to ignore
             val msg = "You ignored the villagers and continued on your way."
             println(msg)
