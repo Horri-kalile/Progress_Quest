@@ -1,5 +1,6 @@
 package models.event
 
+import controllers.PlayerController
 import models.monster.Monster
 import models.player.{EquipmentFactory, Item, Player}
 
@@ -44,7 +45,7 @@ case object TrainingEvent extends GameEvent:
     val exp = Random.between(minExp, maxExp)
     val msg = s"Training completed: +$exp EXP"
     println(msg)
-    (player.gainExp(exp), List(msg), None)
+    (PlayerController.gainXP(player, exp), List(msg), None)
 
 case object RestoreEvent extends GameEvent:
   override def action(player: Player): (Player, List[String], Option[Monster]) =

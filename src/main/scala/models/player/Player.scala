@@ -35,13 +35,7 @@ case class Player(
     bonuses.foldLeft(baseAttributes)(_ + _)
 
   def inventorySize: Int = inventory.size
-
-
-  //TODO calcolare exp necessaria in base al livello
-  def gainExp(amount: Int): Player =
-    val newExp = exp + amount
-    if newExp >= level * 100 then levelUp()
-    else this.copy(exp = newExp)
+  
 
   def levelUp(): Player =
     this.copy(

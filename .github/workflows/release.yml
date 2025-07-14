@@ -3,7 +3,7 @@ name: Scala Release
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - 'v*.*.*'  # Only triggers for semantic version tags like v1.0.0
 
 jobs:
   call-tests:
@@ -17,6 +17,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Required for full tag/branch comparison
+
+      - name: Fetch main branch
+        run: git fetch origin main:refs/remotes/origin/main
 
       - name: Check tag is from main branch
         run: |
@@ -39,13 +44,27 @@ jobs:
         with:
           apps: sbt
 
-      - name: Package project
-        run: sbt package
+      - name: Build fat JAR with sbt assembly
+        run: sbt assembly
 
-      - name: Upload JAR to GitHub Release
+      - name: Rename fat JAR using Git tag
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          JAR_PATH=$(find target/scala-* -name "*.jar" | grep -v 'sources\|javadoc' | head -n 1)
+
+          if [ -z "$JAR_PATH" ]; then
+            echo "::error ::JAR file not found. Check sbt assembly output."
+            exit 1
+          fi
+
+          cp "$JAR_PATH" "progressquest-${TAG}.jar"
+
+      - name: Confirm JAR file exists
+        run: ls -lh progressquest-${{ github.ref_name }}.jar
+
+      - name: Upload fat JAR to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            target/scala-*/ProgressQuest*.jar  # replace as needed
+          files: progressquest-${{ github.ref_name }}.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

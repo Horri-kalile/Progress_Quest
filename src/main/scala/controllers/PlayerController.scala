@@ -21,17 +21,10 @@ object PlayerController {
   }
 
 
-  def gainXP(player: Player, xpGained: Int): Player = {
+  def gainXP(player: Player, xpGained: Int): Player =
     val newExp = player.exp + xpGained
-    if (newExp >= 100)
-      player.copy(
-        exp = newExp - 100,
-        level = player.level + 1
-      )
-    else
-      player.copy(exp = newExp)
-  }
-
+    if newExp >= player.level * 100 then player.levelUp()
+    else player.copy(exp = newExp)
 
   def addItem(player: Player, item: Item, quantity: Int = 1): Player = {
     val updatedInventory = player.inventory + (item -> (player.inventory.getOrElse(item, 0) + quantity))
