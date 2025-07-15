@@ -49,6 +49,11 @@ object PlayerGenerationUi extends JFXApp3:
     val behaviorLabel = new Label(selectedBehavior.toString):
       style = "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
 
+    // ADD RACE DESCRIPTION LABEL
+    val raceDescriptionLabel = new Label(getRaceDescription(selectedRace)):
+      style = "-fx-font-size: 12px; -fx-text-fill: #7f8c8d; -fx-wrap-text: true;"
+      maxWidth = 250
+
     val playerNameLabel = new TextField {
       promptText = "Enter your Player name"
       text = "Player"
@@ -111,7 +116,10 @@ object PlayerGenerationUi extends JFXApp3:
                     selectedRace = Random.shuffle(Race.values.toList).head
                     identity = Identity(race = selectedRace, classType = selectedClass)
                     raceLabel.text = selectedRace.toString
+                    raceDescriptionLabel.text = getRaceDescription(selectedRace) // UPDATE DESCRIPTION
               )
+            ,
+            raceDescriptionLabel 
           )
         ,
         // Class
@@ -236,6 +244,11 @@ object PlayerGenerationUi extends JFXApp3:
     val behaviorLabel = new Label(selectedBehavior.toString):
       style = "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
 
+    //  ADD RACE DESCRIPTION LABEL TO start() METHOD TOO
+    val raceDescriptionLabel = new Label(getRaceDescription(selectedRace)):
+      style = "-fx-font-size: 12px; -fx-text-fill: #7f8c8d; -fx-wrap-text: true;"
+      maxWidth = 250
+
     val playerNameLabel = new TextField {
       promptText = "Enter your Player name"
       text = "Player"
@@ -298,7 +311,10 @@ object PlayerGenerationUi extends JFXApp3:
                     selectedRace = Random.shuffle(Race.values.toList).head
                     identity = Identity(race = selectedRace, classType = selectedClass)
                     raceLabel.text = selectedRace.toString
+                    raceDescriptionLabel.text = getRaceDescription(selectedRace) // UPDATE DESCRIPTION
               )
+            ,
+            raceDescriptionLabel 
           )
         ,
         // Class
@@ -414,3 +430,14 @@ object PlayerGenerationUi extends JFXApp3:
         root = new BorderPane:
           center = mainContent
           bottom = bottomSection
+
+ 
+  private def getRaceDescription(race: Race): String = race match
+    case Race.Human => "Balanced race, good for beginners."
+    case Race.Titan => "Massive beings with high strength."
+    case Race.Orc => "Fierce warriors with great power."
+    case Race.Gnome => "Small but highly intelligent."
+    case Race.Elf => "Graceful with high dexterity."
+    case Race.Dwarf => "Hardy folk with strong constitution."
+    case Race.PandaMan => "Peaceful but wise and lucky."
+    case Race.Gundam => "Mechanical warriors, high defense."
