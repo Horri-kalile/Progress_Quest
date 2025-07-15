@@ -181,8 +181,7 @@ object PlayerController:
     val maybeExisting = player.skills.find(_.name == skill.name)
     maybeExisting match
       case Some(existing: GenericSkill) =>
-        val upgraded = existing.copy(powerLevel = existing.powerLevel + 1)
-        val updatedSkills = player.skills.map(s => if s.name == existing.name then upgraded else s)
+        val updatedSkills = player.skills.map(s => if s.name == existing.name then s.poweredUp else s)
         player.withSkills(updatedSkills)
       case None =>
         player.withSkills(skill :: player.skills)
