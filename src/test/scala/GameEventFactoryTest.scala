@@ -6,10 +6,9 @@ import models.monster.Monster
 import models.monster.OriginZone.Plains
 import models.player.Behavior.BehaviorType
 import org.scalatest.funsuite.AnyFunSuite
-import org.scalatest.matchers.should.Matchers
 
 
-class GameEventFactoryTest extends AnyFunSuite with Matchers:
+class GameEventFactoryTest extends AnyFunSuite:
   val identity: Identity = Identity(Race.Human, ClassType.Warrior)
   val attributes: Attributes = Attributes(10, 10, 10, 10, 10, 10)
   val player: Player = Player("Healer", identity, attributes, BehaviorType.Aggressive)
