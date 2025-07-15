@@ -3,7 +3,7 @@ package controllers
 import models.player.Player
 import models.event.{EventFactory, EventType}
 import util.RandomFunctions
-import view.GameUi
+import view.{GameUi, PlayerGenerationUi}
 import scalafx.application.Platform
 
 import java.util.{Timer, TimerTask}
@@ -15,31 +15,30 @@ import scalafx.Includes.*
 /**
  * Main Game Controller - Handles the game loop and coordinates between models and views
  */
-object GameController {
-  @volatile private var eventInProgress: Boolean = false
+object GameController:
+
   private var currentPlayer: Option[Player] = None
   private var gameTimer: Option[Timer] = None
   private var isGameRunning: Boolean = false
   private val eventInterval: Long = 3000 // 3 seconds between events
+  private var eventInProgress: Boolean = false
 
   /**
    * Initialize the game with a player
    */
-  def startGame(player: Player): Unit = {
+  def startGame(player: Player): Unit =
     currentPlayer = Some(player)
     isGameRunning = true
     startGameLoop()
     updateUI()
-  }
 
   /**
    * Stop the game loop
    */
-  def stopGame(): Unit = {
+  private def stopGame(): Unit =
     isGameRunning = false
     gameTimer.foreach(_.cancel())
     gameTimer = None
-  }
 
   /**
    * Main game loop - triggers events automatically
@@ -48,23 +47,18 @@ object GameController {
     gameTimer = Some(new Timer(true))
 
     gameTimer.foreach(_.scheduleAtFixedRate(new TimerTask {
-      override def run(): Unit = {
-        if isGameRunning && !eventInProgress then
-          currentPlayer.foreach { player =>
-            if (player.isAlive) {
+      override def run(): Unit =
+        if (isGameRunning && !eventInProgress) then
+          currentPlayer.foreach: player =>
+            if player.isAlive then
               triggerRandomEvent()
-            } else {
+            else
               handleGameOver()
-            }
-          }
-      }
     }, eventInterval, eventInterval))
 
   /**
    * Trigger a random event and update the game state
    */
-
-
   private def triggerRandomEvent(): Unit =
     if eventInProgress then return
     eventInProgress = true
@@ -112,7 +106,6 @@ object GameController {
             GameUi.showGameOver()
           else
             updateUI()
-
           eventInProgress = false
         }
 
@@ -132,16 +125,15 @@ object GameController {
   /**
    * Handle game over scenario
    */
-  private def handleGameOver(): Unit = {
+  private def handleGameOver(): Unit =
     stopGame()
-    Platform.runLater(() => {
-      // Show game over screen
-      val gameOverMessage = "GAME OVER - Player has died!"
-      println(gameOverMessage)
-      GameUi.addEventLog(gameOverMessage)
-      // TODO: Show restart option in UI
-    })
-  }
+    Platform.runLater(() =>
+      GameUi.showGameOverWithRestart(() =>
+        // Close current game window
+        // Open PlayerGenerationUi again
+        PlayerGenerationUi.openPlayerGeneration(newPlayer => startGame(newPlayer))
+      )
+    )
 
   /**
    * Update the UI with current player state
@@ -165,17 +157,14 @@ object GameController {
    * Manual event trigger for testing
    */
   def triggerEvent(eventType: EventType): Unit =
-    currentPlayer.foreach { player =>
+    currentPlayer.foreach: player =>
       val (updatedPlayer, messages, result) = EventFactory.executeEvent(eventType, player)
       currentPlayer = Some(updatedPlayer)
 
       // Update monster info based on event type
-      if (eventType == EventType.fight) {
+      if eventType == EventType.fight then
         GameUi.updateMonsterInfo(result)
-      } else {
+      else
         GameUi.updateMonsterInfo(None)
-      }
 
       updateUI()
-    }
-}

@@ -95,10 +95,9 @@ object GameUi:
       spacing = 15
       alignment = Pos.TopLeft
       children = panels
-      children.foreach { child =>
+      children.foreach: child =>
         HBox.setHgrow(child, Priority.Always)
         child.maxWidth(Double.MaxValue)
-      }
 
   private def createPanelWithHeader(title: String, content: Node): VBox =
     new VBox:
@@ -128,11 +127,10 @@ object GameUi:
   )
 
   private def createEquipmentContent(player: Player): Seq[Node] =
-    EquipmentSlot.values.toSeq.map { slot =>
+    EquipmentSlot.values.toSeq.map: slot =>
       val equipped = player.equipment.getOrElse(slot, None)
       val label = equipped.map(e => s"${e.name} (Value: ${e.value})").getOrElse("None")
       createTableRow(slot.toString, label)
-    }
 
   private def createStatsContent(player: Player): Seq[Node] =
     val attrRows = Seq(
@@ -294,7 +292,7 @@ object GameUi:
             style = "-fx-font-weight: bold"
         )
       else
-        val missionLabels = player.activeMissions.map { mission =>
+        val missionLabels = player.activeMissions.map: mission =>
           new HBox:
             spacing = 10
             children = Seq(
@@ -307,7 +305,6 @@ object GameUi:
               new Label(f"${mission.progression}/${mission.goal}"):
                 style = "-fx-font-size: 11; -fx-text-fill: #888888"
             )
-        }
 
         Seq(
           new Label(s"Current Missions: ${player.activeMissions.size}"):
@@ -334,12 +331,10 @@ object GameUi:
    */
   def updatePlayerInfo(player: Player): Unit =
     playerOpt = Some(player) // update stored player reference
-    stageOpt.foreach { stage =>
+    stageOpt.foreach: stage =>
       val newRoot = createRoot(player) // rebuild UI with updated player
       stage.scene().root = newRoot // replace root node
-    }
     println(s"UI Update: ${player.name} - Level ${player.level} - HP: ${player.currentHp}/${player.hp}")
-
 
   /**
    * Add a message to the combat log
@@ -359,12 +354,11 @@ object GameUi:
 
     // Then animate the progress bar after a small delay
     val animationTimer = new java.util.Timer()
-    animationTimer.schedule(new java.util.TimerTask() {
-      override def run(): Unit = {
+    animationTimer.schedule(new java.util.TimerTask():
+      override def run(): Unit =
         animateHeroDiaryProgress()
         animationTimer.cancel()
-      }
-    }, 100) // Small delay to ensure UI is fully updated
+    , 100) // Small delay to ensure UI is fully updated
 
   /**
    * Update the current monster info
@@ -372,17 +366,63 @@ object GameUi:
   def updateMonsterInfo(monster: Option[Monster]): Unit =
     currentMonster = monster
     updateCurrentUI()
+  
+  def showGameOverWithRestart(onRestart: () => Unit): Unit =
+    // Create a simple game over window with restart option
+    val gameOverStage = new Stage:
+      title = "Game Over"
+      width = 400
+      height = 200
+      
+    val gameOverScene = new Scene:
+      root = new VBox:
+        spacing = 20
+        padding = Insets(20)
+        alignment = Pos.Center
+        children = Seq(
+          new Label("Game Over!"):
+            style = "-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #d32f2f"
+          ,
+          new Label("Your hero has fallen..."):
+            style = "-fx-font-size: 16px; -fx-text-fill: #666666"
+          ,
+          new HBox:
+            spacing = 15
+            alignment = Pos.Center
+            children = Seq(
+              new Button("Restart Game"):
+                style = "-fx-background-color: #4caf50; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20"
+                onAction = _ =>
+                  gameOverStage.close()
+                  // Close current game window
+                  stageOpt.foreach(_.close())
+                  stageOpt = None
+                  playerOpt = None
+                  // Call restart callback
+                  onRestart()
+              ,
+              new Button("Exit"):
+                style = "-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20"
+                onAction = _ =>
+                  gameOverStage.close()
+                  // Close current game window
+                  stageOpt.foreach(_.close())
+                  stageOpt = None
+                  playerOpt = None
+            )
+        )
+    
+    gameOverStage.scene = gameOverScene
+    gameOverStage.show()
 
   /**
    * Update the current UI if it's open
    */
   private def updateCurrentUI(): Unit =
-    playerOpt.foreach { player =>
-      stageOpt.foreach { stage =>
+    playerOpt.foreach: player =>
+      stageOpt.foreach: stage =>
         val newRoot = createRoot(player)
         stage.scene().root = newRoot
-      }
-    }
 
   /**
    * Show game over screen
@@ -425,29 +465,26 @@ object GameUi:
    * Animate the Hero Diary progress bar
    */
   private def animateHeroDiaryProgress(): Unit =
-    heroDiaryProgressBar.foreach { progressBar =>
+    heroDiaryProgressBar.foreach: progressBar =>
       // Reset to 0 and animate to 1.0
       progressBar.progress = 0.0
 
       // Simple animation using a thread with Platform.runLater
-      val animationThread = new Thread(() => {
-        try {
-          for (i <- 0 to 10) {
+      val animationThread = new Thread(() =>
+        try
+          for i <- 0 to 10 do
             val progress = i / 10.0
-            scalafx.application.Platform.runLater(() => {
+            scalafx.application.Platform.runLater(() =>
               progressBar.progress = progress
-            })
+            )
             Thread.sleep(100) // 100ms delay
-          }
           Thread.sleep(500) // Stay at 100% for 500ms
-          scalafx.application.Platform.runLater(() => {
+          scalafx.application.Platform.runLater(() =>
             progressBar.progress = 0.0 // Reset to 0
-          })
-        } catch {
+          )
+        catch
           case _: InterruptedException => // Thread was interrupted
-        }
-      })
+      )
       animationThread.setDaemon(true)
       animationThread.start()
-    }
 
