@@ -2,7 +2,6 @@ package models.player
 
 import models.event.Mission
 import models.monster.OriginZone
-import scala.util.Random
 import models.player.Behavior.*
 
 /**
@@ -142,7 +141,6 @@ object Player:
     require(currentHp >= 0 && currentHp <= hp, "Current HP out of range")
     require(currentMp >= 0 && currentMp <= mp, "Current MP out of range")
     require(gold >= 0, "Gold cannot be negative")
-  // add more as needed...
 
   /** Apply factory method to create Player instances */
   def apply(
