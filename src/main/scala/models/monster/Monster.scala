@@ -60,7 +60,7 @@ object MonstersFactory:
     World.applyZoneBuffs(behavior(monster), zone)
 
   private def scaleLevel(playerLevel: Int, strong: Boolean): Int =
-    val base = if strong then playerLevel + Random.between(0, 2)
+    val base = if strong then playerLevel + Random.between(1, 2)
     else playerLevel + Random.between(-1, 1)
     Math.max(base, 1)
 

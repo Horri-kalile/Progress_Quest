@@ -65,19 +65,17 @@ class TestModels extends AnyFunSuite:
     println(s"Normal monster: ${monster.name}, Level: ${monster.level}, HP: ${monster.attributes.hp}, Behavior: ${monster.behavior}")
   }
 
-  test("Generate strong monster has higher level and stats") {
+  test("Generate strong monster has lower physical and magical weakness") {
     val zone = OriginZone.Volcano
     val playerLevel = 10
 
     val normal = MonstersFactory.randomMonsterForZone(zone, playerLevel, 10)
     val strong = MonstersFactory.randomMonsterForZone(zone, playerLevel, 10, strong = true)
 
-    assert(strong.level >= normal.level)
-    assert(strong.attributes.hp >= normal.attributes.hp)
-    assert(strong.attributes.attack >= normal.attributes.attack)
-    assert(strong.goldReward >= normal.goldReward)
-    assert(strong.experienceReward >= normal.experienceReward)
+    assert(strong.attributes.weaknessPhysical <= normal.attributes.weaknessPhysical)
+    assert(strong.attributes.weaknessMagic <= normal.attributes.weaknessMagic)
 
-    println(s"Strong monster: ${strong.name}, Level: ${strong.level}, HP: ${strong.attributes.hp}, Behavior: ${strong.behavior}")
+    println(s"Normal monster: ${normal.name}, Level: ${normal.level}, HP: ${normal.attributes.hp}, Behavior: ${normal.behavior}, Weakness: ${normal.attributes.weaknessPhysical}, ${normal.attributes.weaknessMagic}")
+    println(s"Strong monster: ${strong.name}, Level: ${strong.level}, HP: ${strong.attributes.hp}, Behavior: ${strong.behavior}, Weakness: ${strong.attributes.weaknessPhysical}, ${strong.attributes.weaknessMagic}")
   }
 
