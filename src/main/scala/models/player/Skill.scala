@@ -40,8 +40,9 @@ object SkillFactory:
     val multiplier = Random.between(1.1, 2.0).toInt
     classType match
       case ClassType.Mage => Some(GenericSkill(Random.shuffle(data.magic).head, SkillEffectType.Magic, mana, multiplier))
-      case ClassType.Cleric | ClassType.Paladin => Some(GenericSkill(Random.shuffle(data.healing).head, SkillEffectType.Healing, mana, multiplier))
+      case ClassType.Paladin => Some(GenericSkill(Random.shuffle(data.healing).head, SkillEffectType.Healing, mana, multiplier))
       case ClassType.Assassin => Some(GenericSkill(Random.shuffle(data.physical).head, SkillEffectType.Physical, mana, multiplier))
+      case ClassType.Cleric => Some(randomSkill())
       case _ => None
 
   def randomSkill(): Skill =

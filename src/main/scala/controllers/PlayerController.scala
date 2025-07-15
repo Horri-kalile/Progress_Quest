@@ -1,7 +1,7 @@
 package controllers
 
 import models.event.Mission
-import models.monster.Monster
+import models.monster.{Monster, OriginZone}
 import models.player.*
 import models.player.Behavior.BehaviorType.{FastLeveling, Heal}
 import util.GameConfig
@@ -147,6 +147,16 @@ object PlayerController:
    */
   def addGold(player: Player, amount: Double): Player =
     player.withGold(player.gold + amount)
+
+  /**
+   * Changes player zone.
+   *
+   * @param player  the player receiving gold
+   * @param newZone the new zone
+   * @return updated Player instance with new zone
+   */
+  def changeWorld(player: Player, newZone: OriginZone): Player =
+    player.withCurrentZone(newZone)
 
   /**
    * Spends gold from the player's total, cannot go below zero.

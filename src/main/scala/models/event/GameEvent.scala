@@ -3,12 +3,13 @@ package models.event
 import controllers.{CombatController, MissionController, MonsterController, PlayerController}
 import models.monster.Monster
 import models.player.{EquipmentFactory, Item, ItemFactory, Player}
+import models.world.World
 import util.GameConfig
 
 import scala.util.Random
 
 enum EventType:
-  case fight, mission, training, restore, sell, special, gameOver
+  case fight, mission, changeWorld, training, restore, sell, special, gameOver
 
 sealed trait GameEvent:
   def action(player: Player): (Player, List[String], Option[Monster])
@@ -36,10 +37,16 @@ case object MissionEvent extends GameEvent:
       println(msg)
       (MissionController.progressMission(player, mission), List(msg), None)
     else
-      val mission = MissionFactory.randomMission()
+      val mission = MissionController.createRandomMission(player)
       val msg = s"You accepted a new mission: ${mission.description}"
       println(msg)
       (MissionController.addMission(player, mission), List(msg), None)
+
+case object ChangeWorldEvent extends GameEvent:
+  override def action(player: Player): (Player, List[String], Option[Monster]) =
+    val newWorld = World.randomWorld(player.currentZone)
+    val msg = s"Player has moved on another zone: +$newWorld"
+    (PlayerController.changeWorld(player, newWorld), List(msg), None)
 
 case object TrainingEvent extends GameEvent:
   override def action(player: Player): (Player, List[String], Option[Monster]) =
@@ -161,6 +168,7 @@ object EventFactory:
     val event: GameEvent = eventType match
       case EventType.fight => FightEvent
       case EventType.mission => MissionEvent
+      case EventType.changeWorld => ChangeWorldEvent
       case EventType.training => TrainingEvent
       case EventType.restore => RestoreEvent
       case EventType.sell => SellEvent

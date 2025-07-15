@@ -499,8 +499,8 @@ object PlayerGenerationUi extends JFXApp3:
     // Configure primary stage for the application
     stage = new JFXApp3.PrimaryStage:
       title = "Progress Quest - Player Generation"
-      width = 600
-      height = 500
+      width = 800
+      height = 600
       scene = new Scene:
         root = new BorderPane:
           center = mainContent
@@ -513,14 +513,14 @@ object PlayerGenerationUi extends JFXApp3:
    * @return A user-friendly description string explaining the race's traits
    */
   private def getRaceDescription(race: Race): String = race match
-    case Race.Human => "Balanced race, good for beginners."
+    case Race.Human => "Balanced race, good for beginners. Starts with a random Equipment"
     case Race.Titan => "Massive beings with high strength."
-    case Race.Orc => "Fierce warriors with great power."
-    case Race.Gnome => "Small but highly intelligent."
+    case Race.Orc => "Fierce warriors with more wisdom."
+    case Race.Gnome => "Small but highly intelligence."
     case Race.Elf => "Graceful with high dexterity."
     case Race.Dwarf => "Hardy folk with strong constitution."
     case Race.PandaMan => "Peaceful but wise and lucky."
-    case Race.Gundam => "Mechanical warriors, high defense."
+    case Race.Gundam => "Mechanical warriors, more strength and wisdom."
 
   /**
    * Provides descriptive text for each class to help users understand their combat role.
@@ -529,10 +529,10 @@ object PlayerGenerationUi extends JFXApp3:
    * @return A user-friendly description string explaining the class's abilities and playstyle
    */
   private def getClassDescription(classType: ClassType): String = classType match
-    case ClassType.Warrior => "Melee fighter with high HP."
-    case ClassType.Poisoner => "Uses toxins and stealth attacks."
-    case ClassType.CowBoy => "Ranged fighter with quick shots."
-    case ClassType.Paladin => "Holy warrior with healing magic."
-    case ClassType.Assassin => "Stealthy killer with precision."
-    case ClassType.Mage => "Spellcaster with powerful magic."
-    case ClassType.Cleric => "Healer with protective spells."
+    case ClassType.Warrior => "Starts with more Hp"
+    case ClassType.Poisoner => "Starts with more Mp"
+    case ClassType.CowBoy => "Starts with more Hp and Mp"
+    case ClassType.Paladin => "Starts with healing magic"
+    case ClassType.Assassin => "Starts with physical skill"
+    case ClassType.Mage => "Starts with magic skill"
+    case ClassType.Cleric => "Starts with random magic"

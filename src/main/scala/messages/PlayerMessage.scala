@@ -1,5 +1,0 @@
-package messages
-
-object PlayerMessage {
-
-}

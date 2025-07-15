@@ -129,8 +129,16 @@ object GameUi:
   private def createEquipmentContent(player: Player): Seq[Node] =
     EquipmentSlot.values.toSeq.map: slot =>
       val equipped = player.equipment.getOrElse(slot, None)
-      val label = equipped.map(e => s"${e.name} (Value: ${e.value})").getOrElse("None")
+
+      val label = equipped match
+        case Some(equip) =>
+          val attrs = equip.statBonus
+          val bonusStats = s"STR: ${attrs.strength}, CON: ${attrs.constitution}, DEX: ${attrs.dexterity}, INT: ${attrs.intelligence}, WIS: ${attrs.wisdom}, LUCK: ${attrs.lucky}"
+          s"${equip.name} (Value: ${equip.value}) | Bonus: [$bonusStats]"
+        case None => "None"
+
       createTableRow(slot.toString, label)
+
 
   private def createStatsContent(player: Player): Seq[Node] =
     val attrRows = Seq(
@@ -354,11 +362,16 @@ object GameUi:
 
     // Then animate the progress bar after a small delay
     val animationTimer = new java.util.Timer()
-    animationTimer.schedule(new java.util.TimerTask():
-      override def run(): Unit =
-        animateHeroDiaryProgress()
-        animationTimer.cancel()
-    , 100) // Small delay to ensure UI is fully updated
+
+    animationTimer.schedule(
+      new java.util.TimerTask() {
+        override def run(): Unit =
+          animateHeroDiaryProgress()
+          animationTimer.cancel()
+      },
+      100 // delay in milliseconds
+    )
+
 
   /**
    * Update the current monster info
@@ -366,14 +379,14 @@ object GameUi:
   def updateMonsterInfo(monster: Option[Monster]): Unit =
     currentMonster = monster
     updateCurrentUI()
-  
+
   def showGameOverWithRestart(onRestart: () => Unit): Unit =
     // Create a simple game over window with restart option
     val gameOverStage = new Stage:
       title = "Game Over"
       width = 400
       height = 200
-      
+
     val gameOverScene = new Scene:
       root = new VBox:
         spacing = 20
@@ -411,7 +424,7 @@ object GameUi:
                   playerOpt = None
             )
         )
-    
+
     gameOverStage.scene = gameOverScene
     gameOverStage.show()
 

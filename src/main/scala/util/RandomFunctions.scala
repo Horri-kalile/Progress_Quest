@@ -1,7 +1,9 @@
 package util
 
 import models.event.EventType
+import models.monster.OriginZone
 import util.GameConfig.*
+
 import scala.util.Random
 
 object RandomFunctions:
@@ -13,7 +15,8 @@ object RandomFunctions:
 
     x match
       case v if v < 0.40 => EventType.fight // 40%
-      case v if v < 0.70 => EventType.mission // 30%
+      case v if v < 0.60 => EventType.mission // 20%
+      case v if v < 0.70 => EventType.changeWorld // 10%
       case v if v < 0.80 => EventType.training // 10%
       case v if v < 0.85 => EventType.restore // 5%
       case v if v < 0.90 => EventType.sell // 5%
@@ -31,3 +34,5 @@ object RandomFunctions:
 
   def tryGenerateStrongMonster(): Boolean =
     Random.nextBoolean()
+
+

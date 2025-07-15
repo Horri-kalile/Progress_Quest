@@ -7,6 +7,9 @@ import scala.util.Random
 
 object World:
 
+  def randomWorld(currentZone: OriginZone): OriginZone =
+    val zones = OriginZone.values.filterNot(_ == currentZone)
+    Random.shuffle(zones.toList).head
 
   /** Applies buffs if monster is in its home zone */
   def applyZoneBuffs(monster: Monster, currentZone: OriginZone): Monster =
@@ -46,5 +49,5 @@ object World:
     case OriginZone.Forest => "A dense forest where monsters have enhanced defense"
     case OriginZone.Desert => "A harsh desert where monsters deal more physical damage"
     case OriginZone.Volcano => "A volcanic region where monsters have increased HP"
-    case OriginZone.Swamp => "A mysterious swamp where monsters are more vulnerable to both physical and magical damage"
+    case OriginZone.Swamp => "A mysterious swamp where monsters are less vulnerable to both physical and magical damage"
     case OriginZone.Plains => "Normal plains with no special effects"
