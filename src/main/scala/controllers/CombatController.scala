@@ -33,7 +33,7 @@ object CombatController:
         val turnHeader = (p, Some(m), s"Turn $turn:")
 
         val (pAfterAttack, mAfterAttack, attackLogs) =
-          if p.skills.nonEmpty && Random.nextBoolean() then
+          if p.skills.nonEmpty && Random.nextBoolean() && p.currentMp >= 1 then
             val skill = Random.shuffle(p.skills).head
             val (pp, mm, msg) = PlayerController.useSkill(player = p, skill = skill, target = m)
             (pp, mm, List(msg))

@@ -184,10 +184,14 @@ object GameUi:
 
     add(createTableHeader("Item"), 0, 0)
     add(createTableHeader("Quantity"), 1, 0)
+    add(createTableHeader("Gold"), 2, 0)
+    add(createTableHeader("Rarity"), 3, 0)
 
     player.inventory.toSeq.zipWithIndex.foreach { case ((item, qty), idx) =>
       add(styledLabel(item.name), 0, idx + 1)
       add(styledLabel(qty.toString), 1, idx + 1)
+      add(styledLabel(item.gold.toString), 2, idx + 1)
+      add(styledLabel(item.rarity.toString), 3, idx + 1)
     }
 
   private def createDiaryContent(): Node = new TextArea:
@@ -311,6 +315,9 @@ object GameUi:
                 style = "-fx-font-size: 11; -fx-text-fill: #555555"
               ,
               new Label(f"${mission.progression}/${mission.goal}"):
+                style = "-fx-font-size: 11; -fx-text-fill: #888888"
+              ,
+              new Label(f"${mission.rewardGold},${mission.rewardExp},${mission.rewardItem}"):
                 style = "-fx-font-size: 11; -fx-text-fill: #888888"
             )
 

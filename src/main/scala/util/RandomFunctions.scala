@@ -14,8 +14,8 @@ object RandomFunctions:
     val x = Random.nextDouble()
 
     x match
-      case v if v < 0.40 => EventType.fight // 40%
-      case v if v < 0.60 => EventType.mission // 20%
+      case v if v < 0.30 => EventType.fight // 30%
+      case v if v < 0.60 => EventType.mission // 30%
       case v if v < 0.70 => EventType.changeWorld // 10%
       case v if v < 0.80 => EventType.training // 10%
       case v if v < 0.85 => EventType.restore // 5%

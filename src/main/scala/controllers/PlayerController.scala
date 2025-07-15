@@ -205,12 +205,14 @@ object PlayerController:
    * @return updated Player instance
    */
   def levelUp(player: Player): Player =
+    val newHp = player.hp * Random.between(1.05, 1.2)
+    val newMp = player.mp * Random.between(1.05, 1.2)
     player.withLevel(player.level + 1)
       .withExp(0)
-      .withHp((player.hp * Random.between(1.05, 1.2)).toInt)
-      .withMp((player.mp * Random.between(1.05, 1.2)).toInt)
-      .withCurrentHp(player.hp)
-      .withCurrentMp(player.mp)
+      .withHp(newHp.toInt)
+      .withMp(newMp.toInt)
+      .withCurrentHp(newHp.toInt)
+      .withCurrentMp(newMp.toInt)
       .powerUpAttributes()
 
   /**
@@ -220,12 +222,14 @@ object PlayerController:
    * @return updated Player instance
    */
   def levelDown(player: Player): Player =
+    val newHp = player.hp * Random.between(0.90, 0.99)
+    val newMp = player.mp * Random.between(0.90, 0.99)
     player.withLevel((player.level - 1).max(1))
       .withExp(0)
-      .withHp((player.hp * Random.between(0.90, 0.99)).toInt)
-      .withMp((player.mp * Random.between(0.90, 0.99)).toInt)
-      .withCurrentHp(player.hp)
-      .withCurrentMp(player.mp)
+      .withHp(newHp.toInt)
+      .withMp(newMp.toInt)
+      .withCurrentHp(newHp.toInt)
+      .withCurrentMp(newMp.toInt)
       .powerDownAttributes()
 
   /**
@@ -298,5 +302,5 @@ object PlayerController:
         case SkillEffectType.Healing =>
           val heal = ((player.attributes.wisdom + player.level)
             * multiplier * skill.powerLevel).toInt
-          val healedPlayer = player.receiveHealing(heal)
+          val healedPlayer = updatedPlayer.receiveHealing(heal)
           (healedPlayer, target, s"You healed yourself for $heal HP using ${skill.name}.")

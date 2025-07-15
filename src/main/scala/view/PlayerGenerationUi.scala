@@ -263,8 +263,8 @@ object PlayerGenerationUi extends JFXApp3:
     // Create a regular Stage (not JFXApp3.PrimaryStage) for window reuse
     val newStage = new Stage()
     newStage.title = "Progress Quest - Player Generation"
-    newStage.width = 600
-    newStage.height = 500
+    newStage.width = 800
+    newStage.height = 600
     newStage.scene = new Scene:
       root = new BorderPane:
         center = mainContent
