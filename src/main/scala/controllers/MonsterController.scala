@@ -4,7 +4,6 @@ import models.monster.*
 import models.player.*
 import util.RandomFunctions
 
-import scala.math.max
 import scala.util.Random
 
 object MonsterController:
@@ -57,5 +56,9 @@ object MonsterController:
   def getMonsterDefenceAndWeakness(monster: Monster): (Int, Double, Double) =
     (monster.attributes.defense, monster.attributes.weaknessPhysical, monster.attributes.weaknessMagic)
 
-
+  /**
+   * Generate a random monster for player's level and zone using MonstersFactory
+   */
+  def getRandomMonsterForZone(playerLevel: Int, playerLucky: Int, zone: OriginZone): Monster =
+    MonstersFactory.randomMonsterForZone(zone, playerLevel, playerLucky, RandomFunctions.tryGenerateStrongMonster())
 

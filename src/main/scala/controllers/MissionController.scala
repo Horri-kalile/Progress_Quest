@@ -1,6 +1,5 @@
 package controllers
 
-import controllers.PlayerController.gainXP
 import models.event.{Mission, MissionFactory}
 import models.player.Player
 

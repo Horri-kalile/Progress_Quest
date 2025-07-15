@@ -59,6 +59,18 @@ object GameEventModule:
       val header = s"${eventType.toString.capitalize} Event triggered:"
       (updated, header +: messages, result)
 
+    /** Test-only entry point to directly trigger a specific SpecialEvent case by index.
+     *
+     * This method is intended solely for unit testing to ensure all branches of
+     * [[SpecialEvent]] behave correctly. It should never be used in production logic.
+     *
+     * @param player    the player involved in the event
+     * @param caseIndex the specific branch (0–7) to execute within [[SpecialEvent]]
+     * @return a tuple with updated player, messages, and optional monster
+     */
+    def testSpecialCase(player: Player, caseIndex: Int): (Player, List[String], Option[Monster]) =
+      SpecialEvent.actionWithCase(player, caseIndex)
+
     /** Resolves the internal [[GameEvent]] implementation for the given [[EventType]]. */
     private def resolve(eventType: EventType): GameEvent = eventType match
       case EventType.fight => FightEvent
@@ -166,70 +178,77 @@ object GameEventModule:
    *         8. Random item theft
    */
   private case object SpecialEvent extends GameEvent:
-    def action(player: Player): (Player, List[String], Option[Monster]) =
-      Random.nextInt(8) match
-        case 0 =>
-          val change = Random.between(1, 4)
-          if Random.nextBoolean() then
-            val newPlayer = (1 to change).foldLeft(player)((p, _) => PlayerController.levelUp(player))
-            val msg = s"Blessing! You leveled up $change times."
-            (newPlayer, List(msg), None)
-          else
-            val newLevel = math.max(1, player.level - change)
-            val newPlayer = (1 to change).foldLeft(player)((p, _) => PlayerController.levelDown(player))
-            val msg = s"Curse! You lost $change levels."
-            (newPlayer, List(msg), None)
 
-        case 1 =>
-          EquipmentFactory.generateRandomEquipment(0.8, player.attributes.lucky, player.level) match
-            case Some(newEq) =>
-              val msg1 = "You defeated a powerful monster!"
-              val msg2 = s"You looted a new equipment: ${newEq.name}"
+    override def action(player: Player): (Player, List[String], Option[Monster]) =
+      val randomCase = Random.nextInt(8)
+      actionWithCase(player, randomCase)
 
-              val maybeOldEq = player.equipment.get(newEq.slot)
+    /** Extracted logic for deterministic testing. */
+    def actionWithCase(player: Player, caseIndex: Int): (Player, List[String], Option[Monster]) = caseIndex match
+      case 0 =>
+        val change = Random.between(1, 4)
+        if Random.nextBoolean() then
+          val leveledUp = (1 to change).foldLeft(player)((p, _) => PlayerController.levelUp(p))
+          val msg = s"Blessing! You leveled up $change times."
+          (leveledUp, List(msg), None)
+        else
+          val leveledDown = (1 to change).foldLeft(player)((p, _) => PlayerController.levelDown(p))
+          val msg = s"Curse! You lost $change levels."
+          (leveledDown, List(msg), None)
 
-              val (updatedPlayer, msg3) = maybeOldEq match
-                case Some(oldEq) if oldEq.get.value >= newEq.value =>
-                  val updated = PlayerController.addGold(player, newEq.value)
-                  (updated, s"The old ${oldEq.get.name} is better. You sold ${newEq.name} for ${newEq.value} gold.")
-                case _ =>
-                  val updated = PlayerController.equipmentOn(player, newEq.slot, newEq)
-                  (updated, s"You equipped: ${newEq.name} in slot ${newEq.slot}.")
+      case 1 =>
+        EquipmentFactory.generateRandomEquipment(0.80, player.attributes.lucky, player.level) match
+          case Some(newEq) =>
+            val msg1 = "You defeated a powerful monster!"
+            val msg2 = s"You looted a new equipment: ${newEq.name}"
 
-              (updatedPlayer, List(msg1, msg2, msg3), None)
+            val maybeOld = player.equipment.get(newEq.slot)
 
-            case None =>
-              // If no equipment was generated (very rare or edge-case)
-              (player, List("You defeated a monster but found no loot."), None)
+            val (updatedPlayer, msg3) = maybeOld.get match
+              case Some(old) if old.value >= newEq.value =>
+                val updated = PlayerController.addGold(player, newEq.value)
+                (updated, s"You found ${newEq.name}, sold for ${newEq.value} gold.")
+              case _ =>
+                val updated = PlayerController.equipmentOn(player, newEq.slot, newEq)
+                (updated, s"You equipped: ${newEq.name} (${newEq.slot}).")
 
+            (updatedPlayer, List(msg1, msg2, msg3), None)
 
-        case 2 =>
-          val msg = "You were defeated by a powerful monster. Game over!"
-          val (p, m, r) = GameOverEvent.action(player)
-          (p, msg :: m, r)
+          case None =>
+            (player, List("You defeated a monster but found no loot."), None)
 
-        case 3 =>
-          val item = ItemFactory.randomItem(player.attributes.lucky)
-          val msg = s"Found item: ${item.name} (${item.rarity}) worth ${item.gold}g."
-          (PlayerController.addItem(player, item), List("You discovered a hidden dungeon!", msg), None)
+      case 2 =>
+        val msg = "You were defeated by a powerful monster. Game over!"
+        val (deadPlayer, msgs, result) = GameOverEvent.action(player)
+        (deadPlayer, msg :: msgs, result)
 
-        case 4 =>
-          val msg = "You were injured in a dungeon trap! HP and MP halved."
-          (PlayerController.playerInjured(player), List(msg), None)
+      case 3 =>
+        val item = ItemFactory.randomItem(player.attributes.lucky)
+        val msg1 = "You discovered a hidden dungeon and found a new item!"
+        val msg2 = s"You found: ${item.name}, worth ${item.gold}, rarity: ${item.rarity}"
+        (PlayerController.addItem(player, item), List(msg1, msg2), None)
 
-        case 5 =>
-          val exp = Random.between(50, 100) * player.level + player.attributes.wisdom
-          val msg = s"You helped villagers and gained $exp EXP."
-          (PlayerController.gainXP(player, exp), List(msg), None)
+      case 4 =>
+        val msg = "You were injured in a dungeon trap! HP and MP halved."
+        (PlayerController.playerInjured(player), List(msg), None)
 
-        case 6 =>
-          val msg = "Trap! You were killed instantly. Game over!"
-          val (p, m, r) = GameOverEvent.action(player)
-          (p, msg :: m, r)
+      case 5 =>
+        val gain = Random.between(50, 100) * player.level + player.attributes.wisdom
+        val msg = s"You helped villagers and gained $gain EXP."
+        (PlayerController.gainXP(player, gain), List(msg), None)
 
-        case 7 =>
-          val (p, msg) = PlayerController.stealRandomItem(player)
-          (p, List(msg), None)
+      case 6 =>
+        val msg = "It was a trap! You were killed. Game over!"
+        val (deadPlayer, msgs, result) = GameOverEvent.action(player)
+        (deadPlayer, msg :: msgs, result)
+
+      case 7 =>
+        val (updatedPlayer, msg) = PlayerController.stealRandomItem(player)
+        (updatedPlayer, List(msg), None)
+
+      case _ =>
+        // fallback in case of wrong index
+        (player, List("Nothing happened."), None)
 
   /** Marks the player as dead and ends the game. */
   private case object GameOverEvent extends GameEvent:

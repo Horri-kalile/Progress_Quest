@@ -28,9 +28,9 @@ object RandomFunctions:
   def randomDropFlags(playerLucky: Int): Boolean =
     val bonus = (playerLucky * 0.001).min(0.50) // max +50% bonus per type
     val chance = baseDropChance + bonus
-    val itemDropped = Random.nextDouble() < chance
+    val dropItem = Random.nextDouble() < chance
 
-    itemDropped
+    dropItem
 
   def tryGenerateStrongMonster(): Boolean =
     Random.nextBoolean()

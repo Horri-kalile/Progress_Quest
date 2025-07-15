@@ -91,19 +91,5 @@ object CombatController:
         (updated, s"You found item: ${item.name}.")
       case None => (player, "No item drop.")
 
-  /**
-   * Generate a random monster for player's level using MonstersFactory
-   */
-  def getRandomMonster(playerLevel: Int, playerLucky: Int): Monster =
-    // Use the factory to get a random monster from a random zone
-    val zones = models.monster.OriginZone.values
-    val randomZone = zones(Random.nextInt(zones.length))
 
-    MonstersFactory.randomMonsterForZone(randomZone, playerLevel, playerLucky)
-
-  /**
-   * Generate a random monster for player's level and zone using MonstersFactory
-   */
-  def getRandomMonsterForZone(playerLevel: Int, playerLucky: Int, zone: OriginZone): Monster =
-    MonstersFactory.randomMonsterForZone(zone, playerLevel, playerLucky, RandomFunctions.tryGenerateStrongMonster())
 
