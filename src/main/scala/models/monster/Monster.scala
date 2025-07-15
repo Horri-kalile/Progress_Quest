@@ -1,6 +1,6 @@
 package models.monster
 
-import models.player.{Entity, Equipment, EquipmentFactory, Item, ItemFactory, Player}
+import models.player.{Equipment, EquipmentFactory, Item, ItemFactory, Player}
 import models.world.World
 import util.MonsterLoader
 import util.RandomFunctions
@@ -26,14 +26,14 @@ case class Monster(
                     description: String,
                     berserk: Boolean = false,
                     regenerating: Boolean = false
-                  ) extends Entity:
+                  ):
 
-  override def receiveDamage(amount: Int): Monster =
+  def receiveDamage(amount: Int): Monster =
     val newHP = (this.attributes.currentHp - amount).max(0)
     val newAttributes = attributes.copy(currentHp = newHP)
     this.copy(attributes = newAttributes)
 
-  override def receiveHealing(amount: Int): Monster =
+  def receiveHealing(amount: Int): Monster =
     val newHP = (this.attributes.currentHp + amount).min(attributes.hp)
     val newAttributes = attributes.copy(currentHp = newHP)
     this.copy(attributes = newAttributes)

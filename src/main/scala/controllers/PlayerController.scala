@@ -261,3 +261,32 @@ object PlayerController:
 
   def playerInjured(player: Player): Player =
     player.withCurrentHp(player.currentHp / 2).withCurrentMp(player.currentMp / 2)
+
+  def useSkill(player: Player, skill: Skill, target: Monster): (Player, Monster, String) =
+    if player.currentMp < skill.manaCost then
+      (player, target, s"Not enough mana to cast ${skill.name}.")
+
+    else
+      val updatedPlayer = player.withCurrentMp(player.currentMp - skill.manaCost)
+      val multiplier = Random.between(0.1, skill.baseMultiplier)
+
+      skill.effectType match
+        case SkillEffectType.Physical =>
+          val dmg =
+            ((player.attributes.strength + player.level + player.equipmentList.map(_.value).sum)
+              * multiplier * skill.powerLevel).toInt
+          val damagedMonster = target.receiveDamage(dmg)
+          (updatedPlayer, damagedMonster, s"You dealt $dmg physical damage with ${skill.name}.")
+
+        case SkillEffectType.Magic =>
+          val magicPower = player.attributes.intelligence
+          val dmg = ((magicPower + player.level + player.equipmentList.map(_.value).sum)
+            * multiplier * skill.powerLevel).toInt
+          val damagedMonster = target.receiveDamage(dmg)
+          (updatedPlayer, damagedMonster, s"You dealt $dmg magic damage with ${skill.name}.")
+
+        case SkillEffectType.Healing =>
+          val heal = ((player.attributes.wisdom + player.level)
+            * multiplier * skill.powerLevel).toInt
+          val healedPlayer = player.receiveHealing(heal)
+          (healedPlayer, target, s"You healed yourself for $heal HP using ${skill.name}.")

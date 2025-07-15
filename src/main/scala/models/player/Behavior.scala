@@ -14,7 +14,7 @@ object Behavior:
 
     def onBattleDamage(player: Player, damage: Int): Int = damage
 
-    def onBattleEnd(amount: Int): Int = amount
+    def onBattleEnd(value: Int): Int = value
 
     def onDamageTaken(player: Player, damage: Int): Int = damage
 

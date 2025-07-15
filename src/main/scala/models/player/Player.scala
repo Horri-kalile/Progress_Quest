@@ -98,17 +98,6 @@ trait Player:
   def receiveHealing(amount: Int): Player =
     withCurrentHp((currentHp + amount).min(hp))
 
-  def doDamage(base: Int): Int = behavior.onBattleDamage(this, base)
-
-  def useSkill(skill: Skill): Option[Player] =
-    if currentMp >= skill.manaCost then
-      Some(withCurrentMp(currentMp - skill.manaCost))
-    else None
-
-  def learnSkill(skill: Skill): Player =
-    if skills.exists(_.name == skill.name) then this
-    else withSkills(skill :: skills)
-
   def restore(): Player = withCurrentHp(hp).withCurrentMp(mp)
 
   def equipmentList: Iterable[Equipment] = equipment.values.flatten

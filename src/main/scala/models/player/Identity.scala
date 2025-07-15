@@ -43,7 +43,7 @@ object PlayerBonusesApplication:
       case ClassType.Assassin => (0, 0)
       case _ => (Random.between(10, 31), Random.between(5, 16))
 
-    val startingSkill = SkillFactory.generateStartingSkill(classType).toList
+    val startingSkill = SkillFactory.generateStartingSkill(player.level, classType).toList
 
     player.withHp(raceHp + classHpBonus)
       .withMp(raceMp + classMpBonus)

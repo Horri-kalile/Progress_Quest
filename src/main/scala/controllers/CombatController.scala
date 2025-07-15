@@ -35,8 +35,8 @@ object CombatController:
         val (pAfterAttack, mAfterAttack, attackLogs) =
           if p.skills.nonEmpty && Random.nextBoolean() then
             val skill = Random.shuffle(p.skills).head
-            val (pp, mm) = skill.use(p, m)
-            (pp, mm.asInstanceOf[Monster], List(s"You used ${skill.name}."))
+            val (pp, mm, msg) = PlayerController.useSkill(player = p, skill = skill, target = m)
+            (pp, mm, List(msg))
           else
             val damage = PlayerController.calculatePlayerAttack(p, m)
             val (damagedM, maybeExplosion) = MonsterController.takeDamage(m, damage)
