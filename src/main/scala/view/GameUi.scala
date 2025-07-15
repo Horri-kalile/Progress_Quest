@@ -13,8 +13,30 @@ import scalafx.Includes.jfxNode2sfx
 import scalafx.application.Platform
 import scalafx.scene.SceneIncludes.jfxScene2sfx
 
+/**
+ * Main game user interface that displays all player information and game state.
+ *
+ * This object manages the primary game window containing character stats, equipment,
+ * inventory, world information, skills, missions, combat log, and monster details.
+ * The UI is organized in a grid layout with multiple panels that update in real-time
+ * as the game progresses.
+ *
+ * Features:
+ * - Real-time player stat updates (HP, MP, level, experience)
+ * - Equipment and inventory management display
+ * - Skills categorized by type (physical, magic, healing)
+ * - Current world zone information with description
+ * - Active missions with progression tracking
+ * - Combat log with scrolling message history
+ * - Monster information panel for current encounters
+ * - Hero diary with animated progress indicators
+ * - Game over screen with restart functionality
+ * - Responsive layout that adapts to screen size
+ */
+
 object GameUi:
 
+  /** Screen dimensions for responsive UI sizing */
   private val screenBounds = Screen.primary.visualBounds
   private val screenWidth: Double = screenBounds.width
   private val screenHeight: Double = screenBounds.height
@@ -45,6 +67,15 @@ object GameUi:
 
 
   /** Call this to open the main game UI window */
+
+  /**
+   * Opens the main game UI window.
+   *
+   * Creates and displays the primary game interface with all panels
+   * and information displays. The window is sized to 80% of screen dimensions.
+   *
+   * @throws Exception if no player has been set via playerOpt
+   */
   def open(): Unit =
     val player = playerOpt.getOrElse(throw new Exception("Player not set"))
     val root = createRoot(player)
@@ -56,7 +87,17 @@ object GameUi:
     stage.show()
     stageOpt = Some(stage)
 
-  /** Creates the main UI root node for a given player */
+  /**
+   * Creates the main UI root layout containing all game panels.
+   *
+   * Organizes the interface into three horizontal rows:
+   * - Top: Character info, Equipment, Stats
+   * - Center: Inventory, World info, Skills, Missions
+   * - Bottom: Hero Diary, Combat Log, Monster Info
+   *
+   * @param player The player whose information to display
+   * @return BorderPane containing the complete UI layout
+   */
   private def createRoot(player: Player): BorderPane =
     new BorderPane:
       padding = Insets(15)
@@ -73,7 +114,7 @@ object GameUi:
           children = createStatsContent(player)
         )
       ))
-
+      // Center row: Inventory, World, Skills, Mission panels
       center = createSectionRow(Seq(
         createPanelWithHeader("Inventory", createInventoryContent(player)),
         createPanelWithHeader("World", createWorldContent(player)),
@@ -81,7 +122,7 @@ object GameUi:
         createPanelWithHeader("Mission", createMissionContent(player)),
 
       ))
-
+      // Bottom row: Hero Diary, Combat Log, Monster Info panels
       bottom = createSectionRow(Seq(
         createHeroDiaryPanel(),
         createPanelWithHeader("Combat Log", createCombatLogContent()),
@@ -90,15 +131,29 @@ object GameUi:
         )
       ))
 
+  /**
+   * Creates a horizontal row of panels with equal spacing and growth.
+   *
+   * @param panels Sequence of UI nodes to arrange horizontally
+   * @return HBox containing the arranged panels
+   */
   private def createSectionRow(panels: Seq[Node]): HBox =
     new HBox:
       spacing = 15
       alignment = Pos.TopLeft
       children = panels
+      // Make each panel grow to fill available space equally
       children.foreach: child =>
         HBox.setHgrow(child, Priority.Always)
         child.maxWidth(Double.MaxValue)
 
+  /**
+   * Creates a standardized panel with header and content area.
+   *
+   * @param title   The panel header text
+   * @param content The main content node for the panel
+   * @return VBox containing the styled panel with header
+   */
   private def createPanelWithHeader(title: String, content: Node): VBox =
     new VBox:
       spacing = 0
@@ -116,6 +171,12 @@ object GameUi:
           children = Seq(content)
       )
 
+  /**
+   * Creates character information display showing basic player details.
+   *
+   * @param player The player whose character info to display
+   * @return Sequence of nodes showing name, race, class, level, gold, and experience
+   */
   private def createCharacterContent(player: Player): Seq[Node] = Seq(
     createTableRow("Name", player.name),
     createTableRow("Race", player.identity.race.toString),
@@ -126,6 +187,12 @@ object GameUi:
     createTableRow("Exp/NextLevel", s"${player.exp} / ${player.level * 100}")
   )
 
+  /**
+   * Creates equipment display showing all equipped items by slot.
+   *
+   * @param player The player whose equipment to display
+   * @return Sequence of nodes showing equipment in each slot
+   */
   private def createEquipmentContent(player: Player): Seq[Node] =
     EquipmentSlot.values.toSeq.map: slot =>
       val equipped = player.equipment.getOrElse(slot, None)
@@ -139,8 +206,15 @@ object GameUi:
 
       createTableRow(slot.toString, label)
 
+  /**
+   * Creates stats display showing attributes and health/mana with progress bars.
+   *
+   * @param player The player whose stats to display
+   * @return Sequence of nodes showing all attributes plus HP/MP bars
+   */
 
   private def createStatsContent(player: Player): Seq[Node] =
+    // Basic attribute rows
     val attrRows = Seq(
       createTableRow("STR", player.attributes.strength.toString),
       createTableRow("CON", player.attributes.constitution.toString),
@@ -153,6 +227,7 @@ object GameUi:
     val hpLabel = styledLabel(s"${player.currentHp} / ${player.hp}", labelHeader)
     val mpLabel = styledLabel(s"${player.currentMp} / ${player.mp}", labelHeader)
 
+    // Combine attributes with HP/MP progress bars
     attrRows ++ Seq(
       createTableRow("HP", ""),
       new VBox:
@@ -177,16 +252,24 @@ object GameUi:
         )
     )
 
+  /**
+   * Creates inventory display showing all items and quantities in a grid.
+   *
+   * @param player The player whose inventory to display
+   * @return GridPane node containing item names and quantities
+   */
   private def createInventoryContent(player: Player): Node = new GridPane:
     hgap = 50
     vgap = 10
     padding = Insets(5)
 
+    // Add headers
     add(createTableHeader("Item"), 0, 0)
     add(createTableHeader("Quantity"), 1, 0)
     add(createTableHeader("Gold"), 2, 0)
     add(createTableHeader("Rarity"), 3, 0)
 
+    // Add inventory items
     player.inventory.toSeq.zipWithIndex.foreach { case ((item, qty), idx) =>
       add(styledLabel(item.name), 0, idx + 1)
       add(styledLabel(qty.toString), 1, idx + 1)
@@ -194,6 +277,11 @@ object GameUi:
       add(styledLabel(item.rarity.toString), 3, idx + 1)
     }
 
+  /**
+   * Creates hero diary content showing event messages in a text area.
+   *
+   * @return TextArea containing recent adventure events
+   */
   private def createDiaryContent(): Node = new TextArea:
     text = if eventMessages.isEmpty then "Waiting for adventures..." else eventMessages.mkString("\n")
     editable = false
@@ -201,7 +289,11 @@ object GameUi:
     style = "-fx-font-family: monospace; -fx-font-size: 12; -fx-background-color: transparent"
     focusTraversable = false
 
-
+  /**
+   * Creates combat log content showing recent combat messages.
+   *
+   * @return TextArea containing recent combat events
+   */
   private def createCombatLogContent(): Node =
     val area = new TextArea:
       text = if combatMessages.isEmpty then "No combat yet..." else combatMessages.mkString("\n")
@@ -216,7 +308,11 @@ object GameUi:
 
     area
 
-
+  /**
+   * Creates monster information display showing current encounter details.
+   *
+   * @return TextArea containing detailed monster information or "no monster" message
+   */
   private def createMonsterInfoContent(): Seq[Node] =
     currentMonster match
       case Some(monster) =>
@@ -254,6 +350,12 @@ object GameUi:
         Seq(new Label("No monster encountered yet..."))
 
 
+  /**
+   * Creates world information display showing current zone and description.
+   *
+   * @param player The player whose current zone to display
+   * @return VBox containing zone name and description
+   */
   private def createWorldContent(player: Player): Node =
     new VBox:
       spacing = 10
@@ -268,15 +370,35 @@ object GameUi:
           maxWidth = 200
       )
 
+  /**
+   * Creates skills display organized by effect type (Physical, Magic, Healing).
+   *
+   * @param player The player whose skills to display
+   * @return HBox containing three columns of skills by type
+   */
   private def createSkillsContent(player: Player): Node =
+    // Filter skills by type
     val physicalSkills = player.skills.filter(_.effectType == SkillEffectType.Physical)
     val magicSkills = player.skills.filter(_.effectType == SkillEffectType.Magic)
     val healingSkills = player.skills.filter(_.effectType == SkillEffectType.Healing)
 
+    /**
+     * Helper function to format individual skill display.
+     *
+     * @param skill The skill to format
+     * @return Label with skill name, level, and mana cost
+     */
     def formatSkill(skill: Skill): Label =
       new Label(s"${skill.name} (Lv.${skill.powerLevel}, MP: ${skill.manaCost})"):
         style = "-fx-font-size: 11"
 
+    /**
+     * Helper function to create a column of skills with header.
+     *
+     * @param title  The column header text
+     * @param skills List of skills to display in this column
+     * @return VBox containing header and skill list
+     */
     def makeColumn(title: String, skills: List[Skill]) =
       new VBox:
         spacing = 5
@@ -295,6 +417,12 @@ object GameUi:
         makeColumn("Healing", healingSkills)
       )
 
+  /**
+   * Creates mission display showing active missions and their progress.
+   *
+   * @param player The player whose missions to display
+   * @return VBox containing mission list or "no missions" message
+   */
   private def createMissionContent(player: Player): Node = new VBox:
     spacing = 5
     children =
@@ -337,12 +465,22 @@ object GameUi:
         style = "-fx-min-width: 120"
     )
 
+  /**
+   * Creates a standardized table row with label and value.
+   *
+   * @param label The row label text
+   * @param value The row value text
+   * @return HBox containing formatted label-value pair
+   */
   private def createTableHeader(text: String): Label = new Label(text):
     style = "-fx-font-weight: bold; -fx-underline: true"
 
   /**
    * Update the UI with current player information
    * This method should be called from GameController
+   * state changes to keep the UI synchronized with game state.
+   *
+   * @param player The updated player object to display
    */
   def updatePlayerInfo(player: Player): Unit =
     playerOpt = Some(player) // update stored player reference
@@ -353,6 +491,8 @@ object GameUi:
 
   /**
    * Add a message to the combat log
+   *
+   * @param message The combat message to add
    */
   def addCombatLog(message: String): Unit =
     combatMessages = (combatMessages :+ message).takeRight(20) // Keep last 20 messages
@@ -360,6 +500,8 @@ object GameUi:
 
   /**
    * Add a message to the event diary
+   *
+   * @param message The event message to add
    */
   def addEventLog(message: String): Unit =
     eventMessages = (eventMessages :+ message).takeRight(30) // Keep last 30 messages
@@ -381,12 +523,23 @@ object GameUi:
 
 
   /**
-   * Update the current monster info
+   * Updates the current monster information display.
+   *
+   * @param monster Optional monster to display, or None to clear the display
    */
   def updateMonsterInfo(monster: Option[Monster]): Unit =
     currentMonster = monster
     updateCurrentUI()
 
+
+  /**
+   * Shows game over screen with restart functionality.
+   *
+   * Creates a modal dialog offering the player options to restart
+   * the game or exit completely.
+   *
+   * @param onRestart Callback function to execute when player chooses to restart
+   */
   def showGameOverWithRestart(onRestart: () => Unit): Unit =
     // Create a simple game over window with restart option
     val gameOverStage = new Stage:
@@ -451,6 +604,14 @@ object GameUi:
     // TODO: Show game over dialog with restart option
     println("GAME OVER - Show restart dialog")
 
+  /**
+   * Creates the hero diary panel with animated progress bar.
+   *
+   * The panel includes both the progress bar in the header and the
+   * diary content area for displaying event messages.
+   *
+   * @return VBox containing the complete hero diary panel
+   */
   private def createHeroDiaryPanel(): VBox =
     val progressBar = new ProgressBar:
       progress = 0.0

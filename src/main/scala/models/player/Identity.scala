@@ -29,7 +29,7 @@ object PlayerBonusesApplication:
       case Race.Dwarf => (1.5, 0.5, player.withBaseAttributes(player.baseAttributes.copy(constitution = player.baseAttributes.constitution + Random.between(1, 5))))
       case Race.Orc => (1.7, 0.3, player.withBaseAttributes(player.baseAttributes.copy(wisdom = player.baseAttributes.wisdom + Random.between(1, 5))))
       case Race.Gnome => (0.8, 1.2, player.withBaseAttributes(player.baseAttributes.copy(intelligence = player.baseAttributes.intelligence + Random.between(1, 5))))
-      case Race.Titan => (1.9, 0.1, player.withBaseAttributes(player.baseAttributes.copy(strength = player.baseAttributes.strength + Random.between(1, 5))))
+      case Race.Titan => (1.6, 0.4, player.withBaseAttributes(player.baseAttributes.copy(strength = player.baseAttributes.strength + Random.between(1, 5))))
       case Race.Gundam => (1.3, 0.7, player.withBaseAttributes(player.baseAttributes.copy(constitution = player.baseAttributes.constitution + Random.between(1, 5))))
       case Race.PandaMan => (0.8, 1.2, player.withBaseAttributes(player.baseAttributes.copy(wisdom = player.baseAttributes.wisdom + Random.between(1, 3), strength = player.baseAttributes.strength + Random.between(1, 3))))
 
