@@ -4,21 +4,19 @@ import models.event.Mission
 import models.player.*
 
 
-object PlayerController {
+object PlayerController:
 
 
   def isAlive(player: Player): Boolean =
     player.currentHp > 0
 
 
-  def takeDamage(player: Player, damage: Int): Player = {
+  def takeDamage(player: Player, damage: Int): Player =
     val newHp = (player.currentHp - damage).max(0)
     player.copy(currentHp = newHp)
-  }
 
-  def heal(player: Player, amount: Int): Player = {
+  def heal(player: Player, amount: Int): Player =
     player.copy(currentHp = player.currentHp + amount)
-  }
 
 
   def gainXP(player: Player, xpGained: Int): Player =
@@ -26,40 +24,35 @@ object PlayerController {
     if newExp >= player.level * 100 then player.levelUp()
     else player.copy(exp = newExp)
 
-  def addItem(player: Player, item: Item, quantity: Int = 1): Player = {
+  def addItem(player: Player, item: Item, quantity: Int = 1): Player =
     val updatedInventory = player.inventory + (item -> (player.inventory.getOrElse(item, 0) + quantity))
     player.copy(inventory = updatedInventory)
-  }
 
 
-  private def removeItem(player: Player, item: Item, quantity: Int = 1): Player = {
+  private def removeItem(player: Player, item: Item, quantity: Int = 1): Player =
     val currentQty = player.inventory.getOrElse(item, 0) - quantity
     val updatedInventory =
       if (currentQty > 0) player.inventory.updated(item, currentQty)
       else player.inventory - item
     player.copy(inventory = updatedInventory)
-  }
 
 
-  def equipItem(player: Player, slot: EquipmentSlot, equipment: Equipment): Player = {
+  def equipItem(player: Player, slot: EquipmentSlot, equipment: Equipment): Player =
     val updatedEquipment = player.equipment + (slot -> Some(equipment))
     player.copy(equipment = updatedEquipment)
-  }
 
 
-  def unequipItem(player: Player, slot: EquipmentSlot): Player = {
+  def unequipItem(player: Player, slot: EquipmentSlot): Player =
     val updatedEquipment = player.equipment + (slot -> None)
     player.copy(equipment = updatedEquipment)
-  }
 
 
-  def useItem(player: Player, itemName: String): Player = {
+  def useItem(player: Player, itemName: String): Player =
     val maybeItem = player.inventory.keys.find(_.name == itemName)
     maybeItem match {
       case Some(item) => removeItem(player, item, 1)
       case None => player
     }
-  }
 
 
   def addGold(player: Player, amount: Double): Player =
@@ -86,5 +79,13 @@ object PlayerController {
     player.copy(identity = newIdentity)
 
   def levelDownAndDecreaseStats(player: Player, levels: Int): Player =
-    player.copy()
-}
+    var updatedPlayer = player
+    var remainingLevels = levels
+
+    while remainingLevels > 0 do
+      val newLevel = (updatedPlayer.level - 1).max(1)
+      updatedPlayer = updatedPlayer.copy(level = newLevel).powerDownAttributes()
+      remainingLevels -= 1
+
+    updatedPlayer
+
