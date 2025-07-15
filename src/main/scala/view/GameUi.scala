@@ -47,31 +47,45 @@ object GameUi:
     new BorderPane:
       padding = Insets(15)
       style = "-fx-background-color: #e0e0e0"
+      center = new ScrollPane:
+        fitToWidth = true
+        fitToHeight = true
+        hbarPolicy = ScrollPane.ScrollBarPolicy.AsNeeded
+        vbarPolicy = ScrollPane.ScrollBarPolicy.AsNeeded
+        content = new HBox:
+          spacing = 20
+          alignment = Pos.TopLeft
+          children = Seq(
+            createLeftColumn(player),
+            createRightColumn()
+          )
 
-      top = createSectionRow(Seq(
-        createPanelWithHeader("Character Player", new VBox:
-          children = createCharacterContent(player)
-        ),
-        createPanelWithHeader("Equipment", new VBox:
-          children = createEquipmentContent(player)
-        ),
-        createPanelWithHeader("Stats", new VBox:
-          children = createStatsContent(player)
-        )
-      ))
 
-      center = createSectionRow(Seq(
-        createPanelWithHeader("Inventory", createInventoryContent(player)),
+  private def createLeftColumn(player: Player): VBox =
+    new VBox:
+      spacing = 15
+      prefWidth = screenWidth * 0.6
+      children = Seq(
+        createPanelWithHeader("Character", new VBox(createCharacterContent(player) *)),
+        createPanelWithHeader("Stats", new VBox(createStatsContent(player) *)),
         createPanelWithHeader("World", createWorldContent(player)),
+        createPanelWithHeader("Mission List", createMissionContent(player)),
         createPanelWithHeader("Skills", createSkillsContent(player)),
-        createPanelWithHeader("Mission", createMissionContent(player))
-      ))
+        createPanelWithHeader("Equipment", new VBox(createEquipmentContent(player) *)),
+        createPanelWithHeader("Inventory", createInventoryContent(player))
+      )
 
-      bottom = createSectionRow(Seq(
+
+  private def createRightColumn(): VBox =
+    new VBox:
+      spacing = 15
+      prefWidth = screenWidth * 0.4
+      children = Seq(
         createHeroDiaryPanel(),
         createPanelWithHeader("Combat Log", createCombatLogContent()),
         createPanelWithHeader("Monster Info", createMonsterInfoContent())
-      ))
+      )
+
 
   private def createSectionRow(panels: Seq[Node]): HBox =
     new HBox:
