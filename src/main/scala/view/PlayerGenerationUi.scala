@@ -54,6 +54,11 @@ object PlayerGenerationUi extends JFXApp3:
       style = "-fx-font-size: 12px; -fx-text-fill: #7f8c8d; -fx-wrap-text: true;"
       maxWidth = 250
 
+    // ADD CLASS DESCRIPTION LABEL
+    val classDescriptionLabel = new Label(getClassDescription(selectedClass)):
+      style = "-fx-font-size: 12px; -fx-text-fill: #7f8c8d; -fx-wrap-text: true;"
+      maxWidth = 250
+
     val playerNameLabel = new TextField {
       promptText = "Enter your Player name"
       text = "Player"
@@ -142,7 +147,10 @@ object PlayerGenerationUi extends JFXApp3:
                     selectedClass = Random.shuffle(ClassType.values.toList).head
                     identity = Identity(race = selectedRace, classType = selectedClass)
                     classLabel.text = selectedClass.toString
+                    classDescriptionLabel.text = getClassDescription(selectedClass) // UPDATE DESCRIPTION
               )
+            ,
+            classDescriptionLabel
           )
         ,
         // Behavior
@@ -249,6 +257,11 @@ object PlayerGenerationUi extends JFXApp3:
       style = "-fx-font-size: 12px; -fx-text-fill: #7f8c8d; -fx-wrap-text: true;"
       maxWidth = 250
 
+    // ADD CLASS DESCRIPTION
+    val classDescriptionLabel = new Label(getClassDescription(selectedClass)):
+      style = "-fx-font-size: 12px; -fx-text-fill: #7f8c8d; -fx-wrap-text: true;"
+      maxWidth = 250
+
     val playerNameLabel = new TextField {
       promptText = "Enter your Player name"
       text = "Player"
@@ -337,7 +350,10 @@ object PlayerGenerationUi extends JFXApp3:
                     selectedClass = Random.shuffle(ClassType.values.toList).head
                     identity = Identity(race = selectedRace, classType = selectedClass)
                     classLabel.text = selectedClass.toString
+                    classDescriptionLabel.text = getClassDescription(selectedClass) // UPDATE DESCRIPTION
               )
+            ,
+            classDescriptionLabel
           )
         ,
         // Behavior
@@ -441,3 +457,12 @@ object PlayerGenerationUi extends JFXApp3:
     case Race.Dwarf => "Hardy folk with strong constitution."
     case Race.PandaMan => "Peaceful but wise and lucky."
     case Race.Gundam => "Mechanical warriors, high defense."
+
+  private def getClassDescription(classType: ClassType): String = classType match
+    case ClassType.Warrior => "Melee fighter with high HP."
+    case ClassType.Poisoner => "Uses toxins and stealth attacks."
+    case ClassType.CowBoy => "Ranged fighter with quick shots."
+    case ClassType.Paladin => "Holy warrior with healing magic."
+    case ClassType.Assassin => "Stealthy killer with precision."
+    case ClassType.Mage => "Spellcaster with powerful magic."
+    case ClassType.Cleric => "Healer with protective spells."
