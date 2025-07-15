@@ -40,6 +40,41 @@ class TestModels extends AnyFunSuite:
 
     println(s"Generated Equipment: $equip")
 
+
+  test("generateRandomEquipment returns Some when drop chance is 100%"):
+    val equipment = EquipmentFactory.generateRandomEquipment(probabilityDrop = 1.0, playerLucky = 0, playerLevel = 5)
+    assert(equipment.isDefined)
+
+
+  test("generateRandomEquipment returns None when drop chance is 0% and no luck"):
+    val equipment = EquipmentFactory.generateRandomEquipment(probabilityDrop = 0.0, playerLucky = 0, playerLevel = 5)
+    assert(equipment.isEmpty)
+
+
+  test("equipment attributes increase with player level"):
+    val lowLevel = EquipmentFactory.generateRandomEquipment(1.0, playerLucky = 0, playerLevel = 1).get
+    val highLevel = EquipmentFactory.generateRandomEquipment(1.0, playerLucky = 0, playerLevel = 50).get
+    assert(highLevel.statBonus.total >= lowLevel.statBonus.total)
+
+
+  test("equipment total value matches attribute total"):
+    val eq = EquipmentFactory.generateRandomEquipment(1.0, playerLucky = 10, playerLevel = 10).get
+    assert(eq.value == eq.statBonus.total)
+
+
+  test("high luck increases drop probability"):
+    val attempts = 1000
+    val withLuckDrops = (1 to attempts).count { _ =>
+      EquipmentFactory.generateRandomEquipment(0.50, playerLucky = 100, playerLevel = 5).isDefined
+    }
+    val withoutLuckDrops = (1 to attempts).count { _ =>
+      EquipmentFactory.generateRandomEquipment(0.50, playerLucky = 0, playerLevel = 5).isDefined
+    }
+    println(withoutLuckDrops)
+    println(withLuckDrops)
+    assert(withLuckDrops > withoutLuckDrops)
+
+
   // TestSkill
 
   test("Random skill generation should return valid skill"):

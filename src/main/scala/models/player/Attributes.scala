@@ -1,6 +1,5 @@
 package models.player
 
-import scala.annotation.targetName
 import scala.util.Random
 
 // === Attributes === TODO battle management
