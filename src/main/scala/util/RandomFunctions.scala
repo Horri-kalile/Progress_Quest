@@ -1,6 +1,6 @@
 package util
 
-import models.event.EventType
+import models.event.GameEventModule.EventType
 import models.monster.OriginZone
 import util.GameConfig.*
 

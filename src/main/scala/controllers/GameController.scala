@@ -1,7 +1,6 @@
 package controllers
 
 import models.player.Player
-import models.event.{EventFactory, EventType}
 import util.RandomFunctions
 import view.{GameUi, PlayerGenerationUi}
 import scalafx.application.Platform
@@ -9,6 +8,7 @@ import scalafx.application.Platform
 import java.util.{Timer, TimerTask}
 import scalafx.animation.PauseTransition
 import javafx.util.Duration
+import models.event.GameEventModule.EventType
 import models.monster.Monster
 import scalafx.Includes.*
 
@@ -75,13 +75,13 @@ object GameController:
           val finalMonster = fightSteps.lastOption.flatMap(_._2)
 
           // Post-fight check: game over or other events
-          val (updatedPlayer, postFightMessages, _) = EventFactory.executeEvent(EventType.fight, finalPlayer)
+          val (updatedPlayer, postFightMessages, _) = EventController.runEvent(EventType.fight, finalPlayer)
           val postFightSteps = postFightMessages.map(msg => (updatedPlayer, finalMonster, msg))
 
           showFightStepsSequentially(fightSteps ++ postFightSteps, updatedPlayer)
 
         else
-          val (updatedPlayer, messages, _) = EventFactory.executeEvent(eventType, player)
+          val (updatedPlayer, messages, _) = EventController.runEvent(eventType, player)
 
           Platform.runLater {
             currentPlayer = Some(updatedPlayer)
@@ -158,7 +158,7 @@ object GameController:
    */
   def triggerEvent(eventType: EventType): Unit =
     currentPlayer.foreach: player =>
-      val (updatedPlayer, messages, result) = EventFactory.executeEvent(eventType, player)
+      val (updatedPlayer, messages, result) = EventController.runEvent(eventType, player)
       currentPlayer = Some(updatedPlayer)
 
       // Update monster info based on event type
