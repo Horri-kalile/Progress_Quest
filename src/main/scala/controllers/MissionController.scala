@@ -3,30 +3,40 @@ package controllers
 import models.event.{Mission, MissionFactory}
 import models.player.Player
 
-
 object MissionController:
 
+  /**
+   * Generates a new random mission for the given player.
+   *
+   * The mission is influenced by the player's luck and level to ensure appropriate difficulty and rewards.
+   *
+   * @param player the player for whom the mission is generated
+   * @return a new randomized [[Mission]] instance
+   */
   def createRandomMission(player: Player): Mission =
     MissionFactory.randomMission(playerLucky = player.attributes.lucky, playerLevel = player.level)
-
 
   /**
    * Adds a mission to the player's mission list.
    *
+   * The mission is appended to the current active mission list.
+   *
    * @param player  the player receiving the mission
    * @param mission the mission to add
-   * @return updated Player instance with added mission
+   * @return updated [[Player]] instance with the mission added
    */
   def addMission(player: Player, mission: Mission): Player =
     player.withMissions(player.missions :+ mission)
 
-
   /**
-   * Updates a mission in the player's list and applies rewards if it's completed.
+   * Progresses a mission for the player and checks for completion.
+   *
+   * If the mission becomes completed after progression, rewards (gold, XP, optional item) are granted.
+   * The completed mission is then removed from the mission list.
    *
    * @param player the player progressing a mission
    * @param m      the mission to progress
-   * @return updated Player instance
+   * @return updated [[Player]] instance with mission progress and possible rewards applied
    */
   def progressMission(player: Player, m: Mission): Player =
     // Update missions: progress the target one
@@ -48,13 +58,3 @@ object MissionController:
 
       case None =>
         player.withMissions(updatedMissions)
-
-
-
-
-
-
-
-
-
-
