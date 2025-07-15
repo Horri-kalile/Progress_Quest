@@ -1,6 +1,7 @@
 package view
 
 import models.player.*
+import models.player.Behavior.BehaviorType
 import scalafx.Includes.*
 import scalafx.application.JFXApp3
 import scalafx.geometry.{Insets, Pos}
@@ -33,14 +34,14 @@ object PlayerGenerationUi extends JFXApp3:
       style = "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
     val behaviorLabel = new Label(selectedBehavior.toString):
       style = "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
-    
+
     val playerNameLabel = new TextField {
       promptText = "Enter your Player name"
       text = "Player"
       style = "-fx-font-size: 14px; -fx-padding: 8px; -fx-border-radius: 5px; -fx-background-radius: 5px;"
       prefWidth = 200
     }
-    
+
     val strengthLabel = new Label(s"Strength: ${randomAttributes.strength}"):
       style = "-fx-font-size: 13px; -fx-text-fill: #34495e;"
     val constitutionLabel = new Label(s"Constitution: ${randomAttributes.constitution}"):
@@ -183,7 +184,7 @@ object PlayerGenerationUi extends JFXApp3:
         new Button("✨ Create Hero"):
           style = "-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 12 25; -fx-border-radius: 8px; -fx-background-radius: 8px; -fx-font-weight: bold;"
           onAction = _ =>
-            val player = PlayerFactory.createDefaultPlayer(playerNameLabel.text.value.trim, identity, randomAttributes, selectedBehavior)
+            val player = Player(playerNameLabel.text.value.trim, identity, randomAttributes, selectedBehavior)
             val finalPlayer = PlayerBonusesApplication.applyRaceAndClassBonuses(player)
             println(s"Player Created: $finalPlayer")
             onPlayerCreated(finalPlayer)

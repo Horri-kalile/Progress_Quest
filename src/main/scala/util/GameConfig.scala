@@ -11,4 +11,4 @@ object GameConfig:
   val minGameOverChance: Double = 0.01
   val maxBuffByZone: Double = 0.20 // 20% maximum buff
   val probabilityToMissAttackBonus: Double = 0.001
-
+  val powerUpCost: Int = 100

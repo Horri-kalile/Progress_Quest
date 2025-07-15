@@ -6,38 +6,37 @@ import models.player.Item
 import controllers.PlayerController
 
 
-object MissionController {
+object MissionController:
 
-  def createRandomMission(): Mission = {
+  def createRandomMission(): Mission =
     MissionFactory.randomMission()
-  }
 
 
-  def progressMission(mission: Mission): Mission = {
-    mission.progressed()
-  }
+  /**
+   * Adds a mission to the player's mission list.
+   *
+   * @param player  the player receiving the mission
+   * @param mission the mission to add
+   * @return updated Player instance with added mission
+   */
+  def addMission(player: Player, mission: Mission): Player =
+    player.withMissions(player.missions :+ mission)
 
 
-  def isCompleted(mission: Mission): Boolean = {
-    mission.isCompleted
-  }
+  /**
+   * Updates a mission in the player's list if progressed.
+   *
+   * @param player the player
+   * @param m      the mission to progress
+   * @return updated Player instance
+   */
+  def progressMission(player: Player, m: Mission): Player =
+    val updated = player.missions.map(m1 => if m1.id == m.id then m1.progressed() else m1)
+    player.withMissions(updated)
 
 
-  def completeMission(player: Player, mission: Mission): Player = {
-    var updatedPlayer = PlayerController.gainXP(player, mission.rewardExp)
 
-    mission.rewardGold.foreach { gold =>
-      updatedPlayer = updatedPlayer.earnGold(gold)
-    }
 
-    mission.rewardItem.foreach { item =>
-      updatedPlayer = PlayerController.addItem(updatedPlayer, item)
-
-    }
-
-    updatedPlayer
-  }
-}
 
 
 

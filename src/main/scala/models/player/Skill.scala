@@ -38,7 +38,7 @@ case class GenericSkill(
   override def use(caster: Player, target: Entity): (Player, Entity) =
     if caster.currentMp < manaCost then return (caster, target)
 
-    val updatedCaster = caster.copy(mp = caster.currentMp - manaCost)
+    val updatedCaster = caster.withCurrentMp(caster.currentMp - manaCost)
     val multiplier = Random.between(0.1, baseMultiplier)
 
     effectType match

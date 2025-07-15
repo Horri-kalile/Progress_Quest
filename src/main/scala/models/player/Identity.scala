@@ -12,6 +12,15 @@ case class Identity(race: Race, classType: ClassType)
 
 
 object PlayerBonusesApplication:
+  /**
+   * Applies race and class bonuses to player's HP, MP, and starting skills.
+   * - Race affects HP and MP multipliers.
+   * - Certain classes get random flat bonuses to HP and MP.
+   * - Starting skill is generated based on class type.
+   *
+   * @param player The player instance to apply bonuses to.
+   * @return A new Player instance with updated HP, MP, current HP/MP, and skills.
+   */
   def applyRaceAndClassBonuses(player: Player): Player =
     val (hpMulti, mpMulti) = player.identity.race match
       case Race.Human => (1.0, 1.0)
@@ -34,12 +43,10 @@ object PlayerBonusesApplication:
       case ClassType.Assassin => (0, 0)
       case _ => (Random.between(10, 31), Random.between(5, 16))
 
-    val skillOpt = SkillFactory.generateStartingSkill(classType)
+    val startingSkill = SkillFactory.generateStartingSkill(classType).toList
 
-    player.copy(
-      hp = raceHp + classHpBonus,
-      mp = raceMp + classMpBonus,
-      currentHp = raceHp + classHpBonus,
-      currentMp = raceMp + classMpBonus,
-      skills = skillOpt.toList
-    )
+    player.withHp(raceHp + classHpBonus)
+      .withMp(raceMp + classMpBonus)
+      .withCurrentHp(raceHp + classHpBonus)
+      .withCurrentMp(raceMp + classMpBonus)
+      .withSkills(startingSkill)

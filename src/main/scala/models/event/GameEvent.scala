@@ -1,8 +1,9 @@
 package models.event
 
-import controllers.{CombatController, MonsterController, PlayerController}
+import controllers.{CombatController, MissionController, MonsterController, PlayerController}
 import models.monster.Monster
-import models.player.{EquipmentFactory, Item, Player}
+import models.player.{EquipmentFactory, Item, ItemFactory, Player}
+import util.GameConfig
 
 import scala.util.Random
 
@@ -33,12 +34,12 @@ case object MissionEvent extends GameEvent:
       val mission = Random.shuffle(player.activeMissions).head
       val msg = s"You progressed on mission: ${mission.description}"
       println(msg)
-      (player.progressMission(mission), List(msg), None)
+      (MissionController.progressMission(player, mission), List(msg), None)
     else
       val mission = MissionFactory.randomMission()
       val msg = s"You accepted a new mission: ${mission.description}"
       println(msg)
-      (player.addMission(mission), List(msg), None)
+      (MissionController.addMission(player, mission), List(msg), None)
 
 case object TrainingEvent extends GameEvent:
   override def action(player: Player): (Player, List[String], Option[Monster]) =
@@ -54,13 +55,13 @@ case object RestoreEvent extends GameEvent:
     (player.restore(), List(msg), None)
 
 case object PowerUpEvent extends GameEvent:
-  private val cost = 100
 
-  private def canPowerUp(player: Player): Boolean = player.gold >= cost
+  private def canPowerUp(player: Player): Boolean = player.gold >= GameConfig.powerUpCost * player.level
 
   override def action(player: Player): (Player, List[String], Option[Monster]) =
+    val cost = GameConfig.powerUpCost * player.level
     if canPowerUp(player) then
-      val updated = player.spendGold(cost).map(_.powerUpAttributes()).getOrElse(player)
+      val updated = player.withGold(cost).powerUpAttributes()
       val msg = s"You spend $cost gold to power up your stats!"
       println(msg)
       (updated, List(msg), None)
@@ -83,7 +84,7 @@ case object SellEvent extends GameEvent:
           if qty > 0 then
             val goldGained = item.gold * qty
             val newInventory = p.inventory - item
-            val updated = p.copy(inventory = newInventory, gold = p.gold + goldGained)
+            val updated = p.withGold((p.gold + goldGained)).withInventory(newInventory)
             val msg = s"Sold $qty × ${item.name} for $goldGained gold."
             (updated, logs :+ msg)
           else (p, logs)
@@ -98,66 +99,62 @@ case object SpecialEvent extends GameEvent:
       case 0 =>
         val change = Random.between(1, 4)
         if Random.nextBoolean() then
-          val newPlayer = (1 to change).foldLeft(player)((p, _) => p.levelUp())
+          val newPlayer = (1 to change).foldLeft(player)((p, _) => PlayerController.levelUp(player))
           val msg = s"Blessing! You leveled up $change times."
-          println(msg)
           (newPlayer, List(msg), None)
         else
           val newLevel = math.max(1, player.level - change)
-          val newPlayer = (1 to change).foldLeft(player)((p, _) => p.levelDown())
+          val newPlayer = (1 to change).foldLeft(player)((p, _) => PlayerController.levelDown(player))
           val msg = s"Curse! You lost $change levels."
-          println(msg)
           (newPlayer, List(msg), None)
 
       case 1 =>
         val eq = EquipmentFactory.generateRandomEquipment(probabilityDrop = 1.0, player.attributes.lucky, playerLevel = player.level)
         val msg1 = "You defeated a powerful monster!"
-        val msg2 = s"You looted a rare item: ${eq.get.name}"
-        println(msg1)
-        println(msg2)
-        (player.replaceEquipment(eq.get), List(msg1, msg2), None)
+        val msg2 = s"You looted a new equipment: ${eq.get.name}"
+        val (updatedPlayer, msg3) = player.equipment.getOrElse(eq.get.slot, None) match
+          case Some(old) if old.value >= eq.get.value =>
+            val updated = PlayerController.addGold(player, eq.get.value)
+            (updated, s"You found ${eq.get.name}, sold for ${eq.get.value} gold.")
+          case _ =>
+            val updated = PlayerController.equipmentOn(player, eq.get.slot, eq.get)
+            (updated, s"You equipped: ${eq.get.name} (${eq.get.slot}).")
+        (updatedPlayer, List(msg1, msg2, msg3), None)
 
       case 2 =>
         val msg = "You were defeated by a powerful monster. Game over!"
-        println(msg)
         val (finalPlayer, endMsgs, result) = GameOverEvent.action(player)
         (finalPlayer, msg :: endMsgs, result)
 
       case 3 =>
-        val eq = EquipmentFactory.generateRandomEquipment(probabilityDrop = 1.0, player.attributes.lucky, playerLevel = player.level)
-        val msg1 = "You discovered a hidden dungeon and found rare equipment!"
-        val msg2 = s"You found: ${eq.get.name}"
-        println(msg1)
-        println(msg2)
-        (player.replaceEquipment(eq.get), List(msg1, msg2), None)
+        val eq = ItemFactory.randomItem(player.attributes.lucky)
+        val msg1 = "You discovered a hidden dungeon and found new item!"
+        val msg2 = s"You found: ${eq.name}, ${eq.gold} , ${eq.rarity}"
+        (PlayerController.addItem(player, eq), List(msg1, msg2), None)
 
       case 4 =>
         val msg = "You were injured in a dungeon trap! HP and MP halved."
-        println(msg)
-        (player.copy(currentHp = math.max(1, player.currentHp / 2), currentMp = math.max(0, player.currentMp / 2)), List(msg), None)
+        (PlayerController.playerInjured(player), List(msg), None)
 
       case 5 =>
-        val gain = Random.between(50, 151) + (player.level * player.attributes.wisdom)
+        val gain = Random.between(50, 100) * player.level + player.attributes.wisdom
         val msg = s"You helped villagers and gained $gain EXP."
         println(msg)
         (PlayerController.gainXP(player, gain), List(msg), None)
 
       case 6 =>
         val msg = "It was a trap! You were killed. Game over!"
-        println(msg)
         val (finalPlayer, endMsgs, result) = GameOverEvent.action(player)
         (finalPlayer, msg :: endMsgs, result)
 
       case 7 =>
-        val result = player.stealFromInventory()
-        println(result)
-        (player, List(result), None)
+        val (updatedPlayer, msg): (Player, String) = PlayerController.stealRandomItem(player)
+        (updatedPlayer, List(msg), None)
 
 case object GameOverEvent extends GameEvent:
   override def action(player: Player): (Player, List[String], Option[Monster]) =
     val msg = "GAME OVER."
-    println(msg)
-    (player.copy(currentHp = 0), List(msg), None)
+    (player.withCurrentHp(0), List(msg), None)
 
 object EventFactory:
   def executeEvent(eventType: EventType, player: Player): (Player, List[String], Option[Monster]) =
