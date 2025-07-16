@@ -30,7 +30,7 @@ case class Attributes(strength: Int, constitution: Int, dexterity: Int, intellig
 
 object Attributes:
   /** List of attribute field names. */
-  val attributeNames: Seq[String] = Seq("strength", "constitution", "dexterity", "intelligence", "wisdom", "lucky")
+  private val attributeNames: Seq[String] = Seq("strength", "constitution", "dexterity", "intelligence", "wisdom", "lucky")
 
   /** Map of +1 increment by attribute name. */
   private val increments: Map[String, Attributes] = attributeNames.map(n => n -> singleAttribute(n, 1)).toMap
@@ -83,20 +83,20 @@ object Attributes:
     val List(str, con, dex, int, wis, luck) = values
     Attributes(str, con, dex, int, wis, luck)
 
-  def getIncrements: Map[String, Attributes] = increments
+  private def getIncrements: Map[String, Attributes] = increments
 
-  def getDecrements: Map[String, Attributes] = decrements
+  private def getDecrements: Map[String, Attributes] = decrements
 
 
-/** Extension methods for random mutations. */
-extension (attr: Attributes)
+  /** Extension methods for random mutations. */
+  extension (attr: Attributes)
 
-  /** Randomly increments a subset of attributes. */
-  def incrementRandomAttributes(): Attributes =
-    val selected = Random.shuffle(Attributes.attributeNames).take(Random.between(1, Attributes.attributeNames.size + 1))
-    selected.foldLeft(attr)(_ + Attributes.getIncrements(_))
+    /** Randomly increments a subset of attributes. */
+    def incrementRandomAttributes(): Attributes =
+      val selected = Random.shuffle(Attributes.attributeNames).take(Random.between(1, Attributes.attributeNames.size + 1))
+      selected.foldLeft(attr)(_ + Attributes.getIncrements(_))
 
-  /** Randomly decrements a subset of attributes. */
-  def decrementRandomAttributes(): Attributes =
-    val selected = Random.shuffle(Attributes.attributeNames).take(Random.between(1, Attributes.attributeNames.size + 1))
-    selected.foldLeft(attr)(_ + Attributes.getDecrements(_))
+    /** Randomly decrements a subset of attributes. */
+    def decrementRandomAttributes(): Attributes =
+      val selected = Random.shuffle(Attributes.attributeNames).take(Random.between(1, Attributes.attributeNames.size + 1))
+      selected.foldLeft(attr)(_ + Attributes.getDecrements(_))

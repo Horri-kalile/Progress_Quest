@@ -5,7 +5,7 @@ import models.event.*
 import controllers.{MissionController, PlayerController}
 import models.player.Behavior.BehaviorType
 
-class GameLogicTest extends AnyFunSuite:
+class TestGameLogic extends AnyFunSuite:
 
   val identity: Identity = Identity(Race.Human, ClassType.Warrior)
   val attributes: Attributes = Attributes(10, 10, 10, 10, 10, 10)

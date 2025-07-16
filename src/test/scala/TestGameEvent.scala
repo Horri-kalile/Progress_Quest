@@ -8,7 +8,7 @@ import models.player.Behavior.BehaviorType
 import org.scalatest.funsuite.AnyFunSuite
 
 
-class GameEventFactoryTest extends AnyFunSuite:
+class TestGameEvent extends AnyFunSuite:
   val identity: Identity = Identity(Race.Human, ClassType.Warrior)
   val attributes: Attributes = Attributes(10, 10, 10, 10, 10, 10)
   val player: Player = Player("Healer", identity, attributes, BehaviorType.Aggressive)
