@@ -1,6 +1,6 @@
 package models.world
 
-import models.monster.{Monster, OriginZone}
+import models.monster.Monster
 import util.GameConfig
 
 import scala.util.Random

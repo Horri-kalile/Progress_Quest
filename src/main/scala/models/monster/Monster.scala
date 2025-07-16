@@ -1,7 +1,7 @@
 package models.monster
 
 import models.player.{Equipment, EquipmentFactory, Item, ItemFactory, Player}
-import models.world.World
+import models.world.{OriginZone, World}
 import util.MonsterLoader
 import util.RandomFunctions
 
@@ -86,7 +86,7 @@ case class Monster(
 
   /**
    * Calculates the damage dealt when the monster explodes or uses special attacks.
-   * Currently returns the monster's base attack value.
+   * Currently, returns the monster's base attack value.
    *
    * @return The amount of explosion damage the monster can deal
    */
@@ -109,7 +109,7 @@ case class Monster(
  */
 object MonstersFactory:
   /** 
-   * Pre-loaded monster names organized by zone for consistent creature spawning.
+   * Preloaded monster names organized by zone for consistent creature spawning.
    * Loaded once at startup from external data files.
    */
   private val monsterNames: Map[String, List[String]] = MonsterLoader.loadMonsters()

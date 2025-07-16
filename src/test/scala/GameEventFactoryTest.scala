@@ -3,7 +3,7 @@ import controllers.{CombatController, MonsterController, PlayerController}
 import models.event.GameEventModule.*
 import models.player.{Attributes, ClassType, Equipment, EquipmentFactory, Identity, Item, ItemFactory, Player, Race}
 import models.monster.Monster
-import models.monster.OriginZone.Plains
+import models.world.OriginZone.Plains
 import models.player.Behavior.BehaviorType
 import org.scalatest.funsuite.AnyFunSuite
 

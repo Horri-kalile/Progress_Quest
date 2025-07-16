@@ -2,7 +2,6 @@ package models.event
 
 import models.player.{Item, ItemFactory}
 import util.MissionLoader
-
 import java.util.UUID
 import scala.util.Random
 

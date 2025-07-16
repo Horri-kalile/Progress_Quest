@@ -1,4 +1,4 @@
-package models.monster
+package models.world
 
 /**
  * Enumeration of world zones where monsters can originate and be encountered.

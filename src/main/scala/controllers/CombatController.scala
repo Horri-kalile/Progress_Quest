@@ -1,7 +1,8 @@
 package controllers
 
 import models.player.Player
-import models.monster.{Monster, MonstersFactory, OriginZone}
+import models.monster.{Monster, MonstersFactory}
+import models.world.OriginZone
 import util.RandomFunctions
 
 import scala.annotation.tailrec
@@ -10,7 +11,7 @@ import scala.util.Random
 
 /**
  * Combat Controller - Handles fighting mechanics
- * TODO: This needs to be implemented to complete the FightEvent
+ *
  */
 object CombatController:
   private var _lastMonster: Option[Monster] = None
@@ -33,7 +34,7 @@ object CombatController:
         val turnHeader = (p, Some(m), s"Turn $turn:")
 
         val (pAfterAttack, mAfterAttack, attackLogs) =
-          if p.skills.nonEmpty && Random.nextBoolean() && p.currentMp >= 1 then
+          if p.skills.nonEmpty && Random.nextBoolean() && p.currentMp >= 3 then
             val skill = Random.shuffle(p.skills).head
             val (pp, mm, msg) = PlayerController.useSkill(player = p, skill = skill, target = m)
             (pp, mm, List(msg))

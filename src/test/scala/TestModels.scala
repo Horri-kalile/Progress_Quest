@@ -1,6 +1,7 @@
 import models.event.MissionData
-import models.monster.{MonstersFactory, OriginZone}
+import models.monster.MonstersFactory
 import models.player.*
+import models.world.OriginZone
 import org.scalatest.funsuite.AnyFunSuite
 import util.{EquipmentNameLoader, ItemNameLoader, MissionLoader, SkillLoader}
 

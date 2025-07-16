@@ -1,9 +1,10 @@
 package controllers
 
 import models.event.Mission
-import models.monster.{Monster, OriginZone}
+import models.monster.Monster
 import models.player.*
 import models.player.Behavior.BehaviorType.{FastLeveling, Heal}
+import models.world.OriginZone
 import util.GameConfig
 
 import scala.annotation.tailrec

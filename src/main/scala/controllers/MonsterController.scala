@@ -2,6 +2,7 @@ package controllers
 
 import models.monster.*
 import models.player.*
+import models.world.OriginZone
 import util.RandomFunctions
 
 import scala.util.Random

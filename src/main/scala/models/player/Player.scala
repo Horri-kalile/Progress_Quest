@@ -1,8 +1,8 @@
 package models.player
 
 import models.event.Mission
-import models.monster.OriginZone
 import models.player.Behavior.*
+import models.world.OriginZone
 
 /**
  * The main Player trait.
