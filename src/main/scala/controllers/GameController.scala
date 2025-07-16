@@ -13,7 +13,11 @@ import models.monster.Monster
 import scalafx.Includes.*
 
 /**
- * Main Game Controller - Handles the game loop and coordinates between models and views
+ * Main game controller that manages the overall game flow and timing.
+ *
+ * GameController coordinates between the game models (player, monsters, events)
+ * and the user interface, handling automatic event triggering, combat sequences,
+ * and game state management. It runs the main game loop that drives all gameplay.
  */
 object GameController:
 
@@ -24,7 +28,10 @@ object GameController:
   private var eventInProgress: Boolean = false
 
   /**
-   * Initialize the game with a player
+   * Starts a new game with the given player.
+   * Initializes the game loop and updates the UI.
+   *
+   * @param player The player to start the game with
    */
   def startGame(player: Player): Unit =
     currentPlayer = Some(player)
@@ -94,7 +101,13 @@ object GameController:
       case None =>
         eventInProgress = false
 
-
+  /**
+   * Displays combat steps one by one with 500ms delays for dramatic effect.
+   * Updates UI after each step and handles game over conditions.
+   *
+   * @param steps       List of combat steps (player state, monster state, message)
+   * @param finalPlayer The final player state after all steps
+   */
   private def showFightStepsSequentially(steps: List[(Player, Option[Monster], String)], finalPlayer: Player): Unit =
     steps match
       case Nil =>
@@ -144,17 +157,23 @@ object GameController:
       case None => handleGameOver()
 
   /**
-   * Get current player state
+   * Gets the current player state.
+   *
+   * @return Option containing the current player, or None if no game is active
    */
   def getCurrentPlayer: Option[Player] = currentPlayer
 
   /**
-   * Check if game is running
+   * Checks if the game is currently running.
+   *
+   * @return true if game loop is active, false otherwise
    */
   def isRunning: Boolean = isGameRunning
 
   /**
-   * Manual event trigger for testing
+   * Manually triggers a specific event type (mainly for testing).
+   *
+   * @param eventType The type of event to trigger
    */
   def triggerEvent(eventType: EventType): Unit =
     currentPlayer.foreach: player =>
