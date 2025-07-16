@@ -23,8 +23,6 @@ sealed trait MonsterBehavior:
 /**
  * Aggressive behavior increases the monster's offensive capabilities.
  *
- * Aggressive monsters deal more damage than their base attack would suggest,
- * This behavior is ideal for creating high-damage, glass-cannon type encounters.
  */
 case object Aggressive extends MonsterBehavior:
   /**
@@ -41,9 +39,6 @@ case object Aggressive extends MonsterBehavior:
 /**
  * Defensive behavior increases the monster's protective capabilities.
  *
- * Defensive monsters have  higher defense, making them more resilient to attacks
- * and creating longer, more tactical combat encounters. This behavior emphasizes
- * survivability and damage mitigation over offensive power.
  */
 case object Defensive extends MonsterBehavior:
   /**
@@ -60,8 +55,6 @@ case object Defensive extends MonsterBehavior:
 /**
  * MoreHp behavior increases the monster's health pool significantly.
  *
- * MoreHp monsters have more hit points than normal, both maximum and current HP.
- * This creates tanky opponents that can sustain more damage and provide longer
  */
 case object MoreHp extends MonsterBehavior:
   /**
@@ -94,13 +87,13 @@ case object Berserk extends MonsterBehavior:
  * OneShot behavior creates monsters with devastating single attacks.
  *
  * OneShot monsters have double attack power, making them capable of dealing
- * massive damage in single strikes. This behavior creates high-risk, high-reward
+ * massive damage in single strikes.
  */
 case object OneShot extends MonsterBehavior:
   /**
    * Doubles the monster's attack power.
    *
-   * @param monster The monster to give one-shot capabilities
+   * @param monster The monster
    * @return Monster with doubled attack attribute
    */
   def apply(monster: Monster): Monster = // Behavior managed automatically when creating
@@ -109,8 +102,6 @@ case object OneShot extends MonsterBehavior:
 /**
  * Explosive behavior enables post-death explosion mechanics.
  *
- * Explosive monsters don't receive immediate attribute modifications but are marked
- * for special behavior that activates after death.
  */
 case object Explosive extends MonsterBehavior:
   /**
@@ -119,7 +110,7 @@ case object Explosive extends MonsterBehavior:
    * @param monster The monster to mark as explosive
    * @return The same monster instance (explosion handled elsewhere)
    */
-  def apply(monster: Monster): Monster = monster // Behavior used after death
+  def apply(monster: Monster): Monster = monster
 
 /**
  * Regenerating behavior enables health recovery during combat.

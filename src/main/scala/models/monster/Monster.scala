@@ -30,19 +30,19 @@ case class MonsterNameData(zones: Map[String, List[String]])
  * when defeated. Monsters can have special states like berserk or regenerating that
  * affect their combat behavior.
  *
- * @param name The display name of the monster
- * @param level The monster's level, affecting stats and rewards
- * @param monsterType The category/type of monster (Beast, Undead, etc.)
- * @param originZone The world zone where this monster originates
- * @param attributes Combat statistics including HP, attack, defense, and weaknesses
- * @param goldReward Amount of gold awarded when monster is defeated
+ * @param name             The display name of the monster
+ * @param level            The monster's level, affecting stats and rewards
+ * @param monsterType      The category/type of monster (Beast, Undead, etc.)
+ * @param originZone       The world zone where this monster originates
+ * @param attributes       Combat statistics including HP, attack, defense, and weaknesses
+ * @param goldReward       Amount of gold awarded when monster is defeated
  * @param experienceReward Amount of experience points awarded when defeated
- * @param itemReward Optional consumable item dropped when defeated
- * @param equipReward Optional equipment piece dropped when defeated
- * @param behavior AI behavior pattern that controls monster combat decisions
- * @param description Flavor text describing the monster's appearance or nature
- * @param berserk Whether the monster is in a berserk state (increased aggression)
- * @param regenerating Whether the monster can regenerate health over time
+ * @param itemReward       Optional consumable item dropped when defeated
+ * @param equipReward      Optional equipment piece dropped when defeated
+ * @param behavior         AI behavior pattern that controls monster combat decisions
+ * @param description      Flavor text describing the monster's appearance or nature
+ * @param berserk          Whether the monster is in a berserk state (increased aggression)
+ * @param regenerating     Whether the monster can regenerate health over time
  */
 case class Monster(
                     name: String,
@@ -108,7 +108,7 @@ case class Monster(
  * attribute scaling, reward calculation, and zone-specific buffs.
  */
 object MonstersFactory:
-  /** 
+  /**
    * Preloaded monster names organized by zone for consistent creature spawning.
    * Loaded once at startup from external data files.
    */
@@ -121,10 +121,10 @@ object MonstersFactory:
    * challenge for the player. Optionally creates "strong" monsters with enhanced
    * stats and better rewards for special encounters.
    *
-   * @param zone The world zone where the monster will appear
+   * @param zone        The world zone where the monster will appear
    * @param playerLevel Player's current level for stat scaling
    * @param playerLucky Player's luck attribute affecting reward generation
-   * @param strong Whether to create a powerful version with enhanced stats
+   * @param strong      Whether to create a powerful version with enhanced stats
    * @return A fully configured Monster instance ready for combat
    */
   def randomMonsterForZone(zone: OriginZone, playerLevel: Int, playerLucky: Int, strong: Boolean = false): Monster =
@@ -136,16 +136,16 @@ object MonstersFactory:
     val monsterType = Random.shuffle(MonsterType.values.toList).head
     val behavior = MonsterBehavior.randomBehavior
     val monster = Monster(
-      name = name, 
-      level = monsterLevel, 
-      monsterType = monsterType, 
-      originZone = zone, 
-      attributes = attributes, 
-      goldReward = rewards._1, 
-      experienceReward = rewards._2, 
-      itemReward = rewards._3, 
-      equipReward = rewards._4, 
-      behavior = behavior, 
+      name = name,
+      level = monsterLevel,
+      monsterType = monsterType,
+      originZone = zone,
+      attributes = attributes,
+      goldReward = rewards._1,
+      experienceReward = rewards._2,
+      itemReward = rewards._3,
+      equipReward = rewards._4,
+      behavior = behavior,
       description = s"A ${if strong then "powerful " else ""}$name from the $zone"
     )
     World.applyZoneBuffs(behavior(monster), zone)
@@ -158,7 +158,7 @@ object MonstersFactory:
    * Minimum level is always 1.
    *
    * @param playerLevel The player's current level
-   * @param strong Whether this is a strong encounter
+   * @param strong      Whether this is a strong encounter
    * @return Scaled monster level appropriate for the encounter
    */
   private def scaleLevel(playerLevel: Int, strong: Boolean): Int =
@@ -173,18 +173,18 @@ object MonstersFactory:
    * while regular monsters have standard or increased weaknesses (1.0-1.5 multiplier).
    * All stats scale linearly with monster level.
    *
-   * @param level The monster's level
+   * @param level  The monster's level
    * @param strong Whether this is a strong monster with enhanced stats
    * @return MonsterAttributes with HP, attack, defense, and damage weaknesses
    */
   private def generateAttributes(level: Int, strong: Boolean): MonsterAttributes =
-    val (physicalWeakness, magicalWeakness) = if strong then 
-      (Random.between(0.5, 1.0), Random.between(0.5, 1.0)) 
-    else 
+    val (physicalWeakness, magicalWeakness) = if strong then
+      (Random.between(0.5, 1.0), Random.between(0.5, 1.0))
+    else
       (Random.between(1.0, 1.5), Random.between(1.0, 1.5))
-    val hp = Random.between(20, 50) * level
-    val attack = Random.between(1, 10) * level
-    val defense = Random.between(1, 10) * level
+    val hp = Random.between(20, 40) * level
+    val attack = Random.between(1, 5) * level
+    val defense = Random.between(1, 5) * level
     MonsterAttributes(hp, hp, attack, defense, physicalWeakness, magicalWeakness)
 
   /**
@@ -194,10 +194,10 @@ object MonstersFactory:
    * luck attribute. Equipment drops are generated with consideration for player
    * level and luck to provide appropriate gear upgrades.
    *
-   * @param level Monster's level affecting reward magnitude
+   * @param level       Monster's level affecting reward magnitude
    * @param playerLevel Player's level for equipment scaling
    * @param playerLucky Player's luck attribute affecting drop rates
-   * @param strong Whether this is a strong monster with enhanced rewards
+   * @param strong      Whether this is a strong monster with enhanced rewards
    * @return Tuple of (gold, experience, optional item, optional equipment)
    */
   private def generateRewards(level: Int, playerLevel: Int, playerLucky: Int, strong: Boolean): (Int, Int, Option[Item], Option[Equipment]) =

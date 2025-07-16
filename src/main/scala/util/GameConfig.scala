@@ -2,7 +2,7 @@ package util
 
 object GameConfig:
   // Game mechanics configuration
-  val baseSpecialChance: Double = 0.02 // 2%
+  val baseSpecialChance: Double = 0.03 // 2%
   val baseDropChance: Double = 0.30 // 30%
   val baseLearnSkillChance: Double = 0.30
   val specialBonusPerLucky: Double = 0.001 // 0.1% per lucky
@@ -11,10 +11,10 @@ object GameConfig:
   val baseGameOverChance: Double = 0.02 // 2%
   val minGameOverChance: Double = 0.01
   val maxBuffByZone: Double = 0.20 // 20% maximum buff
-  val probabilityToMissAttackBonus: Double = 0.001
   val powerUpCost: Int = 100
-  val dodgeBonusByDexterity: Double = 0.005
+  val dodgeBonusByDexterity: Double = 0.0025
   val maxDodgeChance: Double = 0.50
+  val oneShotChance: Double = 0.25
 
   // UI Style constants - eliminate redundancy
   val baseFont: String = "-fx-font-family: monospace; -fx-font-size: 12"
