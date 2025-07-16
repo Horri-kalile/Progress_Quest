@@ -283,8 +283,12 @@ object PlayerGenerationUi extends JFXApp3:
                 val player = Player(playerNameLabel.text.value.trim, identity, randomAttributes, selectedBehavior)
                 val finalPlayer = PlayerBonusesApplication.applyRaceAndClassBonuses(player)
                 println(s"Player Created: $finalPlayer")
-                onPlayerCreated(finalPlayer)
+                
+                // Close the character creation window
                 newStage.close()
+                
+                // Call the callback which should start the game and open GameUi
+                onPlayerCreated(finalPlayer)
           )
 
     newStage.show()
