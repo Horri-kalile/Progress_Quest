@@ -282,25 +282,24 @@ object PlayerController:
 
     else
       val updatedPlayer = player.withCurrentMp(player.currentMp - skill.manaCost)
-      val multiplier = Random.between(0.1, skill.baseMultiplier)
 
       skill.effectType match
         case SkillEffectType.Physical =>
           val dmg =
             ((player.attributes.strength + player.level + player.equipmentList.map(_.value).sum)
-              * multiplier * skill.powerLevel).toInt
+              * skill.baseMultiplier * skill.powerLevel).toInt
           val damagedMonster = target.receiveDamage(dmg)
           (updatedPlayer, damagedMonster, s"You dealt $dmg physical damage with ${skill.name}.")
 
         case SkillEffectType.Magic =>
           val magicPower = player.attributes.intelligence
           val dmg = ((magicPower + player.level + player.equipmentList.map(_.value).sum)
-            * multiplier * skill.powerLevel).toInt
+            * skill.baseMultiplier * skill.powerLevel).toInt
           val damagedMonster = target.receiveDamage(dmg)
           (updatedPlayer, damagedMonster, s"You dealt $dmg magic damage with ${skill.name}.")
 
         case SkillEffectType.Healing =>
           val heal = ((player.attributes.wisdom + player.level)
-            * multiplier * skill.powerLevel).toInt
+            * skill.baseMultiplier * skill.powerLevel).toInt
           val healedPlayer = updatedPlayer.receiveHealing(heal)
           (healedPlayer, target, s"You healed yourself for $heal HP using ${skill.name}.")
