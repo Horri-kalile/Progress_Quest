@@ -87,20 +87,37 @@ object GameEventModule:
   // Internal Game Event Implementations
   // ---------------------------
 
-  /** Simulates a fight between the player and the last encountered monster.
+  /** Resolves a post-fight between the player and the last encountered monster.
    * Rewards XP and gold, and possibly drops equipment or items.
    */
   private case object FightEvent extends GameEvent:
     def action(player: Player): (Player, List[String], Option[Monster]) =
-      if !player.isAlive then GameOverEvent.action(player)
+      if !player.isAlive then
+        GameOverEvent.action(player)
       else
-        val monster = CombatController.lastMonster.get
-        val (p1, eqMsg) = CombatController.handleEquipDrop(player, monster)
-        val (p2, itemMsg) = CombatController.handleItemDrop(p1, monster)
-        val pWithXp = PlayerController.gainXP(p2, MonsterController.getExpReward(monster))
-        val finalP = PlayerController.addGold(pWithXp, MonsterController.getGoldReward(monster))
-        val summary = List(eqMsg, itemMsg, s"You earned ${monster.goldReward} gold and ${monster.experienceReward} XP.", "You have won!")
-        (finalP, summary, None)
+        CombatController.lastMonster match
+          case Some(monster) if !monster.isDead =>
+            val summary = List(s"You escaped from ${monster.name}. You got nothing")
+            (player, summary, None)
+
+          case Some(monster) =>
+            val (p1, eqMsg) = CombatController.handleEquipDrop(player, monster)
+            val (p2, itemMsg) = CombatController.handleItemDrop(p1, monster)
+            val pWithXp = PlayerController.gainXP(p2, MonsterController.getExpReward(monster))
+            val finalP = PlayerController.addGold(pWithXp, MonsterController.getGoldReward(monster))
+
+            val summary = List(
+              eqMsg,
+              itemMsg,
+              s"You earned ${monster.goldReward} gold and ${monster.experienceReward} XP.",
+              "You have won!"
+            )
+            (finalP, summary, None)
+
+          case None =>
+            val msg = "No monster was found for the fight."
+            (player, List(msg), None)
+
 
   /** Manages mission progression or generates a new random mission. */
   private case object MissionEvent extends GameEvent:
@@ -144,7 +161,7 @@ object GameEventModule:
     def action(player: Player): (Player, List[String], Option[Monster]) =
       val cost = GameConfig.powerUpCost * player.level
       if canPowerUp(player) then
-        val updated = player.withGold(cost).powerUpAttributes()
+        val updated = player.withGold(player.gold - cost).powerUpAttributes()
         val msg = s"You spent $cost gold to power up your stats!"
         (updated, List(msg), None)
       else
@@ -309,5 +326,5 @@ object GameEventModule:
   /** Marks the player as dead and ends the game. */
   private case object GameOverEvent extends GameEvent:
     def action(player: Player): (Player, List[String], Option[Monster]) =
-      val msg = "YOU GOT A HEART ATTACK!GAME OVER."
+      val msg = "GAME OVER!"
       (player.withCurrentHp(0), List(msg), None)

@@ -98,7 +98,7 @@ case class Monster(
    *
    * @return true if the monster is dead, false otherwise
    */
-  def isDead: Boolean = attributes.currentHp <= 0
+  def isDead: Boolean = attributes.currentHp == 0
 
 /**
  * Factory object for creating monsters with appropriate stats and rewards.

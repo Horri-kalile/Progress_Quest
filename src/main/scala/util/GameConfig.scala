@@ -15,6 +15,7 @@ object GameConfig:
   val dodgeBonusByDexterity: Double = 0.0025
   val maxDodgeChance: Double = 0.50
   val oneShotChance: Double = 0.25
+  val maxTurnBattle: Int = 50
 
   // UI Style constants - eliminate redundancy
   val baseFont: String = "-fx-font-family: monospace; -fx-font-size: 12"

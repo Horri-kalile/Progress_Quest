@@ -1,7 +1,7 @@
 import models.player.{Attributes, EquipmentSlot}
 import org.scalatest.funsuite.AnyFunSuite
 
-class TestAttributes extends AnyFunSuite:
+class TestPlayerAttributes extends AnyFunSuite:
 
   test("Addition of two Attributes should sum each field") {
     val a1 = Attributes(1, 2, 3, 4, 5, 6)

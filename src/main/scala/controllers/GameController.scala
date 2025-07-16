@@ -55,7 +55,7 @@ object GameController:
 
     gameTimer.foreach(_.scheduleAtFixedRate(new TimerTask {
       override def run(): Unit =
-        if (isGameRunning && !eventInProgress) then
+        if isGameRunning && !eventInProgress then
           currentPlayer.foreach: player =>
             if player.isAlive then
               triggerRandomEvent()
@@ -76,11 +76,11 @@ object GameController:
         if eventType == EventType.fight then
           val monster = MonsterController.getRandomMonsterForZone(player.level, player.attributes.lucky, player.currentZone)
 
-          CombatController.setLastMonster(monster)
           val fightSteps = CombatController.simulateFight(player, monster)
           val finalPlayer = fightSteps.lastOption.map(_._1).getOrElse(player)
           val finalMonster = fightSteps.lastOption.flatMap(_._2)
-
+          CombatController.setLastMonster(finalMonster.get)
+          println(finalMonster)
           // Post-fight check: game over or other events
           val (updatedPlayer, postFightMessages, _) = EventController.runEvent(EventType.fight, finalPlayer)
           val postFightSteps = postFightMessages.map(msg => (updatedPlayer, finalMonster, msg))
