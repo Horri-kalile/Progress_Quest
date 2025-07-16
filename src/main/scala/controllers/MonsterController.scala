@@ -19,26 +19,24 @@ object MonsterController:
 
     (damagedMonster, explosion)
 
-  /** Calculates damage dealt by the monster, considering berserk state and dodge chance.
-   *
-   * @return (damageDealt, combatLog)
-   */
-  def attackPlayer(monster: Monster, player: Player): (Int, String) =
+  def attackPlayer(monster: Monster, player: Player): (Int, String, Monster) =
     val baseDamage = monster.attributes.attack + (player.level * 2)
+
+    // Dodge chance based on dexterity
     val dodgeChance = (player.attributes.dexterity * dodgeBonusByDexterity).min(maxDodgeChance)
     val didDodge = Random.nextDouble() < dodgeChance
-    println(dodgeChance + "/" + didDodge)
 
     if didDodge then
-      (0, s"${player.name} dodged the attack!")
+      (0, s"${player.name} dodged the attack!", monster)
     else if monster.berserk then
       val bonus = Random.between(1, 5 + monster.attributes.attack)
-      monster.copy(attributes = monster.attributes.copy(currentHp = (monster.attributes.currentHp - bonus).max(1)))
-      val dmg = (baseDamage + bonus - player.attributes.constitution).max(1)
-      (dmg, s"${monster.name} enters berserk rage and attacks for $dmg damage! But it lost $bonus current hp!")
+      val selfDamage = bonus
+      val updatedMonster = monster.copy(attributes = monster.attributes.copy(currentHp = (monster.attributes.currentHp - selfDamage).max(0)))
+      val damage = (baseDamage + bonus - player.attributes.constitution).max(1)
+      (damage, s"[Berserk] ${monster.name} attacked for $damage and lost $selfDamage HP!", updatedMonster)
     else
-      val dmg = (baseDamage - player.attributes.constitution).max(1)
-      (dmg, s"${monster.name} attacked for $dmg.")
+      val damage = (baseDamage - player.attributes.constitution).max(1)
+      (damage, s"${monster.name} attacked for $damage.", monster)
 
 
   def handleRegeneration(monster: Monster): (Monster, Option[String]) =

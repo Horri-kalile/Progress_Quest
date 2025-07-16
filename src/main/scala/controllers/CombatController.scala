@@ -58,17 +58,18 @@ object CombatController:
           ((pAfterAttack, None, monsterLog) :: accWithPlayerLogs).reverse
         else
           val (regeneratedM, regenLogOpt) = MonsterController.handleRegeneration(mAfterAttack)
-          val (monsterDmg, monsterAttackLog) = MonsterController.attackPlayer(regeneratedM, pAfterAttack)
+          val (monsterDmg, monsterAttackLog, updatedMonster) = MonsterController.attackPlayer(regeneratedM, pAfterAttack)
           val damagedPlayer = PlayerController.takeDamage(pAfterAttack, monsterDmg)
+
           val regenLogs = regenLogOpt.toList
           val allLogs = regenLogs :+ monsterAttackLog
 
           val accWithMonsterLogs = allLogs.reverse.foldLeft(accWithPlayerLogs) {
-            case (logs, msg) => (damagedPlayer, Some(regeneratedM), msg) :: logs
+            case (logs, msg) => (damagedPlayer, Some(updatedMonster), msg) :: logs
           }
 
           if !damagedPlayer.isAlive then accWithMonsterLogs.reverse
-          else loop(damagedPlayer, regeneratedM, accWithMonsterLogs, turn + 1)
+          else loop(damagedPlayer, updatedMonster, accWithMonsterLogs, turn + 1)
 
     loop(player, monster, Nil, 1)
 
