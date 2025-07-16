@@ -41,7 +41,7 @@ class TestGameEvent extends AnyFunSuite:
     assert(updated.activeMissions.nonEmpty)
 
   test("FightEvent awards XP and gold"):
-    CombatController.setLastMonster(monster)
+    CombatController.setLastMonster(monster.copy(attributes = monster.attributes.copy(currentHp = 0)))
     val (updated, msgs, _) = GameEventFactory.executeEvent(EventType.fight, player)
     assert(updated.gold > player.gold)
     assert(updated.exp > player.exp)
