@@ -3,6 +3,7 @@ package view
 import models.player.{EquipmentSlot, Player, Skill, SkillEffectType}
 import models.world.World
 import models.monster.Monster
+import util.GameConfig.*  // Import all style constants
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.{Node, Scene}
 import scalafx.scene.control.*
@@ -33,7 +34,6 @@ import scalafx.scene.SceneIncludes.jfxScene2sfx
  * - Game over screen with restart functionality
  * - Responsive layout that adapts to screen size
  */
-
 object GameUi:
 
   /** Screen dimensions for responsive UI sizing */
@@ -43,30 +43,36 @@ object GameUi:
   private var stageOpt: Option[Stage] = None
   var playerOpt: Option[Player] = None
 
-  // Event log storage
+  /** Event log storage - */
   private var eventMessages: List[String] = List.empty
+  
+  /** Combat log storage */
   private var combatMessages: List[String] = List.empty
 
-  // Current monster info storage
+  /** Current monster information for monster info panel */
   private var currentMonster: Option[Monster] = None
 
-  // Hero Diary progress bar reference
+  /** Reference to hero diary progress bar for animations */
   private var heroDiaryProgressBar: Option[ProgressBar] = None
 
-  // Css elements
-  private val baseFont = "-fx-font-family: monospace; -fx-font-size: 12; -fx-background-color: transparent"
-  private val labelBold = "-fx-font-weight: bold"
-  private val labelHeader = "-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: black"
-  private val panelHeaderStyle = "-fx-background-color: #a9a9a9; -fx-padding: 5 10 5 10"
-  private val panelBodyStyle = "-fx-background-color: white; -fx-border-color: #ccc; -fx-border-width: 0 1 1 1"
-  private val borderPaneStyleBackground = "-fx-background-color: #e0e0e0"
+  /**
+   * Helper function to combine multiple styles.
+   * 
+   * @param styles Variable number of style strings to combine
+   * @return Combined style string
+   */
+  private def combineStyles(styles: String*): String = styles.mkString("; ")
 
+  /**
+   * Helper function to create styled labels with consistent formatting.
+   * 
+   * @param text The label text
+   * @param styles Variable number of style strings to apply
+   * @return Styled Label component
+   */
   private def styledLabel(text: String, styles: String*): Label =
     new Label(text):
-      style = styles.mkString("; ")
-
-
-  /** Call this to open the main game UI window */
+      style = combineStyles(styles: _*)
 
   /**
    * Opens the main game UI window.
@@ -101,7 +107,7 @@ object GameUi:
   private def createRoot(player: Player): BorderPane =
     new BorderPane:
       padding = Insets(15)
-      style = borderPaneStyleBackground
+      style = backgroundMain
 
       top = createSectionRow(Seq(
         createPanelWithHeader("Character Player", new VBox:
@@ -114,15 +120,14 @@ object GameUi:
           children = createStatsContent(player)
         )
       ))
-      // Center row: Inventory, World, Skills, Mission panels
+
       center = createSectionRow(Seq(
         createPanelWithHeader("Inventory", createInventoryContent(player)),
         createPanelWithHeader("World", createWorldContent(player)),
         createPanelWithHeader("Skills", createSkillsContent(player)),
-        createPanelWithHeader("Mission", createMissionContent(player)),
-
+        createPanelWithHeader("Mission", createMissionContent(player))
       ))
-      // Bottom row: Hero Diary, Combat Log, Monster Info panels
+
       bottom = createSectionRow(Seq(
         createHeroDiaryPanel(),
         createPanelWithHeader("Combat Log", createCombatLogContent()),
@@ -142,7 +147,6 @@ object GameUi:
       spacing = 15
       alignment = Pos.TopLeft
       children = panels
-      // Make each panel grow to fill available space equally
       children.foreach: child =>
         HBox.setHgrow(child, Priority.Always)
         child.maxWidth(Double.MaxValue)
@@ -159,14 +163,15 @@ object GameUi:
       spacing = 0
       children = Seq(
         new HBox:
-          style = "-fx-background-color: #a9a9a9; -fx-padding: 5 10 5 10"
+          style = panelHeader
           prefHeight = 30
           alignment = Pos.CenterLeft
           children = Seq(
-            styledLabel(title, labelHeader))
+            styledLabel(title, labelHeader, "-fx-text-fill: white")
+          )
         ,
         new VBox:
-          style = "-fx-background-color: white; -fx-border-color: #ccc; -fx-border-width: 0 1 1 1"
+          style = panelBody
           padding = Insets(10)
           children = Seq(content)
       )
@@ -196,14 +201,12 @@ object GameUi:
   private def createEquipmentContent(player: Player): Seq[Node] =
     EquipmentSlot.values.toSeq.map: slot =>
       val equipped = player.equipment.getOrElse(slot, None)
-
       val label = equipped match
         case Some(equip) =>
           val attrs = equip.statBonus
           val bonusStats = s"STR: ${attrs.strength}, CON: ${attrs.constitution}, DEX: ${attrs.dexterity}, INT: ${attrs.intelligence}, WIS: ${attrs.wisdom}, LUCK: ${attrs.lucky}"
           s"${equip.name} (Value: ${equip.value}) | Bonus: [$bonusStats]"
         case None => "None"
-
       createTableRow(slot.toString, label)
 
   /**
@@ -212,9 +215,7 @@ object GameUi:
    * @param player The player whose stats to display
    * @return Sequence of nodes showing all attributes plus HP/MP bars
    */
-
   private def createStatsContent(player: Player): Seq[Node] =
-    // Basic attribute rows
     val attrRows = Seq(
       createTableRow("STR", player.attributes.strength.toString),
       createTableRow("CON", player.attributes.constitution.toString),
@@ -227,7 +228,6 @@ object GameUi:
     val hpLabel = styledLabel(s"${player.currentHp} / ${player.hp}", labelHeader)
     val mpLabel = styledLabel(s"${player.currentMp} / ${player.mp}", labelHeader)
 
-    // Combine attributes with HP/MP progress bars
     attrRows ++ Seq(
       createTableRow("HP", ""),
       new VBox:
@@ -237,7 +237,7 @@ object GameUi:
           new ProgressBar:
             progress = player.currentHp.toDouble / player.hp
             prefWidth = 200
-            style = "-fx-accent: #4682b4"
+            style = progressBarHP
         )
       ,
       createTableRow("MP", ""),
@@ -248,7 +248,7 @@ object GameUi:
           new ProgressBar:
             progress = player.currentMp.toDouble / player.mp
             prefWidth = 200
-            style = "-fx-accent: #9370db"
+            style = progressBarMP
         )
     )
 
@@ -263,13 +263,11 @@ object GameUi:
     vgap = 10
     padding = Insets(5)
 
-    // Add headers
     add(createTableHeader("Item"), 0, 0)
     add(createTableHeader("Quantity"), 1, 0)
     add(createTableHeader("Gold"), 2, 0)
     add(createTableHeader("Rarity"), 3, 0)
 
-    // Add inventory items
     player.inventory.toSeq.zipWithIndex.foreach { case ((item, qty), idx) =>
       add(styledLabel(item.name), 0, idx + 1)
       add(styledLabel(qty.toString), 1, idx + 1)
@@ -286,7 +284,7 @@ object GameUi:
     text = if eventMessages.isEmpty then "Waiting for adventures..." else eventMessages.mkString("\n")
     editable = false
     prefHeight = 230
-    style = "-fx-font-family: monospace; -fx-font-size: 12; -fx-background-color: transparent"
+    style = textAreaStyle
     focusTraversable = false
 
   /**
@@ -298,20 +296,19 @@ object GameUi:
     val area = new TextArea:
       text = if combatMessages.isEmpty then "No combat yet..." else combatMessages.mkString("\n")
       editable = false
-      style = "-fx-font-family: monospace; -fx-font-size: 12; -fx-background-color: transparent"
+      style = textAreaStyle
       focusTraversable = false
       wrapText = true
 
     Platform.runLater {
       area.positionCaret(area.text.value.length)
     }
-
     area
 
   /**
    * Creates monster information display showing current encounter details.
    *
-   * @return TextArea containing detailed monster information or "no monster" message
+   * @return Sequence of nodes containing detailed monster information
    */
   private def createMonsterInfoContent(): Seq[Node] =
     currentMonster match
@@ -320,35 +317,32 @@ object GameUi:
         val hpBar = new ProgressBar:
           progress = monster.attributes.currentHp.toDouble / monster.attributes.hp
           prefWidth = 150
-          style = "-fx-accent: #4682b4"
+          style = progressBarHP
 
         val infoGrid = new GridPane:
           hgap = 8
           vgap = 4
 
-          add(new Label(s"${monster.name} (Level ${monster.level})"), 0, 0)
-          add(new Label(s"Type: ${monster.monsterType}"), 0, 1)
-          add(new Label(s"Zone: ${monster.originZone}"), 0, 2)
-
+          add(styledLabel(s"${monster.name} (Level ${monster.level})", labelMedium, labelBold), 0, 0)
+          add(styledLabel(s"Type: ${monster.monsterType}"), 0, 1)
+          add(styledLabel(s"Zone: ${monster.originZone}"), 0, 2)
           add(hpLabel, 0, 3)
           add(hpBar, 1, 3)
-
-          add(new Label(s"Attack: ${monster.attributes.attack}"), 0, 4)
-          add(new Label(f"Physical weakness: ${monster.attributes.weaknessPhysical}%.2f"), 1, 4)
-          add(new Label(s"Defense: ${monster.attributes.defense}"), 0, 5)
-          add(new Label(f"Magical weakness: ${monster.attributes.weaknessMagic}%.2f"), 1, 5)
-          add(new Label(s"Behavior: ${monster.behavior}"), 0, 6)
-          add(new Label(s"Gold Reward: ${monster.goldReward}"), 0, 7)
-          add(new Label(s"EXP Reward: ${monster.experienceReward}"), 0, 8)
-          add(new Label(s"Item Reward: ${monster.itemReward.fold("None")(_.toString)}"), 0, 9)
-          add(new Label(s"Equipment Reward: ${monster.equipReward.fold("None")(_.toString)}"), 0, 10)
-          add(new Label(monster.description), 0, 11, 2, 1) // span 2 columns
+          add(styledLabel(s"Attack: ${monster.attributes.attack}"), 0, 4)
+          add(styledLabel(f"Physical weakness: ${monster.attributes.weaknessPhysical}%.2f"), 1, 4)
+          add(styledLabel(s"Defense: ${monster.attributes.defense}"), 0, 5)
+          add(styledLabel(f"Magical weakness: ${monster.attributes.weaknessMagic}%.2f"), 1, 5)
+          add(styledLabel(s"Behavior: ${monster.behavior}"), 0, 6)
+          add(styledLabel(s"Gold Reward: ${monster.goldReward}"), 0, 7)
+          add(styledLabel(s"EXP Reward: ${monster.experienceReward}"), 0, 8)
+          add(styledLabel(s"Item Reward: ${monster.itemReward.fold("None")(_.toString)}"), 0, 9)
+          add(styledLabel(s"Equipment Reward: ${monster.equipReward.fold("None")(_.toString)}"), 0, 10)
+          add(styledLabel(monster.description, labelSmall, textGray), 0, 11, 2, 1)
 
         Seq(infoGrid)
 
       case None =>
-        Seq(new Label("No monster encountered yet..."))
-
+        Seq(styledLabel("No monster encountered yet...", textGray))
 
   /**
    * Creates world information display showing current zone and description.
@@ -361,12 +355,9 @@ object GameUi:
       spacing = 10
       children = Seq(
         styledLabel("Current World:", labelBold),
-
-        new Label(player.currentZone.toString):
-          style = "-fx-font-size: 14; -fx-font-weight: bold"
-        ,
+        styledLabel(player.currentZone.toString, labelHeader),
         new Label(World.getZoneDescription(player.currentZone)):
-          style = "-fx-font-size: 12; -fx-text-fill: #666666; -fx-wrap-text: true"
+          style = combineStyles(labelMedium, textGray, "-fx-wrap-text: true")
           maxWidth = 200
       )
 
@@ -377,35 +368,19 @@ object GameUi:
    * @return HBox containing three columns of skills by type
    */
   private def createSkillsContent(player: Player): Node =
-    // Filter skills by type
     val physicalSkills = player.skills.filter(_.effectType == SkillEffectType.Physical)
     val magicSkills = player.skills.filter(_.effectType == SkillEffectType.Magic)
     val healingSkills = player.skills.filter(_.effectType == SkillEffectType.Healing)
 
-    /**
-     * Helper function to format individual skill display.
-     *
-     * @param skill The skill to format
-     * @return Label with skill name, level, and mana cost
-     */
     def formatSkill(skill: Skill): Label =
-      new Label(s"${skill.name} (Lv.${skill.powerLevel}, MP: ${skill.manaCost})"):
-        style = "-fx-font-size: 11"
+      styledLabel(s"${skill.name} (Lv.${skill.powerLevel}, MP: ${skill.manaCost})", labelSmall)
 
-    /**
-     * Helper function to create a column of skills with header.
-     *
-     * @param title  The column header text
-     * @param skills List of skills to display in this column
-     * @return VBox containing header and skill list
-     */
     def makeColumn(title: String, skills: List[Skill]) =
       new VBox:
         spacing = 5
         alignment = Pos.TopLeft
         children = Seq(
-          new Label(title):
-            style = "-fx-font-weight: bold; -fx-underline: true"
+          styledLabel(title, labelBold, "-fx-underline: true")
         ) ++ skills.map(formatSkill)
 
     new HBox:
@@ -427,43 +402,19 @@ object GameUi:
     spacing = 5
     children =
       if player.activeMissions.isEmpty then
-        Seq(
-          new Label("No missions accepted"):
-            style = "-fx-font-weight: bold"
-        )
+        Seq(styledLabel("No missions accepted", labelBold))
       else
         val missionLabels = player.activeMissions.map: mission =>
           new HBox:
             spacing = 10
             children = Seq(
-              new Label(s"• ${mission.name}"):
-                style = "-fx-font-size: 12; -fx-font-weight: bold"
-              ,
-              new Label(mission.description):
-                style = "-fx-font-size: 11; -fx-text-fill: #555555"
-              ,
-              new Label(f"${mission.progression}/${mission.goal}"):
-                style = "-fx-font-size: 11; -fx-text-fill: #888888"
-              ,
-              new Label(f"${mission.rewardGold},${mission.rewardExp},${mission.rewardItem}"):
-                style = "-fx-font-size: 11; -fx-text-fill: #888888"
+              styledLabel(s"• ${mission.name}", labelMedium, labelBold),
+              styledLabel(mission.description, labelSmall, textDarkGray),
+              styledLabel(f"${mission.progression}/${mission.goal}", labelSmall, textLightGray),
+              styledLabel(f"${mission.rewardGold},${mission.rewardExp},${mission.rewardItem}", labelSmall, textLightGray)
             )
 
-        Seq(
-          new Label(s"Current Missions: ${player.activeMissions.size}"):
-            style = "-fx-font-weight: bold"
-        ) ++ missionLabels
-
-
-  private def createTableRow(label: String, value: String): HBox = new HBox:
-    spacing = 10
-    children = Seq(
-      new Label(label):
-        style = "-fx-font-weight: bold; -fx-min-width: 80"
-      ,
-      new Label(value):
-        style = "-fx-min-width: 120"
-    )
+        Seq(styledLabel(s"Current Missions: ${player.activeMissions.size}", labelBold)) ++ missionLabels
 
   /**
    * Creates a standardized table row with label and value.
@@ -472,55 +423,61 @@ object GameUi:
    * @param value The row value text
    * @return HBox containing formatted label-value pair
    */
-  private def createTableHeader(text: String): Label = new Label(text):
-    style = "-fx-font-weight: bold; -fx-underline: true"
+  private def createTableRow(label: String, value: String): HBox = new HBox:
+    spacing = 10
+    children = Seq(
+      styledLabel(label, labelBold, "-fx-min-width: 80"),
+      styledLabel(value, "-fx-min-width: 120")
+    )
 
   /**
-   * Update the UI with current player information
-   * This method should be called from GameController
-   * state changes to keep the UI synchronized with game state.
+   * Creates a standardized table header label.
+   *
+   * @param text The header text
+   * @return Label with header styling (bold and underlined)
+   */
+  private def createTableHeader(text: String): Label = 
+    styledLabel(text, labelBold, "-fx-underline: true")
+
+  /**
+   * Updates the UI with current player information.
    *
    * @param player The updated player object to display
    */
   def updatePlayerInfo(player: Player): Unit =
-    playerOpt = Some(player) // update stored player reference
+    playerOpt = Some(player)
     stageOpt.foreach: stage =>
-      val newRoot = createRoot(player) // rebuild UI with updated player
-      stage.scene().root = newRoot // replace root node
+      val newRoot = createRoot(player)
+      stage.scene().root = newRoot
     println(s"UI Update: ${player.name} - Level ${player.level} - HP: ${player.currentHp}/${player.hp}")
 
   /**
-   * Add a message to the combat log
+   * Adds a message to the combat log with automatic scrolling.
    *
    * @param message The combat message to add
    */
   def addCombatLog(message: String): Unit =
-    combatMessages = (combatMessages :+ message).takeRight(20) // Keep last 20 messages
+    combatMessages = (combatMessages :+ message).takeRight(20)
     updateCurrentUI()
 
   /**
-   * Add a message to the event diary
+   * Adds a message to the event diary with progress bar animation.
    *
    * @param message The event message to add
    */
   def addEventLog(message: String): Unit =
-    eventMessages = (eventMessages :+ message).takeRight(30) // Keep last 30 messages
-
-    // Update UI first to get fresh progress bar reference
+    eventMessages = (eventMessages :+ message).takeRight(30)
     updateCurrentUI()
 
-    // Then animate the progress bar after a small delay
     val animationTimer = new java.util.Timer()
-
     animationTimer.schedule(
       new java.util.TimerTask() {
         override def run(): Unit =
           animateHeroDiaryProgress()
           animationTimer.cancel()
       },
-      100 // delay in milliseconds
+      100
     )
-
 
   /**
    * Updates the current monster information display.
@@ -531,17 +488,12 @@ object GameUi:
     currentMonster = monster
     updateCurrentUI()
 
-
   /**
    * Shows game over screen with restart functionality.
-   *
-   * Creates a modal dialog offering the player options to restart
-   * the game or exit completely.
    *
    * @param onRestart Callback function to execute when player chooses to restart
    */
   def showGameOverWithRestart(onRestart: () => Unit): Unit =
-    // Create a simple game over window with restart option
     val gameOverStage = new Stage:
       title = "Game Over"
       width = 400
@@ -553,32 +505,25 @@ object GameUi:
         padding = Insets(20)
         alignment = Pos.Center
         children = Seq(
-          new Label("Game Over!"):
-            style = "-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #d32f2f"
-          ,
-          new Label("Your hero has fallen..."):
-            style = "-fx-font-size: 16px; -fx-text-fill: #666666"
-          ,
+          styledLabel("Game Over!", "-fx-font-size: 24px", labelBold, "-fx-text-fill: #d32f2f"),
+          styledLabel("Your hero has fallen...", "-fx-font-size: 16px", textGray),
           new HBox:
             spacing = 15
             alignment = Pos.Center
             children = Seq(
               new Button("Restart Game"):
-                style = "-fx-background-color: #4caf50; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20"
+                style = buttonGreen
                 onAction = _ =>
                   gameOverStage.close()
-                  // Close current game window
                   stageOpt.foreach(_.close())
                   stageOpt = None
                   playerOpt = None
-                  // Call restart callback
                   onRestart()
               ,
               new Button("Exit"):
-                style = "-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20"
+                style = buttonRed
                 onAction = _ =>
                   gameOverStage.close()
-                  // Close current game window
                   stageOpt.foreach(_.close())
                   stageOpt = None
                   playerOpt = None
@@ -589,7 +534,7 @@ object GameUi:
     gameOverStage.show()
 
   /**
-   * Update the current UI if it's open
+   * Updates the current UI if a window is open.
    */
   private def updateCurrentUI(): Unit =
     playerOpt.foreach: player =>
@@ -598,17 +543,13 @@ object GameUi:
         stage.scene().root = newRoot
 
   /**
-   * Show game over screen
+   * Shows a basic game over notification.
    */
   def showGameOver(): Unit =
-    // TODO: Show game over dialog with restart option
     println("GAME OVER - Show restart dialog")
 
   /**
    * Creates the hero diary panel with animated progress bar.
-   *
-   * The panel includes both the progress bar in the header and the
-   * diary content area for displaying event messages.
    *
    * @return VBox containing the complete hero diary panel
    */
@@ -618,39 +559,34 @@ object GameUi:
       prefWidth = 150
       style = "-fx-accent:rgb(63, 147, 156)"
 
-    // Store the progress bar reference
     heroDiaryProgressBar = Some(progressBar)
 
     new VBox:
       spacing = 0
       children = Seq(
         new HBox:
-          style = "-fx-background-color: #a9a9a9; -fx-padding: 5 10 5 10"
+          style = panelHeader
           prefHeight = 30
           alignment = Pos.CenterLeft
           spacing = 10
           children = Seq(
-            new Label("Hero Diary"):
-              style = "-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 14"
-            ,
+            styledLabel("Hero Diary", labelHeader, "-fx-text-fill: white"),
             progressBar
           )
         ,
         new VBox:
-          style = "-fx-background-color: white; -fx-border-color: #ccc; -fx-border-width: 0 1 1 1"
+          style = panelBody
           padding = Insets(10)
           children = Seq(createDiaryContent())
       )
 
   /**
-   * Animate the Hero Diary progress bar
+   * Animates the Hero Diary progress bar to provide visual feedback.
    */
   private def animateHeroDiaryProgress(): Unit =
     heroDiaryProgressBar.foreach: progressBar =>
-      // Reset to 0 and animate to 1.0
       progressBar.progress = 0.0
 
-      // Simple animation using a thread with Platform.runLater
       val animationThread = new Thread(() =>
         try
           for i <- 0 to 10 do
@@ -658,13 +594,13 @@ object GameUi:
             scalafx.application.Platform.runLater(() =>
               progressBar.progress = progress
             )
-            Thread.sleep(100) // 100ms delay
-          Thread.sleep(500) // Stay at 100% for 500ms
+            Thread.sleep(100)
+          Thread.sleep(500)
           scalafx.application.Platform.runLater(() =>
-            progressBar.progress = 0.0 // Reset to 0
+            progressBar.progress = 0.0
           )
         catch
-          case _: InterruptedException => // Thread was interrupted
+          case _: InterruptedException =>
       )
       animationThread.setDaemon(true)
       animationThread.start()
