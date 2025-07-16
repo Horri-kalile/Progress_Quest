@@ -1,10 +1,7 @@
 package controllers
 
+import models.monster.Monster
 import models.player.Player
-import models.monster.{Monster, MonstersFactory}
-import models.world.OriginZone
-import util.RandomFunctions
-
 import scala.annotation.tailrec
 import scala.util.Random
 
@@ -56,12 +53,9 @@ object CombatController:
           ((pAfterAttack, None, monsterLog) :: accWithPlayer).reverse
         else
           val (regeneratedM, regenLogOpt) = MonsterController.handleRegeneration(mAfterAttack)
-          val monsterDmg = MonsterController.attackPlayer(regeneratedM, pAfterAttack)
+          val (monsterDmg, monsterAttackLog) = MonsterController.attackPlayer(regeneratedM, pAfterAttack)
           val damagedPlayer = PlayerController.takeDamage(pAfterAttack, monsterDmg)
-
-          val monsterAttackLog = s"${regeneratedM.name} attacked for $monsterDmg."
           val regenLogs = regenLogOpt.toList
-
           val allLogs = regenLogs :+ monsterAttackLog
           val accWithMonsterLogs = allLogs.reverse.foldLeft(accWithPlayer) {
             case (logsAcc, msg) => (damagedPlayer, Some(regeneratedM), msg) :: logsAcc

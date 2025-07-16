@@ -3,6 +3,7 @@ package controllers
 import models.monster.*
 import models.player.*
 import models.world.OriginZone
+import util.GameConfig.{dodgeBonusByDexterity, maxDodgeChance}
 import util.RandomFunctions
 
 import scala.util.Random
@@ -18,14 +19,27 @@ object MonsterController:
 
     (damagedMonster, explosion)
 
-  def attackPlayer(monster: Monster, player: Player): Int =
+  /** Calculates damage dealt by the monster, considering berserk state and dodge chance.
+   *
+   * @return (damageDealt, combatLog)
+   */
+  def attackPlayer(monster: Monster, player: Player): (Int, String) =
     val baseDamage = monster.attributes.attack + (player.level * 2)
-    if monster.berserk then
-      val bonus: Int = Random.between(1, 5 + monster.attributes.attack)
-      monster.copy(attributes = monster.attributes.copy(currentHp = (monster.attributes.currentHp - bonus).min(0)))
-      (baseDamage + bonus - player.attributes.constitution).max(1)
+    val dodgeChance = (player.attributes.dexterity * dodgeBonusByDexterity).min(maxDodgeChance)
+    val didDodge = Random.nextDouble() < dodgeChance
+    println(dodgeChance + "/" + didDodge)
+
+    if didDodge then
+      (0, s"${player.name} dodged the attack!")
+    else if monster.berserk then
+      val bonus = Random.between(1, 5 + monster.attributes.attack)
+      monster.copy(attributes = monster.attributes.copy(currentHp = (monster.attributes.currentHp - bonus).max(1)))
+      val dmg = (baseDamage + bonus - player.attributes.constitution).max(1)
+      (dmg, s"${monster.name} enters berserk rage and attacks for $dmg damage! But it lost $bonus current hp!")
     else
-      (baseDamage - player.attributes.constitution).max(1)
+      val dmg = (baseDamage - player.attributes.constitution).max(1)
+      (dmg, s"${monster.name} attacked for $dmg.")
+
 
   def handleRegeneration(monster: Monster): (Monster, Option[String]) =
     if monster.regenerating && !monster.isDead then
