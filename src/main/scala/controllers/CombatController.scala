@@ -5,22 +5,27 @@ import models.player.Player
 import scala.annotation.tailrec
 import scala.util.Random
 
-
 /**
- * Combat Controller - Handles fighting mechanics
- *
+ * Handles turn-based combat logic between a player and a monster.
  */
 object CombatController:
+
+  /** Internal reference to last fought monster (for tracking/debugging). */
   private var _lastMonster: Option[Monster] = None
 
+  /** Returns the last monster fought, if any. */
   def lastMonster: Option[Monster] = _lastMonster
 
+  /** Stores a monster as the last monster fought. */
   def setLastMonster(monster: Monster): Unit =
     _lastMonster = Some(monster)
 
   /**
-   * Simulate a fight between player and monster
-   * Returns (updatedPlayer, combatLog)
+   * Simulates a full turn-based combat between player and monster.
+   *
+   * @param player  the player character
+   * @param monster the enemy monster
+   * @return a list of (Player state, optional Monster state, log message) for each action
    */
   def simulateFight(player: Player, monster: Monster): List[(Player, Option[Monster], String)] =
 
@@ -33,32 +38,33 @@ object CombatController:
         val (pAfterAttack, mAfterAttack, attackLogs) =
           if p.skills.nonEmpty && Random.nextBoolean() && p.currentMp >= 3 then
             val skill = Random.shuffle(p.skills).head
-            val (pp, mm, msg) = PlayerController.useSkill(player = p, skill = skill, target = m)
+            val (pp, mm, msg) = PlayerController.useSkill(p, skill, m)
             (pp, mm, List(msg))
           else
             val damage = PlayerController.calculatePlayerAttack(p, m)
             val (damagedM, maybeExplosion) = MonsterController.takeDamage(m, damage)
             val damagedP = maybeExplosion.fold(p)(PlayerController.takeDamage(p, _))
-            val logs = List(s"You attacked ${m.name} for $damage.") ++ maybeExplosion.map(d => s"[Explosive] ${m.name} exploded for $d!").toList
+            val logs = List(s"You attacked ${m.name} for $damage.") ++
+              maybeExplosion.map(d => s"[Explosive] ${m.name} exploded for $d!").toList
             (damagedP, damagedM, logs)
 
         val accWithHeader = turnHeader :: acc
-        val accWithPlayer = attackLogs.reverse.foldLeft(accWithHeader) {
+        val accWithPlayerLogs = attackLogs.reverse.foldLeft(accWithHeader) {
           case (logs, msg) => (pAfterAttack, Some(mAfterAttack), msg) :: logs
         }
 
-
         if mAfterAttack.isDead then
           val monsterLog = s"${mAfterAttack.name} was defeated!"
-          ((pAfterAttack, None, monsterLog) :: accWithPlayer).reverse
+          ((pAfterAttack, None, monsterLog) :: accWithPlayerLogs).reverse
         else
           val (regeneratedM, regenLogOpt) = MonsterController.handleRegeneration(mAfterAttack)
           val (monsterDmg, monsterAttackLog) = MonsterController.attackPlayer(regeneratedM, pAfterAttack)
           val damagedPlayer = PlayerController.takeDamage(pAfterAttack, monsterDmg)
           val regenLogs = regenLogOpt.toList
           val allLogs = regenLogs :+ monsterAttackLog
-          val accWithMonsterLogs = allLogs.reverse.foldLeft(accWithPlayer) {
-            case (logsAcc, msg) => (damagedPlayer, Some(regeneratedM), msg) :: logsAcc
+
+          val accWithMonsterLogs = allLogs.reverse.foldLeft(accWithPlayerLogs) {
+            case (logs, msg) => (damagedPlayer, Some(regeneratedM), msg) :: logs
           }
 
           if !damagedPlayer.isAlive then accWithMonsterLogs.reverse
@@ -66,6 +72,14 @@ object CombatController:
 
     loop(player, monster, Nil, 1)
 
+  /**
+   * Handles equipment drop after a monster is defeated.
+   * Compares new equipment to existing, either equipping or selling it.
+   *
+   * @param player  the player
+   * @param monster the defeated monster
+   * @return (updatedPlayer, resultMessage)
+   */
   def handleEquipDrop(player: Player, monster: Monster): (Player, String) =
     MonsterController.getEquipReward(monster) match
       case Some(newEquip) =>
@@ -79,12 +93,16 @@ object CombatController:
             (updated, s"You equipped: ${newEquip.name} ($slot).")
       case None => (player, "No equipment drop.")
 
+  /**
+   * Handles item drop after a monster is defeated.
+   *
+   * @param player  the player
+   * @param monster the defeated monster
+   * @return (updatedPlayer, resultMessage)
+   */
   def handleItemDrop(player: Player, monster: Monster): (Player, String) =
     MonsterController.getItemReward(monster) match
       case Some(item) =>
         val updated = PlayerController.addItem(player, item)
         (updated, s"You found item: ${item.name}.")
       case None => (player, "No item drop.")
-
-
-
