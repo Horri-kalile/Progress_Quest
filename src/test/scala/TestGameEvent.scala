@@ -1,6 +1,6 @@
 import controllers.{CombatController, MonsterController, PlayerController}
 import models.event.GameEventModule.*
-import models.player.{Attributes, ClassType, Equipment, EquipmentFactory, Identity, Item, ItemFactory, Player, Race}
+import models.player.{Attributes, ClassType, Equipment, EquipmentFactory, EquipmentSlot, Identity, Item, ItemFactory, Player, Race}
 import models.monster.Monster
 import models.world.OriginZone.Plains
 import models.player.Behavior.BehaviorType
@@ -13,6 +13,14 @@ class TestGameEvent extends AnyFunSuite:
   val monster: Monster = MonsterController.getRandomMonsterForZone(player.level, player.attributes.lucky, player.currentZone)
   val item: Item = ItemFactory.randomItem(player.attributes.lucky)
   val equipment: Equipment = EquipmentFactory.generateRandomEquipment(1.0, player.attributes.lucky, player.level).get
+
+  private def equipRandomGear(player: Player): Player =
+    EquipmentSlot.values.foldLeft(player)((p, slot) =>
+      EquipmentFactory.generateRandomEquipment(1.0, p.attributes.lucky, p.level) match
+        case Some(equipment) if equipment.slot == slot =>
+          PlayerController.equipmentOn(p, slot, equipment)
+        case _ => p
+    )
 
   test("RestoreEvent fully restores the player"):
     val damaged = player.withCurrentHp(5)
@@ -51,11 +59,34 @@ class TestGameEvent extends AnyFunSuite:
     val (updated, messages, _) = GameEventFactory.testSpecialCase(leveledUpPlayer, 0)
     assert(updated.level != leveledUpPlayer.level)
 
-  test("Case 1 - Loot equipment: equip or sell depending on value"):
-    val playerWithEquip = PlayerController.equipmentOn(player, equipment.slot, equipment)
-    val (updated, messages, _) = GameEventFactory.testSpecialCase(playerWithEquip, 1)
-    assert(messages.exists(msg => msg.toLowerCase.contains("equipped") || msg.toLowerCase.contains("sold") || msg.toLowerCase.contains("but")))
-    assert(updated.gold >= 0)
+  test("Case 1 - Loot equipment: equip, sell, or no loot"):
+    var startingPlayer = player
+    for _ <- 1 to 100 do
+      startingPlayer = equipRandomGear(startingPlayer)
+
+    val startingGold = startingPlayer.gold
+
+    val (updatedPlayer, messages, _) = GameEventFactory.testSpecialCase(startingPlayer, 1)
+
+    val lootMessage = messages.find(_.toLowerCase.contains("looted"))
+    val equipMessage = messages.find(_.toLowerCase.contains("equipped"))
+    val soldMessage = messages.find(_.toLowerCase.contains("sold"))
+    val noLootMessage = messages.find(_.toLowerCase.contains("no loot"))
+    println(startingPlayer.gold)
+    println(updatedPlayer.gold)
+    if noLootMessage.isDefined then
+      // Case 1: No loot was found
+      assert(updatedPlayer == startingPlayer, "Player should remain unchanged if no loot was found.")
+    else
+      // Case 2: Equipment was generated
+      assert(lootMessage.isDefined, "Expected loot message when equipment is found.")
+
+      if equipMessage.isDefined then
+        assert(updatedPlayer.equipment.values.flatten.nonEmpty, "Expected at least one equipped item.")
+
+      if soldMessage.isDefined then
+        assert(updatedPlayer.gold > startingGold, "Expected gold to increase if equipment was sold.")
+
 
   test("Case 2 - Game over by monster"):
     val (dead, messages, _) = GameEventFactory.testSpecialCase(player, 2)
