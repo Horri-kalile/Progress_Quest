@@ -13,10 +13,15 @@ import models.monster.Monster
 import scalafx.Includes.*
 
 /**
- * Main Game Controller - Handles the game loop and coordinates between models and views
+ * Main game controller that manages the overall game flow and timing.
+ *
+ * GameController coordinates between the game models (player, monsters, events)
+ * and the user interface, handling automatic event triggering, combat sequences,
+ * and game state management. It runs the main game loop that drives all gameplay.
  */
 object GameController:
 
+  // Game state variables
   private var currentPlayer: Option[Player] = None
   private var gameTimer: Option[Timer] = None
   private var isGameRunning: Boolean = false
@@ -24,7 +29,10 @@ object GameController:
   private var eventInProgress: Boolean = false
 
   /**
-   * Initialize the game with a player
+   * Starts a new game with the given player.
+   * Initializes the game loop and updates the UI.
+   *
+   * @param player The player to start the game with
    */
   def startGame(player: Player): Unit =
     currentPlayer = Some(player)
@@ -33,7 +41,7 @@ object GameController:
     updateUI()
 
   /**
-   * Stop the game loop
+   * Stops the current game by canceling timers and resetting state.
    */
   private def stopGame(): Unit =
     isGameRunning = false
@@ -41,7 +49,8 @@ object GameController:
     gameTimer = None
 
   /**
-   * Main game loop - triggers events automatically
+   * Starts the automatic game loop that triggers events 
+   * Events only trigger if the game is running
    */
   private def startGameLoop(): Unit =
     gameTimer = Some(new Timer(true))
@@ -57,7 +66,7 @@ object GameController:
     }, eventInterval, eventInterval))
 
   /**
-   * Trigger a random event and update the game state
+   * Triggers a random event based on player's luck attribute.
    */
   private def triggerRandomEvent(): Unit =
     if eventInProgress then return
@@ -74,8 +83,8 @@ object GameController:
           val finalPlayer = fightSteps.lastOption.map(_._1).getOrElse(player)
           val finalMonster = fightSteps.lastOption.flatMap(_._2)
 
-          // Post-fight check: game over or other events
-          val (updatedPlayer, postFightMessages, _) = EventController.runEvent(EventType.fight, finalPlayer)
+          // Process post-fight events (rewards, experience, etc.)
+          val (updatedPlayer, postFightMessages, _) = EventFactory.executeEvent(EventType.fight, finalPlayer)
           val postFightSteps = postFightMessages.map(msg => (updatedPlayer, finalMonster, msg))
 
           showFightStepsSequentially(fightSteps ++ postFightSteps, updatedPlayer)
@@ -94,7 +103,13 @@ object GameController:
       case None =>
         eventInProgress = false
 
-
+  /**
+   * Displays combat steps one by one with 500ms delays for dramatic effect.
+   * Updates UI after each step and handles game over conditions.
+   *
+   * @param steps List of combat steps (player state, monster state, message)
+   * @param finalPlayer The final player state after all steps
+   */
   private def showFightStepsSequentially(steps: List[(Player, Option[Monster], String)], finalPlayer: Player): Unit =
     steps match
       case Nil =>
@@ -121,22 +136,20 @@ object GameController:
         pause.setOnFinished(_ => showFightStepsSequentially(tail, finalPlayer))
         pause.play()
 
-
   /**
-   * Handle game over scenario
+   * Handles game over by stopping the game loop and showing restart dialog.
    */
   private def handleGameOver(): Unit =
     stopGame()
     Platform.runLater(() =>
       GameUi.showGameOverWithRestart(() =>
-        // Close current game window
-        // Open PlayerGenerationUi again
+        // Close current game window and open player creation
         PlayerGenerationUi.openPlayerGeneration(newPlayer => startGame(newPlayer))
       )
     )
 
   /**
-   * Update the UI with current player state
+   * Updates the UI with the current player's information.
    */
   private def updateUI(): Unit =
     currentPlayer match
@@ -144,24 +157,30 @@ object GameController:
       case None => handleGameOver()
 
   /**
-   * Get current player state
+   * Gets the current player state.
+   *
+   * @return Option containing the current player, or None if no game is active
    */
   def getCurrentPlayer: Option[Player] = currentPlayer
 
   /**
-   * Check if game is running
+   * Checks if the game is currently running.
+   *
+   * @return true if game loop is active, false otherwise
    */
   def isRunning: Boolean = isGameRunning
 
   /**
-   * Manual event trigger for testing
+   * Manually triggers a specific event type (mainly for testing).
+   *
+   * @param eventType The type of event to trigger
    */
   def triggerEvent(eventType: EventType): Unit =
     currentPlayer.foreach: player =>
       val (updatedPlayer, messages, result) = EventController.runEvent(eventType, player)
       currentPlayer = Some(updatedPlayer)
 
-      // Update monster info based on event type
+      // Update monster info for combat events
       if eventType == EventType.fight then
         GameUi.updateMonsterInfo(result)
       else
