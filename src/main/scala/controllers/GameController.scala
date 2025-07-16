@@ -142,9 +142,19 @@ object GameController:
     stopGame()
     Platform.runLater(() =>
       GameUi.showGameOverWithRestart(() =>
-        // Close current game window
-        // Open PlayerGenerationUi again
-        PlayerGenerationUi.openPlayerGeneration(newPlayer => startGame(newPlayer))
+        // This callback should:
+        // 1. Open character creation
+        // 2. When character is created, start game + open GameUi
+        PlayerGenerationUi.openPlayerGeneration(newPlayer => 
+          // Start the game logic
+          GameController.startGame(newPlayer)
+          
+          // Set player in GameUi
+          GameUi.playerOpt = Some(newPlayer)
+          
+          // Open the GameUi window
+          GameUi.open()
+        )
       )
     )
 
