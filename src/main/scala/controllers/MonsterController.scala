@@ -41,7 +41,7 @@ object MonsterController:
 
   def handleRegeneration(monster: Monster): (Monster, Option[String]) =
     if monster.regenerating && !monster.isDead then
-      val healAmount = Random.between(1, 3 * monster.level)
+      val healAmount = Random.between(1, 2 * monster.level)
       val healed = monster.receiveHealing(healAmount)
       (healed, Some(s"[Regenerating] ${monster.name} recovered $healAmount HP."))
     else (monster, None)

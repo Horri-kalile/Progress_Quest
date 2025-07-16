@@ -46,7 +46,7 @@ object RandomFunctions:
       case v if v < 0.90 => sell
       case v if v < 0.90 + specialChance => special
       case v if v < 0.90 + specialChance + gameOverChance => gameOver
-      case _ => fight // fallback
+      case _ => training // fallback
 
   /**
    * Determines whether an item should drop based on player's luck.

@@ -2,7 +2,7 @@ package util
 
 object GameConfig:
   // Game mechanics configuration
-  val baseSpecialChance: Double = 0.03 // 2%
+  val baseSpecialChance: Double = 0.04 // 4%
   val baseDropChance: Double = 0.30 // 30%
   val baseLearnSkillChance: Double = 0.30
   val specialBonusPerLucky: Double = 0.001 // 0.1% per lucky
