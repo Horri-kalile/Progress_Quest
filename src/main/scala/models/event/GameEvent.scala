@@ -8,13 +8,40 @@ import util.GameConfig
 
 import scala.util.Random
 
+/**
+ * Enumeration of all possible event types that can occur during gameplay.
+ * Each event type corresponds to a specific game mechanic or interaction.
+ */
 enum EventType:
   case fight, mission, changeWorld, training, restore, sell, special, gameOver
 
+/**
+ * Base trait for all game events that can occur during player adventures.
+ * 
+ * All events follow the same pattern: they take a player state and return
+ * an updated player state, along with messages describing what happened
+ * and optionally a monster for combat encounters.
+ */
 sealed trait GameEvent:
+  /**
+   * Executes the event's action on the player.
+   *
+   * @param player The current player state
+   * @return Tuple of (updated player, event messages, optional monster)
+   */
   def action(player: Player): (Player, List[String], Option[Monster])
 
+/**
+ * Event triggered after winning a combat encounter.
+ * Handles loot distribution, experience gains, and gold rewards.
+ */
 case object FightEvent extends GameEvent:
+  /**
+   * Processes victory rewards from the last combat encounter.
+   *
+   * @param player The victorious player
+   * @return Updated player with rewards and victory messages
+   */
   override def action(player: Player): (Player, List[String], Option[Monster]) =
     if !player.isAlive then return GameOverEvent.action(player)
 
@@ -28,8 +55,16 @@ case object FightEvent extends GameEvent:
 
     (finalPlayer, summary, None)
 
-
+/**
+ * Event that handles mission system interactions.
+ */
 case object MissionEvent extends GameEvent:
+  /**
+   * Manages mission progression or creation.
+   *
+   * @param player The player to update with mission changes
+   * @return Updated player with mission progress and status messages
+   */
   override def action(player: Player): (Player, List[String], Option[Monster]) =
     if player.activeMissions.nonEmpty && Random.nextBoolean() then
       val mission = Random.shuffle(player.activeMissions).head
@@ -42,29 +77,75 @@ case object MissionEvent extends GameEvent:
       println(msg)
       (MissionController.addMission(player, mission), List(msg), None)
 
+/**
+ * Event that handles world zone transitions.
+ * Moves the player to a new random zone different from their current location.
+ */
 case object ChangeWorldEvent extends GameEvent:
+  /**
+   * Transitions player to a new random world zone.
+   *
+   * @param player The player to move to a new zone
+   * @return Updated player in new zone with transition message
+   */
   override def action(player: Player): (Player, List[String], Option[Monster]) =
     val newWorld = World.randomWorld(player.currentZone)
     val msg = s"Player has moved on another zone: +$newWorld"
     (PlayerController.changeWorld(player, newWorld), List(msg), None)
 
+/**
+ * Event that provides experience gain through training activities.
+ * Gives experience points based on player level and random factors.
+ */
 case object TrainingEvent extends GameEvent:
+  /**
+   * Awards experience points from training activities.
+   * Experience gained scales with player level.
+   *
+   * @param player The player to grant experience to
+   * @return Updated player with experience gain and training message
+   */
   override def action(player: Player): (Player, List[String], Option[Monster]) =
     val exp = player.level * Random.between(1, 100)
     val msg = s"Training completed: +$exp EXP"
     println(msg)
     (PlayerController.gainXP(player, exp), List(msg), None)
 
+/**
+ * Event that fully restores player health and mana.
+ * Provides a way for players to recover from damage without items.
+ */
 case object RestoreEvent extends GameEvent:
+  /**
+   * Fully restores player HP and MP to maximum values.
+   *
+   * @param player The player to restore
+   * @return Fully restored player with recovery message
+   */
   override def action(player: Player): (Player, List[String], Option[Monster]) =
     val msg = "You rested and recovered fully."
     println(msg)
     (player.restore(), List(msg), None)
 
+/**
+ * Event that allows players to spend gold to permanently boost their attributes.
+ */
 case object PowerUpEvent extends GameEvent:
-
+  /**
+   * Checks if the player has enough gold for a power-up.
+   *
+   * @param player The player to check
+   * @return true if player can afford the power-up cost
+   */
   private def canPowerUp(player: Player): Boolean = player.gold >= GameConfig.powerUpCost * player.level
 
+  /**
+   * Attempts to power up player attributes using gold.
+   * Cost increases with player level to maintain progression balance.
+   *
+   * @param player The player attempting to power up
+   * @return Updated player with boosted stats or unchanged if insufficient gold
+   */
   override def action(player: Player): (Player, List[String], Option[Monster]) =
     val cost = GameConfig.powerUpCost * player.level
     if canPowerUp(player) then
@@ -76,7 +157,16 @@ case object PowerUpEvent extends GameEvent:
       val msg = "You don't have enough gold to power up your stats!"
       (player, List(msg), None)
 
+/**
+ * Event that handles selling inventory items for gold.
+ */
 case object SellEvent extends GameEvent:
+  /**
+   * Sells random items from player inventory and attempts power-ups.
+   *
+   * @param player The player selling items
+   * @return Updated player with sold items converted to gold and possible power-ups
+   */
   override def action(player: Player): (Player, List[String], Option[Monster]) =
     if player.inventory.isEmpty then
       (player, List("Inventory empty. Nothing to sell."), None)
@@ -100,7 +190,22 @@ case object SellEvent extends GameEvent:
       val (finalPlayer, powerUpMsgs, result) = PowerUpEvent.action(updatedPlayer)
       (finalPlayer, messages ++ powerUpMsgs, result)
 
+/**
+ * Event that triggers random special encounters with various outcomes.
+ * Can result in blessings, curses, powerful monsters, treasures, or traps.
+ */
 case object SpecialEvent extends GameEvent:
+  /**
+   * Executes a random special encounter with multiple possible outcomes:
+   * - Blessing/Curse: Level changes (±1 to ±3 levels)
+   * - Powerful Monster: Rare equipment drop or game over
+   * - Hidden Dungeon: Item discovery or deadly trap
+   * - Village Help: Experience gain based on wisdom
+   * - Theft: Random items stolen from inventory
+   *
+   * @param player The player experiencing the special event
+   * @return Updated player state with event outcome and descriptive messages
+   */
   override def action(player: Player): (Player, List[String], Option[Monster]) =
     Random.nextInt(8) match
       case 0 =>
@@ -158,12 +263,32 @@ case object SpecialEvent extends GameEvent:
         val (updatedPlayer, msg): (Player, String) = PlayerController.stealRandomItem(player)
         (updatedPlayer, List(msg), None)
 
+/**
+ * Event that handles game over conditions.
+ * Sets player HP to 0 and provides game over message.
+ */
 case object GameOverEvent extends GameEvent:
+  /**
+   * Triggers game over state by setting player HP to 0.
+   *
+   * @param player The player to set as game over
+   * @return Player with 0 HP and game over message
+   */
   override def action(player: Player): (Player, List[String], Option[Monster]) =
     val msg = "GAME OVER."
     (player.withCurrentHp(0), List(msg), None)
 
+/**
+ * Factory object for creating and executing game events.
+ */
 object EventFactory:
+  /**
+   * Creates and executes the appropriate event based on the event type.
+   *
+   * @param eventType The type of event to execute
+   * @param player The player to apply the event to
+   * @return Tuple of (updated player, formatted messages, optional monster)
+   */
   def executeEvent(eventType: EventType, player: Player): (Player, List[String], Option[Monster]) =
     val event: GameEvent = eventType match
       case EventType.fight => FightEvent
