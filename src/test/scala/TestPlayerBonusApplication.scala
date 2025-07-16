@@ -34,12 +34,13 @@ class TestPlayerBonusApplication extends AnyFunSuite:
     assert(updated.hp == 100)
     assert(updated.mp == 50)
 
-  test("Elf gets MP multiplier and lucky bonus"):
+  test("Elf gets dexterity bonus"):
     val player = basePlayer(Race.Elf, ClassType.Mage)
     val updated = applyRaceAndClassBonuses(player)
-
+    println(player)
+    println(updated)
     assert(updated.mp > 50)
-    assert(updated.baseAttributes.lucky > 5)
+    assert(updated.baseAttributes.dexterity > 5)
 
   test("Titan has more strength"):
     val player = basePlayer(Race.Titan, ClassType.Mage)

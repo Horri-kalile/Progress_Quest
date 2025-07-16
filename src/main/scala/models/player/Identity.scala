@@ -47,7 +47,7 @@ object PlayerBonusesApplication:
       case Human =>
         (1.0, 1.0, player.withEquipment(player.equipment + (equip.slot -> Some(equip))))
       case Elf =>
-        (0.6, 1.4, player.withBaseAttributes(player.baseAttributes.copy(lucky = player.baseAttributes.dexterity + Random.between(1, 5))))
+        (0.6, 1.4, player.withBaseAttributes(player.baseAttributes.copy(dexterity = player.baseAttributes.dexterity + Random.between(1, 5))))
       case Dwarf =>
         (1.5, 0.5, player.withBaseAttributes(player.baseAttributes.copy(constitution = player.baseAttributes.constitution + Random.between(1, 5))))
       case Orc =>
@@ -56,10 +56,10 @@ object PlayerBonusesApplication:
         (0.8, 1.2, player.withBaseAttributes(player.baseAttributes.copy(intelligence = player.baseAttributes.intelligence + Random.between(1, 5))))
       case Titan =>
         (1.6, 0.4, player.withBaseAttributes(player.baseAttributes.copy(strength = player.baseAttributes.strength + Random.between(1, 5))))
-      case Gundam =>
-        (1.3, 0.7, player.withBaseAttributes(player.baseAttributes.copy(constitution = player.baseAttributes.constitution + Random.between(1, 5))))
       case PandaMan =>
-        (0.8, 1.2, player.withBaseAttributes(player.baseAttributes.copy(wisdom = player.baseAttributes.wisdom + Random.between(1, 3), strength = player.baseAttributes.strength + Random.between(1, 3))))
+        (0.8, 1.3, player.withBaseAttributes(player.baseAttributes.copy(lucky = player.baseAttributes.lucky + Random.between(1, 5))))
+      case Gundam =>
+        (1.3, 0.7, player.withBaseAttributes(player.baseAttributes.copy(wisdom = player.baseAttributes.wisdom + Random.between(1, 3), strength = player.baseAttributes.strength + Random.between(1, 3))))
 
     val raceHp = (player.hp * hpMulti).toInt
     val raceMp = (player.mp * mpMulti).toInt
@@ -69,7 +69,7 @@ object PlayerBonusesApplication:
       case Mage | Cleric | Paladin | Assassin => (0, 0)
       case Warrior => (Random.between(10, 31), 0)
       case Poisoner => (0, Random.between(5, 16))
-      case CowBoy => (Random.between(10, 31), Random.between(5, 16))
+      case CowBoy => (Random.between(5, 25), Random.between(5, 10))
 
     val startingSkills = SkillFactory.generateStartingSkill(player.level, player.identity.classType).toList
 

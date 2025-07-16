@@ -13,7 +13,7 @@ object GameConfig:
   val maxBuffByZone: Double = 0.20 // 20% maximum buff
   val probabilityToMissAttackBonus: Double = 0.001
   val powerUpCost: Int = 100
-  val dodgeBonusByDexterity: Double = 0.001
+  val dodgeBonusByDexterity: Double = 0.005
   val maxDodgeChance: Double = 0.50
 
   // UI Style constants - eliminate redundancy
