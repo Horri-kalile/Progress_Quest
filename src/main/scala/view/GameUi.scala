@@ -121,30 +121,29 @@ object GameUi:
       createTableRow(slot.toString, label)
 
   private def createStatWithBarRow(label: String, value: String, progressValue: Double, color: String): VBox =
-    val labelNode = new Label(label):
-      style = "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
-      maxWidth = Double.MaxValue
+    val labelRow = new HBox:
+      alignment = Pos.CenterLeft
+      spacing = 10
+      children = Seq(
+        new Label(s"$label:"):
+          style = "-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #34495e;"
+        ,
+        new Label(value):
+          style = "-fx-font-size: 14px; -fx-text-fill: #34495e;"
+      )
 
-    val valueNode = new Label(value):
-      style = "-fx-font-size: 14px; -fx-text-fill: #2c3e50;"
-      maxWidth = Double.MaxValue
-      alignment = Pos.CenterRight
-
-    HBox.setHgrow(labelNode, Priority.Always)
-    HBox.setHgrow(valueNode, Priority.Always)
+    val progressBar = new ProgressBar:
+      progress = progressValue
+      prefWidth = 250
+      prefHeight = 20
+      minHeight = 20
+      maxHeight = 20
+      style = s"-fx-accent: $color; -fx-control-inner-background: #dfe6e9; -fx-border-color: #b2bec3;"
 
     new VBox:
-      spacing = 5
-      padding = Insets(5, 20, 5, 20)
-      children = Seq(
-        new HBox:
-          spacing = 40
-          alignment = Pos.CenterLeft
-          style = "-fx-background-color: white; -fx-border-color: transparent;"
-          padding = Insets(10, 0, 10, 0)
-          children = Seq(labelNode, valueNode)
-
-        )
+      spacing = 6
+      padding = Insets(10, 20, 10, 20)
+      children = Seq(labelRow, progressBar)
 
   private def createStatsContent(player: Player): Seq[Node] =
     val attrRows = Seq(
@@ -194,28 +193,64 @@ object GameUi:
       focusTraversable = false
 
   private def createMonsterInfoContent(): Node =
-    val monsterText = currentMonster match
+    currentMonster match
       case Some(monster) =>
-        s"""${monster.name} (Level ${monster.level})
-           |Type: ${monster.monsterType}
-           |Zone: ${monster.originZone}
-           |HP: ${monster.attributes.hp}
-           |Attack: ${monster.attributes.attack}
-           |Defense: ${monster.attributes.defense}
-           |Behavior: ${monster.behavior}
-           |Gold Reward: ${monster.goldReward}
-           |EXP Reward: ${monster.experienceReward}
-           |
-           |${monster.description}""".stripMargin
+        val hpLabel = new Label(s"HP: ${monster.attributes.currentHp}/${monster.attributes.hp}")
+
+        val hpBar = new ProgressBar:
+          progress = monster.attributes.currentHp.toDouble / monster.attributes.hp
+          prefWidth = 150
+          style = "-fx-accent: #4682b4"
+
+        val grid = new GridPane:
+          hgap = 8
+          vgap = 4
+          padding = Insets(5)
+
+        // Ligne 0 : nom et level
+        grid.add(new Label(s"${monster.name} (Level ${monster.level})") {
+          style = "-fx-font-weight: bold; -fx-font-size: 14;"
+        }, 0, 0, 2, 1)
+
+        // Ligne 1 : type
+        grid.add(new Label(s"Type: ${monster.monsterType}"), 0, 1)
+        grid.add(new Label(s"Zone: ${monster.originZone}"), 0, 2)
+
+        // Ligne 3 : HP
+        grid.add(hpLabel, 0, 3)
+        grid.add(hpBar, 1, 3)
+
+        // Ligne 4 : Attack / Physical weakness
+        grid.add(new Label(s"Attack: ${monster.attributes.attack}"), 0, 4)
+        grid.add(new Label(f"Physical weakness: ${monster.attributes.weaknessPhysical}%.2f"), 1, 4)
+
+        // Ligne 5 : Defense / Magical weakness
+        grid.add(new Label(s"Defense: ${monster.attributes.defense}"), 0, 5)
+        grid.add(new Label(f"Magical weakness: ${monster.attributes.weaknessMagic}%.2f"), 1, 5)
+
+        // Ligne 6 : Behavior
+        grid.add(new Label(s"Behavior: ${monster.behavior}"), 0, 6, 2, 1)
+
+        // Ligne 7 : Rewards
+        grid.add(new Label(s"Gold Reward: ${monster.goldReward}"), 0, 7)
+        grid.add(new Label(s"EXP Reward: ${monster.experienceReward}"), 0, 8)
+
+        // Ligne 8 : Item reward
+        grid.add(new Label(s"Item Reward: ${monster.itemReward.fold("None")(_.toString)}"), 0, 9, 2, 1)
+        grid.add(new Label(s"Equipment Reward: ${monster.equipReward.fold("None")(_.toString)}"), 0,10,2, 1)
+
+        // Ligne 10 : description
+        grid.add(new Label(monster.description) {
+          style = "-fx-font-size: 11; -fx-text-fill: #555555; -fx-wrap-text: true"
+          maxWidth = 300
+        }, 0, 11,2, 1)
+
+        grid
+
       case None =>
-        "No monster encountered yet..."
-    
-    new TextArea:
-      text = monsterText
-      editable = false
-      style = "-fx-font-family: monospace; -fx-font-size: 12; -fx-background-color: transparent"
-      mouseTransparent = true
-      focusTraversable = false
+        new Label("No monster encountered yet...") {
+          style = "-fx-font-style: italic; -fx-text-fill: #888888;"
+        }
 
   private def createWorldContent(player: Player): Node =
     new VBox:
@@ -447,7 +482,6 @@ object GameUi:
       spacing = 10
       padding = Insets(10)
       children = Seq(progressSection, diaryContent)
-
 
     createPanelWithHeader("Hero Diary", combinedContent)
 
