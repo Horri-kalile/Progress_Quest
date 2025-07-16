@@ -46,12 +46,12 @@ object GameUi:
   private def createRoot(player: Player): BorderPane =
     new BorderPane:
       padding = Insets(15)
-      style = "-fx-background-color: #e0e0e0"
+      style = "-fx-background-color: #ecf0f1"
       center = new ScrollPane:
         fitToWidth = true
         fitToHeight = true
-        hbarPolicy = ScrollPane.ScrollBarPolicy.AsNeeded
-        vbarPolicy = ScrollPane.ScrollBarPolicy.AsNeeded
+        hbarPolicy = ScrollPane.ScrollBarPolicy.AS_NEEDED
+        vbarPolicy = ScrollPane.ScrollBarPolicy.AS_NEEDED
         content = new HBox:
           spacing = 20
           alignment = Pos.TopLeft
@@ -60,11 +60,10 @@ object GameUi:
             createRightColumn()
           )
 
-
   private def createLeftColumn(player: Player): VBox =
     new VBox:
       spacing = 15
-      prefWidth = screenWidth * 0.6
+      prefWidth = screenWidth * 0.5
       children = Seq(
         createPanelWithHeader("Character", new VBox(createCharacterContent(player) *)),
         createPanelWithHeader("Stats", new VBox(createStatsContent(player) *)),
@@ -74,12 +73,10 @@ object GameUi:
         createPanelWithHeader("Equipment", new VBox(createEquipmentContent(player) *)),
         createPanelWithHeader("Inventory", createInventoryContent(player))
       )
-
-
   private def createRightColumn(): VBox =
     new VBox:
       spacing = 15
-      prefWidth = screenWidth * 0.4
+      prefWidth = screenWidth * 0.5
       children = Seq(
         createHeroDiaryPanel(),
         createPanelWithHeader("Combat Log", createCombatLogContent()),
@@ -99,20 +96,13 @@ object GameUi:
   private def createPanelWithHeader(title: String, content: Node): VBox =
     new VBox:
       spacing = 0
+      style = "-fx-background-color: white; -fx-border-color: #bdc3c7; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;"
+      padding = Insets(15)
       children = Seq(
-        new HBox:
-          style = "-fx-background-color: #a9a9a9; -fx-padding: 5 10 5 10"
-          prefHeight = 30
-          alignment = Pos.CenterLeft
-          children = Seq(
-            new Label(title):
-              style = "-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 14"
-          )
+        new Label(title):
+          style = "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-padding: 0 0 10 0;"
         ,
-        new VBox:
-          style = "-fx-background-color: white; -fx-border-color: #ccc; -fx-border-width: 0 1 1 1"
-          padding = Insets(10)
-          children = Seq(content)
+        content
       )
 
   private def createCharacterContent(player: Player): Seq[Node] = Seq(
@@ -130,6 +120,32 @@ object GameUi:
       val label = equipped.map(e => s"${e.name} (Value: ${e.value})").getOrElse("None")
       createTableRow(slot.toString, label)
 
+  private def createStatWithBarRow(label: String, value: String, progressValue: Double, color: String): VBox =
+    val labelNode = new Label(label):
+      style = "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
+      maxWidth = Double.MaxValue
+
+    val valueNode = new Label(value):
+      style = "-fx-font-size: 14px; -fx-text-fill: #2c3e50;"
+      maxWidth = Double.MaxValue
+      alignment = Pos.CenterRight
+
+    HBox.setHgrow(labelNode, Priority.Always)
+    HBox.setHgrow(valueNode, Priority.Always)
+
+    new VBox:
+      spacing = 5
+      padding = Insets(5, 20, 5, 20)
+      children = Seq(
+        new HBox:
+          spacing = 40
+          alignment = Pos.CenterLeft
+          style = "-fx-background-color: white; -fx-border-color: transparent;"
+          padding = Insets(10, 0, 10, 0)
+          children = Seq(labelNode, valueNode)
+
+        )
+
   private def createStatsContent(player: Player): Seq[Node] =
     val attrRows = Seq(
       createTableRow("STR", player.attributes.strength.toString),
@@ -144,28 +160,10 @@ object GameUi:
     val mpLabel = new Label(s"${player.currentMp} / ${player.mp}")
 
     attrRows ++ Seq(
-      createTableRow("HP", ""),
-      new VBox:
-        spacing = 2
-        children = Seq(
-          hpLabel,
-          new ProgressBar:
-            progress = player.currentHp.toDouble / player.hp
-            prefWidth = 200
-            style = "-fx-accent: #4682b4"
-        )
-      ,
-      createTableRow("MP", ""),
-      new VBox:
-        spacing = 2
-        children = Seq(
-          mpLabel,
-          new ProgressBar:
-            progress = player.currentMp.toDouble / player.mp
-            prefWidth = 200
-            style = "-fx-accent: #9370db"
-        )
+      createStatWithBarRow("HP", s"${player.currentHp} / ${player.hp}", player.currentHp.toDouble / player.hp, "#4682b4"),
+      createStatWithBarRow("MP", s"${player.currentMp} / ${player.mp}", player.currentMp.toDouble / player.mp, "#9370db")
     )
+
 
   private def createInventoryContent(player: Player): Node = new GridPane:
     hgap = 50
@@ -290,15 +288,27 @@ object GameUi:
         ) ++ missionLabels
 
 
-  private def createTableRow(label: String, value: String): HBox = new HBox:
-    spacing = 10
-    children = Seq(
-      new Label(label):
-        style = "-fx-font-weight: bold; -fx-min-width: 80"
-      ,
-      new Label(value):
-        style = "-fx-min-width: 120"
-    )
+  private def createTableRow(label: String, value: String): HBox =
+    val labelNode = new Label(label):
+      style = "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #34495e;"
+      maxWidth = Double.MaxValue
+
+    val valueNode = new Label(value):
+      style = "-fx-font-size: 14px; -fx-text-fill: #2c3e50;"
+      maxWidth = Double.MaxValue
+      alignment = Pos.CenterRight
+
+    HBox.setHgrow(labelNode, Priority.Always)
+    HBox.setHgrow(valueNode, Priority.Always)
+
+    new HBox:
+      spacing = 40
+      alignment = Pos.CenterLeft
+      padding = Insets(10, 20, 10, 20)
+      style =
+        "-fx-background-color: white;" +
+          "-fx-border-color: transparent;"
+      children = Seq(labelNode, valueNode)
 
   private def createTableHeader(text: String): Label = new Label(text):
     style = "-fx-font-weight: bold; -fx-underline: true"
@@ -413,31 +423,34 @@ object GameUi:
     val progressBar = new ProgressBar:
       progress = 0.0
       prefWidth = 150
-      style = "-fx-accent:rgb(63, 147, 156)"
+      style = "-fx-accent: rgb(63,147,156);"
 
-    // Store the progress bar reference
+
     heroDiaryProgressBar = Some(progressBar)
 
-    new VBox:
-      spacing = 0
+
+    val progressSection = new HBox:
+      spacing = 10
+      alignment = Pos.CenterLeft
       children = Seq(
-        new HBox:
-          style = "-fx-background-color: #a9a9a9; -fx-padding: 5 10 5 10"
-          prefHeight = 30
-          alignment = Pos.CenterLeft
-          spacing = 10
-          children = Seq(
-            new Label("Hero Diary"):
-              style = "-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 14"
-            ,
-            progressBar
-          )
+        new Label("Progress:"):
+          style = "-fx-font-weight: bold; -fx-font-size: 12; -fx-text-fill: #34495e;"
         ,
-        new VBox:
-          style = "-fx-background-color: white; -fx-border-color: #ccc; -fx-border-width: 0 1 1 1"
-          padding = Insets(10)
-          children = Seq(createDiaryContent())
+        progressBar
       )
+
+
+    val diaryContent = createDiaryContent()
+
+
+    val combinedContent = new VBox:
+      spacing = 10
+      padding = Insets(10)
+      children = Seq(progressSection, diaryContent)
+
+
+    createPanelWithHeader("Hero Diary", combinedContent)
+
 
   /**
    * Animate the Hero Diary progress bar

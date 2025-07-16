@@ -16,16 +16,11 @@ sealed trait Skill:
 
   def powerLevel: Int
 
+  def baseMultiplier: Double
+
   def effectType: SkillEffectType
 
-  def use(caster: Player, target: Entity): (Player, Entity)
-
   def poweredUp: Skill
-
-trait Entity:
-  def receiveDamage(amount: Int): Entity
-
-  def receiveHealing(amount: Int): Entity
 
 case class GenericSkill(
                          name: String,
@@ -35,43 +30,19 @@ case class GenericSkill(
                          powerLevel: Int = 1
                        ) extends Skill:
 
-  override def use(caster: Player, target: Entity): (Player, Entity) =
-    if caster.currentMp < manaCost then return (caster, target)
-
-    val updatedCaster = caster.copy(mp = caster.currentMp - manaCost)
-    val multiplier = Random.between(0.1, baseMultiplier)
-
-    effectType match
-      case SkillEffectType.Physical =>
-        val attributes = caster.attributes
-        val eqPower = caster.equipment.values.flatten.map(_.value).sum
-        val damage = ((attributes.strength + caster.level + eqPower) * multiplier * powerLevel).toInt
-        (updatedCaster, target.receiveDamage(damage))
-
-      case SkillEffectType.Magic =>
-        val attributes = caster.attributes
-        val eqPower = caster.equipment.values.flatten.map(_.value).sum
-        val magicPower = attributes.intelligence + attributes.wisdom
-        val damage = ((magicPower + caster.level + eqPower) * multiplier * powerLevel).toInt
-        (updatedCaster, target.receiveDamage(damage))
-
-      case SkillEffectType.Healing =>
-        val healingPower = caster.attributes.wisdom + caster.level
-        val heal = (healingPower * multiplier * powerLevel).toInt
-        (updatedCaster, target.receiveHealing(heal))
-
   override def poweredUp: Skill = copy(powerLevel = powerLevel + 1)
 
 object SkillFactory:
   private val data: SkillNameData = SkillLoader.loadSkillNames()
 
-  def generateStartingSkill(classType: ClassType): Option[Skill] =
-    val mana = Random.between(4, 13)
+  def generateStartingSkill(playerLevel: Int, classType: ClassType): Option[Skill] =
+    val mana = Random.between(4, 13) * playerLevel
     val multiplier = Random.between(1.1, 2.0).toInt
     classType match
       case ClassType.Mage => Some(GenericSkill(Random.shuffle(data.magic).head, SkillEffectType.Magic, mana, multiplier))
-      case ClassType.Cleric | ClassType.Paladin => Some(GenericSkill(Random.shuffle(data.healing).head, SkillEffectType.Healing, mana, multiplier))
+      case ClassType.Paladin => Some(GenericSkill(Random.shuffle(data.healing).head, SkillEffectType.Healing, mana, multiplier))
       case ClassType.Assassin => Some(GenericSkill(Random.shuffle(data.physical).head, SkillEffectType.Physical, mana, multiplier))
+      case ClassType.Cleric => Some(randomSkill())
       case _ => None
 
   def randomSkill(): Skill =

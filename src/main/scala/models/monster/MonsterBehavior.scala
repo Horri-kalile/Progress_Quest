@@ -3,37 +3,43 @@ package models.monster
 import scala.util.Random
 
 sealed trait MonsterBehavior:
-  def apply(monster: Monster): Unit
+  def apply(monster: Monster): Monster
 
 case object Aggressive extends MonsterBehavior:
-  def apply(monster: Monster): Unit =
-    monster.attributes.copy(attack = (monster.attributes.attack * 1.5).toInt)
+  def apply(monster: Monster): Monster =
+    monster.copy(attributes = monster.attributes.copy(
+      attack = (monster.attributes.attack * 1.25).toInt
+    ))
 
 case object Defensive extends MonsterBehavior:
-  def apply(monster: Monster): Unit =
-    monster.attributes.copy(defense = (monster.attributes.defense * 1.5).toInt)
+  def apply(monster: Monster): Monster =
+    monster.copy(attributes = monster.attributes.copy(
+      defense = (monster.attributes.defense * 1.25).toInt
+    ))
 
-case object DoubleHP extends MonsterBehavior:
-  def apply(monster: Monster): Unit =
-    monster.attributes.copy(hp = monster.attributes.hp * 2)
+case object MoreHp extends MonsterBehavior:
+  def apply(monster: Monster): Monster =
+    val newHP = (monster.attributes.hp * 1.25).toInt
+    monster.copy(attributes = monster.attributes.copy(hp = newHP, currentHp = newHP))
 
 case object Berserk extends MonsterBehavior:
-  def apply(monster: Monster): Unit =
-    monster.berserk = true // logica nella classe Monster
+  def apply(monster: Monster): Monster =
+    monster.copy(berserk = true)
 
 case object OneShot extends MonsterBehavior:
-  def apply(monster: Monster): Unit = {} // gestione nel metodo attaccaGiocatore
+  def apply(monster: Monster): Monster = // Behavior managed automatically when creating
+    monster.copy(attributes = monster.attributes.copy(attack = monster.attributes.attack * 2))
 
 case object Explosive extends MonsterBehavior:
-  def apply(monster: Monster): Unit = {} // gestione in prendiDanno
+  def apply(monster: Monster): Monster = monster // Behavior used after death
 
 case object Regenerating extends MonsterBehavior:
-  def apply(monster: Monster): Unit =
-    monster.regenerating = true // logica nella classe Monster
+  def apply(monster: Monster): Monster = // Behavior used after monster attacked
+    monster.copy(regenerating = true)
 
-case object MonsterBehavior:
+object MonsterBehavior:
   private val allBehaviors: List[MonsterBehavior] = List(
-    Aggressive, Defensive, DoubleHP,
+    Aggressive, Defensive, MoreHp,
     Berserk, OneShot, Explosive, Regenerating
   )
 

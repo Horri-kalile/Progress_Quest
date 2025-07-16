@@ -27,5 +27,6 @@ lazy val root = (project in file("."))
       "com.typesafe.akka" %% "akka-actor-typed" % "2.8.5",
       "com.lihaoyi" %% "upickle" % "3.1.0",
       "org.scalatest" %% "scalatest" % "3.2.18" % Test
-    )
+    ),
+    Compile / mainClass := Some("GameMain")
   )

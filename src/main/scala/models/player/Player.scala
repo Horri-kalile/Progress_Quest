@@ -2,186 +2,273 @@ package models.player
 
 import models.event.Mission
 import models.monster.OriginZone
-import models.world.World
-
-import scala.collection.immutable.HashMap
-import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
 import scala.util.Random
+import models.player.Behavior.*
 
-case class Player(
-                   name: String,
-                   identity: Identity,
-                   level: Int,
-                   exp: Int,
-                   hp: Int,
-                   mp: Int,
-                   currentHp: Int,
-                   currentMp: Int,
-                   baseAttributes: Attributes,
-                   behaviorType: BehaviorType,
-                   inventory: Map[Item, Int] = Map.empty,
-                   equipment: Map[EquipmentSlot, Option[Equipment]] = EquipmentSlot.values.map(_ -> None).toMap,
-                   skills: List[Skill] = List.empty,
-                   missions: List[Mission] = List.empty,
-                   gold: Double,
-                   currentZone: OriginZone
-                 ) extends Entity:
+/**
+ * The main Player trait.
+ * Behavior logic is resolved from the BehaviorType.
+ * All updates return new Player instances to keep immutability.
+ */
+trait Player:
 
-  val behavior: Behavior = BehaviorResolver.getBehavior(behaviorType)
+  def name: String
 
+  def identity: Identity
+
+  def level: Int
+
+  def exp: Int
+
+  def hp: Int
+
+  def mp: Int
+
+  def currentHp: Int
+
+  def currentMp: Int
+
+  def baseAttributes: Attributes
+
+  def behaviorType: BehaviorType
+
+  def inventory: Map[Item, Int]
+
+  def equipment: Map[EquipmentSlot, Option[Equipment]]
+
+  def skills: List[Skill]
+
+  def missions: List[Mission]
+
+  def gold: Double
+
+  def currentZone: OriginZone
+
+  /** The behavior logic instance resolved from type */
+  def behavior: Strategy = summon[Strategy](using behaviorType)
+
+  /** Current stats including equipment bonuses */
   def attributes: Attributes =
-    val bonuses = equipment.values.flatten.map(_.statBonus)
-    bonuses.foldLeft(baseAttributes)(_ + _)
+    equipment.values.flatten.map(_.statBonus).foldLeft(baseAttributes)(_ + _)
 
+  /** Is the player alive (has HP)? */
+  def isAlive: Boolean = currentHp > 0
+
+  /** Inventory item count */
   def inventorySize: Int = inventory.size
-  
 
-  def levelUp(): Player =
-    this.copy(
-      level = level + 1,
-      exp = 0,
-      currentHp = hp,
-      currentMp = mp
-    ).powerUpAttributes()
-
-  def levelDown(): Player =
-    this.copy(
-      level = (level - 1).max(1),
-      exp = 0,
-      currentHp = hp,
-      currentMp = mp
-    ).powerDownAttributes()
-
-  /*TODO calcolo danno*/
-  override def receiveDamage(amount: Int): Player =
-    val finalDamage = behavior.onDamageTaken(this, amount)
-    val newHP = (hp - finalDamage).max(0)
-    this.copy(hp = newHP)
-
-  override def receiveHealing(amount: Int): Player =
-    val newHP = (hp + amount).min(hp)
-    this.copy(hp = newHP)
-
-  def useSkill(skill: Skill): Boolean = mp match
-    case a if mp >= skill.manaCost => this.copy(mp = mp - skill.manaCost); true
-    case _ => false
-
-  def equip(item: Equipment): Player =
-    val updated = equipment.updated(item.slot, Some(item))
-    this.copy(equipment = updated)
-
-  def unequip(slot: EquipmentSlot): Player =
-    val updated = equipment.updated(slot, None)
-    this.copy(equipment = updated)
-
-  def learnSkill(skill: Skill): Player =
-    if skills.exists(_.name == skill.name) then this
-    else this.copy(skills = skill :: skills)
-
-  def obtainItem(item: Item, amount: Int = 1): Player =
-    val updated = inventory.updatedWith(item) {
-      case Some(count) => Some(count + amount)
-      case None => Some(amount)
-    }
-    this.copy(inventory = updated)
-
-
-  def sellItem(): (Player, String) =
-    if inventory.isEmpty then (this, "Inventory empty. Nothing sold.")
-    else
-      val itemList = inventory.toList
-      val (item, count) = itemList(Random.nextInt(itemList.size))
-      val toRemove = Random.between(1, count + 1)
-      val updatedInventory =
-        if count > toRemove then inventory.updated(item, count - toRemove)
-        else inventory - item
-
-      val totalGold = item.gold * toRemove
-      val updatedPlayer = this.copy(
-        inventory = updatedInventory,
-        gold = gold + totalGold
-      )
-      (updatedPlayer, s"Sold $toRemove × ${item.name} for $totalGold gold.")
-
-
-  def stealFromInventory(): String =
-    if inventory.isEmpty then "Nothing to steal."
-    else
-      val itemList = inventory.toList
-      val (item, count) = itemList(Random.nextInt(itemList.size))
-      val updatedInventory =
-        if count > 1 then inventory.updated(item, count - 1)
-        else inventory - item
-
-      val updatedPlayer = this.copy(inventory = updatedInventory)
-      s"A ${item.name} was stolen from your inventory."
-
-
+  /** Is inventory empty */
   def emptyInventory: Boolean = inventory.isEmpty
 
-  def startGame(): Player = behavior.onGameStart(this)
+  // ===== Update methods =====
+  def withHp(hp: Int): Player
 
-  def doDamage(damage: Int): Int = behavior.onBattleDamage(this, damage)
+  def withMp(mp: Int): Player
 
-  def takeDamage(damage: Int): Player =
-    val finalDmg = behavior.onDamageTaken(this, damage)
-    val newHP = (hp - finalDmg).max(0)
-    this.copy(hp = newHP)
+  def withLevel(newLevel: Int): Player
 
-  def replaceEquipment(incoming: Equipment): Player =
-    val currentOpt = equipment(incoming.slot)
-    if currentOpt.forall(incoming.value > _.value) then
-      val updated = equipment.updated(incoming.slot, Some(incoming))
-      this.copy(equipment = updated)
-    else this
+  def withExp(newExp: Int): Player
 
-  def equipmentList: Iterable[Equipment] =
-    equipment.values.flatten
+  def withCurrentHp(newHp: Int): Player
 
-  def earnGold(amount: Double): Player =
-    this.copy(gold = gold + amount)
+  def withCurrentMp(newMp: Int): Player
 
-  def spendGold(amount: Double): Option[Player] =
-    if gold >= amount then Some(this.copy(gold = gold - amount))
-    else None
+  def withBaseAttributes(newAttr: Attributes): Player
 
-  def restore(): Player =
-    this.copy(currentHp = hp, currentMp = mp)
+  def withInventory(newInventory: Map[Item, Int]): Player
 
-  def addMission(m: Mission): Player = this.copy(missions = m :: missions)
+  def withEquipment(newEquipment: Map[EquipmentSlot, Option[Equipment]]): Player
+
+  def withSkills(newSkills: List[Skill]): Player
+
+  def withMissions(newMissions: List[Mission]): Player
+
+  def withGold(newGold: Double): Player
+
+  def withCurrentZone(newZone: OriginZone): Player
+
+  def withBehaviorType(newBehaviorType: BehaviorType): Player
+
+  // ===== Player logic methods using update methods =====
+
+  def receiveDamage(amount: Int): Player =
+    val dmg = behavior.onDamageTaken(this, amount)
+    withCurrentHp((currentHp - dmg).max(0))
+
+  def receiveHealing(amount: Int): Player =
+    withCurrentHp((currentHp + amount).min(hp))
+
+  def restore(): Player = withCurrentHp(hp).withCurrentMp(mp)
+
+  def equipmentList: Iterable[Equipment] = equipment.values.flatten
 
   def activeMissions: List[Mission] = missions.filterNot(_.isCompleted)
 
-  def progressMission(mission: Mission): Player =
-    val updatedMissions = missions.map { m =>
-      if m.id == mission.id then m.progressed() else m
-    }
-    this.copy(missions = updatedMissions)
-
   def powerUpAttributes(): Player =
-    this.copy(baseAttributes = baseAttributes.incrementRandomAttributes())
+    withBaseAttributes(baseAttributes.incrementRandomAttributes())
 
   def powerDownAttributes(): Player =
-    this.copy(baseAttributes = baseAttributes.decrementRandomAttributes())
+    withBaseAttributes(baseAttributes.decrementRandomAttributes())
 
-object PlayerFactory:
-  def createDefaultPlayer(name: String, identity: Identity, attributes: Attributes, behavior: BehaviorType): Player =
-    val hp = attributes.constitution * 5
-    val mp = attributes.intelligence * 2
+/** Companion object for Player trait */
+object Player:
+
+  import models.player.Behavior.given
+
+  /** Validate params, throw exception if invalid */
+  private def validateParams(
+                              name: String,
+                              identity: Identity,
+                              level: Int,
+                              exp: Int,
+                              hp: Int,
+                              mp: Int,
+                              currentHp: Int,
+                              currentMp: Int,
+                              baseAttributes: Attributes,
+                              behaviorType: BehaviorType,
+                              inventory: Map[Item, Int],
+                              equipment: Map[EquipmentSlot, Option[Equipment]],
+                              skills: List[Skill],
+                              missions: List[Mission],
+                              gold: Double,
+                              currentZone: OriginZone
+                            ): Unit =
+    require(name.nonEmpty, "Player name cannot be empty")
+    require(level > 0, "Level must be positive")
+    require(exp >= 0, "Experience cannot be negative")
+    require(hp > 0, "HP must be positive")
+    require(mp >= 0, "MP cannot be negative")
+    require(currentHp >= 0 && currentHp <= hp, "Current HP out of range")
+    require(currentMp >= 0 && currentMp <= mp, "Current MP out of range")
+    require(gold >= 0, "Gold cannot be negative")
+  // add more as needed...
+
+  /** Apply factory method to create Player instances */
+  def apply(
+             name: String,
+             identity: Identity,
+             level: Int,
+             exp: Int,
+             hp: Int,
+             mp: Int,
+             currentHp: Int,
+             currentMp: Int,
+             baseAttributes: Attributes,
+             behaviorType: BehaviorType,
+             inventory: Map[Item, Int] = Map.empty,
+             equipment: Map[EquipmentSlot, Option[Equipment]] = EquipmentSlot.values.map(_ -> None).toMap,
+             skills: List[Skill] = List.empty,
+             missions: List[Mission] = List.empty,
+             gold: Double,
+             currentZone: OriginZone
+           ): Player =
+    validateParams(name, identity, level, exp, hp, mp, currentHp, currentMp, baseAttributes, behaviorType, inventory, equipment, skills, missions, gold, currentZone)
+    val raw = PlayerImpl(name, identity, level, exp, hp, mp, currentHp, currentMp, baseAttributes, behaviorType, inventory, equipment, skills, missions, gold, currentZone)
+    raw.behavior.onGameStart(raw) // Apply behavior bonus when it needs
+
+  /** Minimal factory method for convenience, using default level=1, exp=0, gold=0 */
+  def apply(
+             name: String,
+             identity: Identity,
+             baseAttributes: Attributes,
+             behaviorType: BehaviorType
+           ): Player =
+    val baseHp = baseAttributes.constitution * 5
+    val baseMp = baseAttributes.intelligence * 2
+    val level = 1
+    val exp = 0
     val gold = 0.0
+    val currentZone = OriginZone.Plains
 
-    Player(
+    apply(
       name = name,
       identity = identity,
-      level = 1,
-      exp = 0,
-      hp = hp,
-      mp = mp,
-      currentHp = hp,
-      currentMp = mp,
-      baseAttributes = attributes,
-      behaviorType = behavior,
+      level = level,
+      exp = exp,
+      hp = baseHp,
+      mp = baseMp,
+      currentHp = baseHp,
+      currentMp = baseMp,
+      baseAttributes = baseAttributes,
+      behaviorType = behaviorType,
+      inventory = Map.empty,
+      equipment = EquipmentSlot.values.map(_ -> None).toMap,
+      skills = List.empty,
+      missions = List.empty,
       gold = gold,
-      currentZone = OriginZone.Plains
+      currentZone = currentZone
     )
+
+  /** Extractor for pattern matching */
+  def unapply(p: Player): Option[(String, Identity, Int, Int, Int, Int, Int, Int, Attributes, BehaviorType, Map[Item, Int], Map[EquipmentSlot, Option[Equipment]], List[Skill], List[Mission], Double, OriginZone)] =
+    Some(
+      (
+        p.name,
+        p.identity,
+        p.level,
+        p.exp,
+        p.hp,
+        p.mp,
+        p.currentHp,
+        p.currentMp,
+        p.baseAttributes,
+        p.behaviorType,
+        p.inventory,
+        p.equipment,
+        p.skills,
+        p.missions,
+        p.gold,
+        p.currentZone
+      )
+    )
+
+  /** Private implementation case class hidden from public */
+  private case class PlayerImpl(
+                                 name: String,
+                                 identity: Identity,
+                                 level: Int,
+                                 exp: Int,
+                                 hp: Int,
+                                 mp: Int,
+                                 currentHp: Int,
+                                 currentMp: Int,
+                                 baseAttributes: Attributes,
+                                 behaviorType: BehaviorType,
+                                 inventory: Map[Item, Int],
+                                 equipment: Map[EquipmentSlot, Option[Equipment]],
+                                 skills: List[Skill],
+                                 missions: List[Mission],
+                                 gold: Double,
+                                 currentZone: OriginZone
+                               ) extends Player:
+
+    override def withHp(hp: Int): Player = copy(hp = hp)
+
+    override def withMp(mp: Int): Player = copy(mp = mp)
+
+    override def withLevel(newLevel: Int): Player = copy(level = newLevel)
+
+    override def withExp(newExp: Int): Player = copy(exp = newExp)
+
+    override def withCurrentHp(newHp: Int): Player = copy(currentHp = newHp)
+
+    override def withCurrentMp(newMp: Int): Player = copy(currentMp = newMp)
+
+    override def withBaseAttributes(newAttr: Attributes): Player = copy(baseAttributes = newAttr)
+
+    override def withInventory(newInventory: Map[Item, Int]): Player = copy(inventory = newInventory)
+
+    override def withEquipment(newEquipment: Map[EquipmentSlot, Option[Equipment]]): Player = copy(equipment = newEquipment)
+
+    override def withSkills(newSkills: List[Skill]): Player = copy(skills = newSkills)
+
+    override def withMissions(newMissions: List[Mission]): Player = copy(missions = newMissions)
+
+    override def withGold(newGold: Double): Player = copy(gold = newGold)
+
+    override def withCurrentZone(newZone: OriginZone): Player = copy(currentZone = newZone)
+
+    override def withBehaviorType(newBehaviorType: BehaviorType): Player = copy(behaviorType = newBehaviorType)
+
+    override def behavior: Strategy = behaviorType
