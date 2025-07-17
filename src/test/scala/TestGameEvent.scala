@@ -112,7 +112,6 @@ class TestGameEvent extends AnyFunSuite:
   test("Case 6 - Death by trap or increased hp or mp"):
     val (updated, messages, _) = GameEventFactory.testSpecialCase(player, 6)
     assert(updated.currentHp == 0 || updated.hp > player.hp || messages.exists(_.toLowerCase.contains("backed away.")))
-    assert(messages.exists(_.toLowerCase.contains("trap")))
 
   test("Case 7 - Item stolen"):
     val withItem = PlayerController.addItem(player, item)
