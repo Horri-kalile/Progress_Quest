@@ -185,15 +185,8 @@ object GameEventModule:
         val (pAfterPowerUp, msgs, r) = PowerUpEvent.action(pAfterSell)
         (pAfterPowerUp, sellMsgs ++ msgs, r)
 
-  /** A special unpredictable event with 8 possible outcomes:
-   *      1. Level up or down
-   *         2. Loot rare equipment
-   *         3. Game over from defeat
-   *         4. Discover an item
-   *         5. Take trap damage
-   *         6. Gain XP by helping villagers
-   *         7. Instant death trap
-   *         8. Random item theft
+  /** A special unpredictable event with 8 possible outcomes.
+   * random choice fallback when player doesn't respond to dialogs.
    */
   private case object SpecialEvent extends GameEvent:
 
@@ -222,7 +215,18 @@ object GameEventModule:
             case Some(false) =>
               (player, List("You ignored the shrine and continued on your path."), None)
             case None =>
-              (player, List("You hesitated too long and the shrine vanished."), None)
+              // Random choice fallback
+              val randomChoice = Random.nextBoolean()
+              if randomChoice then
+                val change = Random.between(1, 4)
+                val isBlessing = Random.nextBoolean()
+                val updated = (1 to change).foldLeft(player)((p, _) =>
+                  if isBlessing then PlayerController.levelUp(p) else PlayerController.levelDown(p)
+                )
+                val msg = if isBlessing then s"Random blessing! You leveled up $change times." else s"Random curse! You lost $change levels."
+                (updated, List(msg), None)
+              else
+                (player, List("You randomly ignored the shrine."), None)
         else
           val change = Random.between(1, 4)
           val isBlessing = Random.nextBoolean()
