@@ -65,22 +65,24 @@ object GameUi:
       spacing = 15
       prefWidth = screenWidth * 0.5
       children = Seq(
-        createPanelWithHeader("Character", new VBox(createCharacterContent(player) *)),
-        createPanelWithHeader("Stats", new VBox(createStatsContent(player) *)),
-        createPanelWithHeader("World", createWorldContent(player)),
-        createPanelWithHeader("Mission List", createMissionContent(player)),
-        createPanelWithHeader("Skills", createSkillsContent(player)),
-        createPanelWithHeader("Equipment", new VBox(createEquipmentContent(player) *)),
-        createPanelWithHeader("Inventory", createInventoryContent(player))
+        createPanelWithHeader("Character", "\uD83D\uDC64", new VBox(createCharacterContent(player)*)),
+          createPanelWithHeader("Stats", "\uD83D\uDCCA", new VBox(createStatsContent(player)*)),
+          createPanelWithHeader("World", "\uD83C\uDF0D", createWorldContent(player)),
+          createPanelWithHeader("Mission List", "\uD83D\uDCDC", createMissionContent(player)),
+          createPanelWithHeader("Skills", "\u2728", createSkillsContent(player)),
+          createPanelWithHeader("Equipment", "\uD83D\uDEE1", new VBox(createEquipmentContent(player)*)),
+          createPanelWithHeader("Inventory", "\uD83D\uDCC3", createInventoryContent(player))
+
       )
   private def createRightColumn(): VBox =
     new VBox:
       spacing = 15
       prefWidth = screenWidth * 0.5
       children = Seq(
-        createHeroDiaryPanel(),
-        createPanelWithHeader("Combat Log", createCombatLogContent()),
-        createPanelWithHeader("Monster Info", createMonsterInfoContent())
+
+        createPanelWithHeader("Hero Diary", "\uD83D\uDCD6", createHeroDiaryPanel()),
+        createPanelWithHeader("Combat Log", "\u2694", createCombatLogContent()),
+        createPanelWithHeader("Monster Info", "\uD83D\uDC7E", createMonsterInfoContent())
       )
 
 
@@ -93,16 +95,24 @@ object GameUi:
         HBox.setHgrow(child, Priority.Always)
         child.maxWidth(Double.MaxValue)
 
-  private def createPanelWithHeader(title: String, content: Node): VBox =
+  private def createPanelWithHeader(title: String, icon: String, content: Node): VBox =
     new VBox:
       spacing = 0
       style = "-fx-background-color: white; -fx-border-color: #bdc3c7; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;"
       padding = Insets(15)
       children = Seq(
-        new Label(title):
-          style = "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-padding: 0 0 10 0;"
-        ,
-        content
+        new HBox:
+          spacing = 8
+          alignment = Pos.CenterLeft
+          children = Seq(
+            new Label(icon):
+              style = "-fx-font-size: 16px;",
+
+          new Label(title):
+              style = "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
+          ),
+
+          content
       )
 
   private def createCharacterContent(player: Player): Seq[Node] = Seq(
@@ -478,12 +488,13 @@ object GameUi:
     val diaryContent = createDiaryContent()
 
 
-    val combinedContent = new VBox:
+    new VBox:
       spacing = 10
       padding = Insets(10)
       children = Seq(progressSection, diaryContent)
 
-    createPanelWithHeader("Hero Diary", combinedContent)
+
+
 
 
   /**
