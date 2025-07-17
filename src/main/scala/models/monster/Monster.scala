@@ -1,6 +1,7 @@
 package models.monster
 
-import models.player.{Equipment, EquipmentFactory, Item, ItemFactory, Player}
+import models.player.EquipmentModule.{Equipment, EquipmentFactory}
+import models.player.{Item, ItemFactory, Player}
 import models.world.{OriginZone, World}
 import util.MonsterLoader
 import util.RandomFunctions
@@ -208,7 +209,7 @@ object MonstersFactory:
     if RandomFunctions.randomDropFlags(playerLucky) then
       randomItem = Some(ItemFactory.randomItem(playerLucky))
 
-    (gold, exp, randomItem, EquipmentFactory.generateRandomEquipment(playerLucky = playerLucky, playerLevel = playerLevel))
+    (gold, exp, randomItem, EquipmentFactory.probBased(playerLucky = playerLucky, playerLevel = playerLevel))
 
 
 

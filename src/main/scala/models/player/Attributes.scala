@@ -1,5 +1,7 @@
 package models.player
 
+import models.player.EquipmentModule.EquipmentSlot
+
 import scala.util.Random
 
 /**
@@ -87,16 +89,32 @@ object Attributes:
 
   private def getDecrements: Map[String, Attributes] = decrements
 
-
-  /** Extension methods for random mutations. */
+  /**
+   * Extension methods for the [[Attributes]] class to allow random mutation.
+   */
   extension (attr: Attributes)
 
-    /** Randomly increments a subset of attributes. */
+    /**
+     * Randomly increments 1 to 6 attribute fields by small predefined amounts.
+     *
+     * The incremented fields are chosen randomly, and their values are increased
+     * according to [[Attributes.getIncrements]] for each field.
+     *
+     * @return a new [[Attributes]] instance with modified values
+     */
     def incrementRandomAttributes(): Attributes =
       val selected = Random.shuffle(Attributes.attributeNames).take(Random.between(1, Attributes.attributeNames.size + 1))
       selected.foldLeft(attr)(_ + Attributes.getIncrements(_))
 
-    /** Randomly decrements a subset of attributes. */
+    /**
+     * Randomly decrements 1 to 6 attribute fields by small predefined amounts.
+     *
+     * The decremented fields are chosen randomly, and their values are decreased
+     * according to [[Attributes.getDecrements]] for each field.
+     *
+     * @return a new [[Attributes]] instance with modified values
+     */
     def decrementRandomAttributes(): Attributes =
       val selected = Random.shuffle(Attributes.attributeNames).take(Random.between(1, Attributes.attributeNames.size + 1))
       selected.foldLeft(attr)(_ + Attributes.getDecrements(_))
+

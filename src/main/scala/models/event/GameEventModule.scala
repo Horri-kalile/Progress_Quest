@@ -25,12 +25,16 @@ object GameEventModule:
    * - `changeWorld`: Moving to a new zone
    * - `training`: Passive XP gain
    * - `restore`: Full player restoration
+   * - `power`: Power up player stats if he has enough gold
    * - `sell`: Selling items from inventory
    * - `special`: Randomized, unpredictable event
+   * - `craft`: Craft new equip or power up an old one
+   * - `magic`: Learn new skill or power up an existing one
    * - `gameOver`: Ends the game
+   *
    */
   enum EventType:
-    case fight, mission, changeWorld, training, restore, sell, special, gameOver
+    case fight, mission, changeWorld, training, restore, power, sell, special, craft, magic, gameOver
 
   /** A game event represents a single action that may modify the player's state.
    *
@@ -80,6 +84,9 @@ object GameEventModule:
       case EventType.training => TrainingEvent
       case EventType.restore => RestoreEvent
       case EventType.sell => SellEvent
+      case EventType.power => PowerUpEvent
+      case EventType.craft => CraftEvent
+      case EventType.magic => MagicEvent
       case EventType.special => SpecialEvent
       case EventType.gameOver => GameOverEvent
 
@@ -182,8 +189,30 @@ object GameEventModule:
             val msg = s"Sold $qty × ${item.name} for $gold gold."
             (updated, logs :+ msg)
         }
-        val (pAfterPowerUp, msgs, r) = PowerUpEvent.action(pAfterSell)
-        (pAfterPowerUp, sellMsgs ++ msgs, r)
+        (pAfterSell, sellMsgs, None)
+
+  private case object MagicEvent extends GameEvent:
+    def action(player: Player): (Player, List[String], Option[Monster]) =
+      if player.activeMissions.nonEmpty && Random.nextBoolean() then
+        val m = Random.shuffle(player.activeMissions).head
+        val msg = s"You progressed on mission: ${m.description}"
+        (MissionController.progressMission(player, m), List(msg), None)
+      else
+        val newMission = MissionController.createRandomMission(player)
+        val msg = s"You accepted a new mission: ${newMission.description}"
+        (MissionController.addMission(player, newMission), List(msg), None)
+
+  private case object CraftEvent extends GameEvent:
+    def action(player: Player): (Player, List[String], Option[Monster]) =
+      if player.activeMissions.nonEmpty && Random.nextBoolean() then
+        val m = Random.shuffle(player.activeMissions).head
+        val msg = s"You progressed on mission: ${m.description}"
+        (MissionController.progressMission(player, m), List(msg), None)
+      else
+        val newMission = MissionController.createRandomMission(player)
+        val msg = s"You accepted a new mission: ${newMission.description}"
+        (MissionController.addMission(player, newMission), List(msg), None)
+
 
   /** A special unpredictable event with 8 possible outcomes:
    *      1. Level up or down
@@ -246,7 +275,7 @@ object GameEventModule:
 
       case 2 =>
         if useDialogs then SpecialEventDialog.showGameOverMonsterDialog()
-        val msg = "You were defeated by a powerful monster. Game over!"
+        val msg = "You were defeated by a powerful monster. Game over!" //if won get 100 gold * lv, if lose exp = 0
         val (p2, msgs, result) = GameOverEvent.action(player)
         (p2, msg :: msgs, result)
 

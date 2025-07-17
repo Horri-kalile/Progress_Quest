@@ -4,6 +4,7 @@ import models.event.Mission
 import models.monster.Monster
 import models.player.*
 import models.player.Behavior.BehaviorType.{FastLeveling, Heal}
+import models.player.EquipmentModule.{Equipment, EquipmentSlot}
 import models.world.OriginZone
 import util.GameConfig
 
@@ -172,20 +173,22 @@ object PlayerController:
 
   /**
    * Adds a skill to the player's skill list.
-   * If skill already exists, upgrade its power level by 1.
+   * If the skill already exists, upgrades its power level.
    *
    * @param player the player learning the skill
    * @param skill  the skill to add or upgrade
-   * @return updated Player instance with new or upgraded skill
+   * @return a tuple (updated player, isNew) where isNew = true if new skill was added
    */
-  def addSkill(player: Player, skill: Skill): Player =
-    val maybeExisting = player.skills.find(_.name == skill.name)
-    maybeExisting match
+  def addSkill(player: Player, skill: Skill): (Player, Boolean) =
+    player.skills.find(_.name == skill.name) match
       case Some(existing: GenericSkill) =>
-        val updatedSkills = player.skills.map(s => if s.name == existing.name then s.poweredUp else s)
-        player.withSkills(updatedSkills)
+        val updatedSkills = player.skills.map(s =>
+          if s.name == existing.name then s.poweredUp else s
+        )
+        (player.withSkills(updatedSkills), false)
       case None =>
-        player.withSkills(skill :: player.skills)
+        (player.withSkills(skill :: player.skills), true)
+
 
   /**
    * Lowers the player's level by a given number and decreases stats.
@@ -241,7 +244,7 @@ object PlayerController:
   private def maybeLearnSkill(player: Player): Player =
     val chance = GameConfig.baseLearnSkillChance +
       GameConfig.specialBonusPerLucky * player.attributes.lucky
-    if Random.nextDouble() < chance then addSkill(player, SkillFactory.randomSkill())
+    if Random.nextDouble() < chance then addSkill(player, SkillFactory.randomSkill())._1
     else player
 
   /**

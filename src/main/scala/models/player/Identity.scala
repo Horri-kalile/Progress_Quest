@@ -3,6 +3,7 @@ package models.player
 import scala.util.Random
 import models.player.Race.*
 import models.player.ClassType.*
+import models.player.EquipmentModule.EquipmentFactory
 
 /**
  * Represents available fantasy races.
@@ -40,7 +41,7 @@ object PlayerBonusesApplication:
    * @return A new Player with bonuses applied
    */
   def applyRaceAndClassBonuses(player: Player): Player =
-    val equip = EquipmentFactory.generateRandomEquipment(1.0, player.attributes.lucky, player.level).get
+    val equip = EquipmentFactory.alwaysDrop(playerLevel = player.level).get
 
     // Race-based modifications
     val (hpMulti, mpMulti, updatedPlayer) = player.identity.race match

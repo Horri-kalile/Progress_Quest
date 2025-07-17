@@ -1,7 +1,10 @@
 package util
 
+import controllers.PlayerController
 import models.event.GameEventModule.EventType
 import models.event.GameEventModule.EventType.*
+import models.player.EquipmentModule.{Equipment, EquipmentFactory}
+import models.player.{Player, SkillFactory}
 import util.GameConfig.*
 
 import scala.util.Random
@@ -17,20 +20,30 @@ object RandomFunctions:
     def capped(min: Double, max: Double): Double = x.max(min).min(max)
 
   /**
-   * Generates a random [[EventType]] based on player's luck.
+   * Returns a random [[EventType]] based on base probabilities,
+   * adjusted dynamically by the player's `lucky` attribute.
    *
-   * - Base chances:
-   *   - Fight:        30%
-   *   - Mission:      30%
-   *   - ChangeWorld:  10%
-   *   - Training:     10%
-   *   - Restore:       5%
-   *   - Sell:          5%
-   *   - Special:     dynamic, scaled by luck
-   *   - GameOver:    dynamic, reduced by luck
+   * ### Probability Overview (base rates):
+   * - Fight:        20%
+   * - Magic:         5%
+   * - Craft:         5%
+   * - Power:        10%
+   * - Mission:      20%
+   * - ChangeWorld:  10%
+   * - Training:     10%
+   * - Restore:       5%
+   * - Sell:          5%
+   * - Special:  Dynamic; increases with luck
+   * - GameOver: Dynamic; decreases with luck
    *
-   * @param lucky player's lucky attribute
-   * @return a random EventType
+   * ### Special Notes:
+   * - `specialChance` scales *up* with luck
+   * - `gameOverChance` scales *down* with luck
+   *
+   * If none of the above thresholds are matched, falls back to `training`.
+   *
+   * @param lucky The player's `lucky` attribute (0–100+)
+   * @return A randomly chosen [[EventType]] with luck-adjusted weighting
    */
   def getRandomEventType(lucky: Int): EventType =
     val specialChance = (baseSpecialChance + specialBonusPerLucky * lucky).capped(0.0, maxSpecialChance)
@@ -38,7 +51,10 @@ object RandomFunctions:
     val x = Random.nextDouble()
 
     x match
-      case v if v < 0.30 => fight
+      case v if v < 0.20 => fight
+      case v if v < 0.25 => magic
+      case v if v < 0.30 => craft
+      case v if v < 0.40 => power
       case v if v < 0.60 => mission
       case v if v < 0.70 => changeWorld
       case v if v < 0.80 => training
@@ -47,6 +63,7 @@ object RandomFunctions:
       case v if v < 0.90 + specialChance => special
       case v if v < 0.90 + specialChance + gameOverChance => gameOver
       case _ => training // fallback
+
 
   /**
    * Determines whether an item should drop based on player's luck.
@@ -64,3 +81,42 @@ object RandomFunctions:
    */
   def tryGenerateStrongMonster(): Boolean =
     Random.nextBoolean()
+
+  /**
+   * Learns a new skill, or upgrades it if the player already knows it.
+   *
+   * @param player the player to modify
+   * @return a tuple: (updated player, descriptive message)
+   */
+  def learnOrUpgradeSkill(player: Player): (Player, String) =
+    val newSkill = SkillFactory.randomSkill()
+    val (updatedPlayer, isNew) = PlayerController.addSkill(player, newSkill)
+    val msg =
+      if isNew then s"Learned new skill: ${newSkill.name}"
+      else s"Upgraded existing skill: ${newSkill.name} to level ${newSkill.poweredUp.powerLevel}"
+    (updatedPlayer, msg)
+
+
+
+  /**
+   * Attempts to equip a new equipment or power up an existing one.
+   *
+   * @param player        The player to modify
+   * @param upgradeChance Probability (0.0 to 1.0) of upgrading existing equipment
+   * @return A new Player with equipment changes and a descriptive message
+   */
+  def forgeOrUpgradeEquipment(player: Player, upgradeChance: Double = 0.5): (Player, String) =
+    val newEq = EquipmentFactory.probBased(player.attributes.lucky, player.level)
+    val maybeExisting: Option[Equipment] = player.equipment(newEq.get.slot)
+
+    if maybeExisting.isDefined && Random.nextDouble() < upgradeChance then
+      val upgraded = EquipmentFactory.powerUpEquip(maybeExisting.get)
+      val updatedPlayer = PlayerController.equipmentOn(player, upgraded.slot, upgraded)
+      (updatedPlayer, s"Upgraded equipment: ${maybeExisting.get.name} with ${maybeExisting.get.value} ${upgraded.name}, now worth ${upgraded.value}")
+    else
+      EquipmentFactory.alwaysDrop(player.level) match
+        case Some(newEq) =>
+          val updatedPlayer = PlayerController.equipmentOn(player, newEq.slot, newEq)
+          (updatedPlayer, s"Equipped new item: ${newEq.name}")
+        case None =>
+          (player, "No equipment was forged.")
