@@ -190,7 +190,7 @@ object SpecialEventDialog:
     val latch = new java.util.concurrent.CountDownLatch(1)
 
     // Execute dialog creation and display on JavaFX Application Thread
-    Platform.runLater: () =>
+    Platform.runLater(() =>
       try
         // Create confirmation dialog with custom buttons
         val dialog = new Alert(AlertType.Confirmation)
@@ -205,18 +205,18 @@ object SpecialEventDialog:
         val noButton = new ButtonType(noText, ButtonData.No)
         dialog.buttonTypes = Seq(yesButton, noButton)
 
-          // Setup 5-second auto-random-choice timer
-          val timer = new Timer()
-          timer.schedule(new TimerTask:
-            def run(): Unit =
-              Platform.runLater(() =>
-                // Make a random choice and close dialog
-                val randomChoice = Random.nextBoolean()
-                dialogResult = Some(randomChoice)
-                dialog.close()
-              )
+        // Setup 5-second auto-random-choice timer
+        val timer = new Timer()
+        timer.schedule(new TimerTask {
+          override def run(): Unit =
+            Platform.runLater(() => {
+              // Make a random choice and close dialog
+              val randomChoice = Random.nextBoolean()
+              dialogResult = Some(randomChoice)
+              dialog.close()
+            })
+        }, 5000) // 5000ms = 5 seconds
 
-          , 5000) // 5000ms = 5 seconds
 
         // Show dialog and wait for user response or timeout
         val result = dialog.showAndWait()
@@ -234,10 +234,12 @@ object SpecialEventDialog:
       finally
         // Always signal completion to unblock waiting thread
         latch.countDown()
+    )
 
     // Block current thread until dialog is complete (maintains event timing)
     latch.await()
     dialogResult
+
 
   /**
    * Private helper method to show information-only dialog (no choices).
