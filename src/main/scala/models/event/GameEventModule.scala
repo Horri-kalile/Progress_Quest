@@ -220,7 +220,7 @@ object GameEventModule:
      * @param useDialogs whether to show interactive dialogs (true = gameplay, false = test mode)
      * @return a tuple with updated player, messages, and optional monster
      *
-     *         Interactive cases (0, 1, 3, 5) now handle timeout scenarios by making
+     *         Interactive cases (0, 1, 2, 3, 4, 5, 6) now handle timeout scenarios by making
      *         random choices automatically, ensuring all special events produce outcomes.
      */
     def actionWithCase(player: Player, caseIndex: Int, useDialogs: Boolean): (Player, List[String], Option[Monster]) = caseIndex match
@@ -378,9 +378,9 @@ object GameEventModule:
             val (p2, msgs, result) = GameOverEvent.action(p)
             (p2, msg :: msgs, result)
           else
-            val (hp, mp) = (Random.between(1, 4) * p.level, Random.between(1, 4) * p.level)
-            val msg = "You evaded the deadly trap just in time! You have increased your maximum hp by and mp"
-            (p, List(msg), None)
+            val (hpBonus, mpBonus) = (Random.between(1, 4) * p.level, Random.between(1, 4) * p.level)
+            val msg = s"You evaded the deadly trap just in time! You have increased your maximum hp by ${hpBonus} and mp by ${mpBonus}"
+            (p.withHp(p.hp + hpBonus).withMp(p.mp + mpBonus), List(msg), None)
 
         def safeEscapeOutcome(p: Player): (Player, List[String], Option[Monster]) =
           (p, List("You noticed something was wrong and carefully backed away."), None)

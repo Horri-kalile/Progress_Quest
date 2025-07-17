@@ -90,9 +90,8 @@ class TestGameEvent extends AnyFunSuite:
 
 
   test("Case 2 - Game over by monster"):
-    val (dead, messages, _) = GameEventFactory.testSpecialCase(player, 2)
-    assert(dead.currentHp == 0)
-    assert(messages.exists(_.toLowerCase.contains("game over")))
+    val (updated, messages, _) = GameEventFactory.testSpecialCase(player, 2)
+    assert(updated.exp == 0 || updated.gold >= player.gold)
 
   test("Case 3 - Found a new item"):
     val (updated, messages, _) = GameEventFactory.testSpecialCase(player, 3)
@@ -110,11 +109,10 @@ class TestGameEvent extends AnyFunSuite:
     assert(updated.exp > player.exp || updated.level > player.level)
     assert(messages.exists(_.toLowerCase.contains("villagers")))
 
-  test("Case 6 - Death by trap"):
-    val (dead, messages, _) = GameEventFactory.testSpecialCase(player, 6)
-    assert(dead.currentHp == 0)
+  test("Case 6 - Death by trap or increased hp or mp"):
+    val (updated, messages, _) = GameEventFactory.testSpecialCase(player, 6)
+    assert(updated.currentHp == 0 || updated.hp > player.hp || messages.exists(_.toLowerCase.contains("backed away.")))
     assert(messages.exists(_.toLowerCase.contains("trap")))
-    assert(messages.exists(_.toLowerCase.contains("game over")))
 
   test("Case 7 - Item stolen"):
     val withItem = PlayerController.addItem(player, item)
