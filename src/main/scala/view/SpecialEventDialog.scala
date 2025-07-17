@@ -21,7 +21,11 @@ object SpecialEventDialog:
   /**
    * Show blessing/curse dialog with 5-second auto-random timer.
    * 
-   * @return Some(true) if player/random chooses to pray, Some(false) if ignore, None should not happen
+   * Presents the player with a mysterious shrine that could provide
+   * beneficial or harmful effects when interacted with. If no choice
+   * is made within 5 seconds, a random decision is automatically selected.
+   * 
+   * @return Some(true) if player/random chooses to pray, Some(false) if ignore
    */
   def showBlessingCurseDialog(): Option[Boolean] =
     showTimedDialog(
@@ -35,7 +39,11 @@ object SpecialEventDialog:
   /**
    * Show powerful monster dialog with 5-second auto-random timer.
    * 
-   * @return Some(true) if player/random chooses to fight, Some(false) if flee, None should not happen
+   * Presents the player with a challenging combat encounter that
+   * offers high risk but potentially valuable rewards. If no choice
+   * is made within 5 seconds, a random decision is automatically selected.
+   * 
+   * @return Some(true) if player/random chooses to fight, Some(false) if flee
    */
   def showPowerfulMonsterDialog(): Option[Boolean] =
     showTimedDialog(
@@ -49,7 +57,11 @@ object SpecialEventDialog:
   /**
    * Show hidden dungeon discovery dialog with 5-second auto-random timer.
    * 
-   * @return Some(true) if player/random chooses to explore, Some(false) if leave, None should not happen
+   * Presents the player with an exploration opportunity that could
+   * contain valuable loot or dangerous traps. If no choice is made
+   * within 5 seconds, a random decision is automatically selected.
+   * 
+   * @return Some(true) if player/random chooses to explore, Some(false) if leave
    */
   def showHiddenDungeonDialog(): Option[Boolean] =
     showTimedDialog(
@@ -63,7 +75,11 @@ object SpecialEventDialog:
   /**
    * Show villager help request dialog with 5-second auto-random timer.
    * 
-   * @return Some(true) if player/random chooses to help, Some(false) if ignore, None should not happen
+   * Presents the player with an opportunity to help NPCs, potentially
+   * gaining experience based on their wisdom attribute. If no choice
+   * is made within 5 seconds, a random decision is automatically selected.
+   * 
+   * @return Some(true) if player/random chooses to help, Some(false) if ignore
    */
   def showVillagerHelpDialog(): Option[Boolean] =
     showTimedDialog(
@@ -137,7 +153,7 @@ object SpecialEventDialog:
    * @param content The detailed dialog content/question
    * @param yesText Text for the positive action button
    * @param noText Text for the negative action button
-   * @return Some(true) for yes choice, Some(false) for no choice (never returns None now)
+   * @return Some(true) for yes choice, Some(false) for no choice (guaranteed non-None)
    */
   private def showTimedDialog(
     title: String,
