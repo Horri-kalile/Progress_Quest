@@ -90,6 +90,16 @@ object SpecialEventDialog:
       noText = "Ignore"
     )
 
+
+  def showGameOverMonsterDialog(): Option[Boolean] =
+    showTimedDialog(
+      title = "Powerful Monster Encounter",
+      header = "A deadly monster appears!",
+      content = "This monster looks extremely dangerous!\nDo you want to face it or try to escape?",
+      yesText = "Fight",
+      noText = "Escape"
+    )
+
   /**
    * Show game over notification for powerful monster defeat.
    * 
@@ -101,6 +111,16 @@ object SpecialEventDialog:
       title = "Defeated!",
       header = "💀 You were defeated by a powerful monster!",
       content = "The powerful monster was too strong for you.\n\nGame Over!"
+    )
+
+
+  def showGameOverTrapDialog(): Option[Boolean] =
+    showTimedDialog(
+      title = "Deadly Trap!",
+      header = "You found a suspicious trap!",
+      content = "This trap looks lethal!\nDo you want to try to disarm it or avoid it?",
+      yesText = "Disarm",
+      noText = "Avoid"
     )
 
   /**
@@ -122,11 +142,13 @@ object SpecialEventDialog:
    * Displays a notification when the player triggers a trap that
    * damages but doesn't kill them, reducing HP and MP by half.
    */
-  def showDungeonTrapDialog(): Unit =
-    showInfoDialog(
+  def showDungeonTrapDialog(): Option[Boolean] =
+    showTimedDialog(
       title = "Dungeon Trap!",
-      header = "You triggered a dangerous trap!",
-      content = "You stepped on a hidden pressure plate!\n\nYour HP and MP have been halved!"
+      header = "You discovered a trap mechanism!",
+      content = "There's a trap here that might hurt you.\nDo you want to trigger it or find another way?",
+      yesText = "Trigger",
+      noText = "Find Another Way"
     )
 
   /**
