@@ -1,9 +1,10 @@
 package view
 
-import models.player.{EquipmentSlot, Player, Skill, SkillEffectType}
+import models.player.{Player, Skill, SkillEffectType}
 import models.world.World
 import models.monster.Monster
-import util.GameConfig.*  // Import all style constants
+import models.player.EquipmentModule.EquipmentSlot
+import util.GameConfig.*
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.{Node, Scene}
 import scalafx.scene.control.*
@@ -45,7 +46,7 @@ object GameUi:
 
   /** Event log storage - */
   private var eventMessages: List[String] = List.empty
-  
+
   /** Combat log storage */
   private var combatMessages: List[String] = List.empty
 
@@ -57,7 +58,7 @@ object GameUi:
 
   /**
    * Helper function to combine multiple styles.
-   * 
+   *
    * @param styles Variable number of style strings to combine
    * @return Combined style string
    */
@@ -65,8 +66,8 @@ object GameUi:
 
   /**
    * Helper function to create styled labels with consistent formatting.
-   * 
-   * @param text The label text
+   *
+   * @param text   The label text
    * @param styles Variable number of style strings to apply
    * @return Styled Label component
    */
@@ -436,7 +437,7 @@ object GameUi:
    * @param text The header text
    * @return Label with header styling (bold and underlined)
    */
-  private def createTableHeader(text: String): Label = 
+  private def createTableHeader(text: String): Label =
     styledLabel(text, labelBold, "-fx-underline: true")
 
   /**

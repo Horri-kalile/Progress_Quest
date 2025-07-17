@@ -2,7 +2,8 @@ package models.event
 
 import controllers.{CombatController, MissionController, MonsterController, PlayerController}
 import models.monster.Monster
-import models.player.{EquipmentFactory, ItemFactory, Player}
+import models.player.EquipmentModule.EquipmentFactory
+import models.player.{ItemFactory, Player}
 import models.world.World
 import util.GameConfig
 import view.SpecialEventDialog
@@ -334,7 +335,7 @@ object GameEventModule:
 
     /** Helper for equipment outcome logic */
     private def generateEquipOutcome(player: Player): (Player, List[String], Option[Monster]) =
-      EquipmentFactory.generateRandomEquipment(0.80, player.attributes.lucky, player.level) match
+      EquipmentFactory.probBased(player.attributes.lucky, player.level) match
         case Some(newEq) =>
           val msg1 = "You defeated a powerful monster!"
           val msg2 = s"You looted: ${newEq.name}"

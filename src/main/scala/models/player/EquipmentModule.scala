@@ -48,14 +48,7 @@ object EquipmentModule:
      * @return Some(Equipment) if drop occurs, None otherwise
      */
     def generateRandomEquipment(probabilityDrop: Double, playerLucky: Int, playerLevel: Int): Option[Equipment]
-
-    /**
-     * Enhances an equipment item by randomly increasing some of its attributes.
-     *
-     * @param equipment Equipment to enhance
-     * @return New enhanced equipment instance
-     */
-    def powerUpEquip(equipment: Equipment): Equipment
+  
 
   /**
    * Factory object to obtain different implementations of EquipmentFactory.
