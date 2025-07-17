@@ -2,8 +2,8 @@ package models.event
 
 import controllers.{CombatController, MissionController, MonsterController, PlayerController}
 import models.monster.Monster
-import models.player.EquipmentModule.EquipmentFactory
-import models.player.{ItemFactory, Player}
+import models.player.EquipmentModule.{Equipment, EquipmentFactory}
+import models.player.{ItemFactory, Player, SkillFactory}
 import models.world.World
 import util.GameConfig
 import view.SpecialEventDialog
@@ -194,25 +194,14 @@ object GameEventModule:
 
   private case object MagicEvent extends GameEvent:
     def action(player: Player): (Player, List[String], Option[Monster]) =
-      if player.activeMissions.nonEmpty && Random.nextBoolean() then
-        val m = Random.shuffle(player.activeMissions).head
-        val msg = s"You progressed on mission: ${m.description}"
-        (MissionController.progressMission(player, m), List(msg), None)
-      else
-        val newMission = MissionController.createRandomMission(player)
-        val msg = s"You accepted a new mission: ${newMission.description}"
-        (MissionController.addMission(player, newMission), List(msg), None)
+      val (updatedPlayer, msg) = learnOrUpgradeSkill(player: Player)
+      (updatedPlayer, List(msg), None)
+
 
   private case object CraftEvent extends GameEvent:
     def action(player: Player): (Player, List[String], Option[Monster]) =
-      if player.activeMissions.nonEmpty && Random.nextBoolean() then
-        val m = Random.shuffle(player.activeMissions).head
-        val msg = s"You progressed on mission: ${m.description}"
-        (MissionController.progressMission(player, m), List(msg), None)
-      else
-        val newMission = MissionController.createRandomMission(player)
-        val msg = s"You accepted a new mission: ${newMission.description}"
-        (MissionController.addMission(player, newMission), List(msg), None)
+      val (updatedPlayer, msg) = forgeOrUpgradeEquipment(player: Player)
+      (updatedPlayer, List(msg), None)
 
 
   /** A special unpredictable event with 8 possible outcomes.
@@ -230,9 +219,9 @@ object GameEventModule:
      * @param caseIndex  the specific case to trigger (0–7)
      * @param useDialogs whether to show interactive dialogs (true = gameplay, false = test mode)
      * @return a tuple with updated player, messages, and optional monster
-     * 
-     * Interactive cases (0, 1, 3, 5) now handle timeout scenarios by making
-     * random choices automatically, ensuring all special events produce outcomes.
+     *
+     *         Interactive cases (0, 1, 3, 5) now handle timeout scenarios by making
+     *         random choices automatically, ensuring all special events produce outcomes.
      */
     def actionWithCase(player: Player, caseIndex: Int, useDialogs: Boolean): (Player, List[String], Option[Monster]) = caseIndex match
       case 0 =>
@@ -249,7 +238,6 @@ object GameEventModule:
             case Some(false) =>
               (player, List("You ignored the shrine and continued on your path."), None)
             case None =>
-              // Random choice fallback for timeout scenarios
               val randomChoice = Random.nextBoolean()
               if randomChoice then
                 val change = Random.between(1, 4)
@@ -287,10 +275,32 @@ object GameEventModule:
           generateEquipOutcome(player)
 
       case 2 =>
-        if useDialogs then SpecialEventDialog.showGameOverMonsterDialog()
-        val msg = "You were defeated by a powerful monster. Game over!" //if won get 100 gold * lv, if lose exp = 0
-        val (p2, msgs, result) = GameOverEvent.action(player)
-        (p2, msg :: msgs, result)
+        def fightOutcome(p: Player): (Player, List[String], Option[Monster]) =
+          if Random.nextBoolean() then
+            val reward = 100 * p.level
+            val p2 = PlayerController.addGold(p, reward)
+            val msg = s"You defeated the lethal monster and gained $reward gold!"
+            (p2, List(msg), None)
+          else
+            val p2 = p.withExp(0)
+            val msg = s"You fought and lost... All your EXP is gone!"
+            (p2, List(msg), None)
+
+        def escapeOutcome(p: Player): (Player, List[String], Option[Monster]) =
+          (p, List("You escaped from the deadly monster just in time."), None)
+
+        if useDialogs then SpecialEventDialog.showGameOverMonsterDialog() match
+          case Some(true) =>
+            fightOutcome(player)
+
+          case Some(false) =>
+            escapeOutcome(player)
+
+          case None =>
+            if Random.nextBoolean() then fightOutcome(player)
+            else escapeOutcome(player)
+        else if Random.nextBoolean() then fightOutcome(player) else escapeOutcome(player)
+
 
       case 3 =>
         if useDialogs then
@@ -318,9 +328,26 @@ object GameEventModule:
           (PlayerController.addItem(player, item), List(msg1, msg2), None)
 
       case 4 =>
-        if useDialogs then SpecialEventDialog.showDungeonTrapDialog()
-        val msg = "You were injured in a dungeon trap! HP and MP halved."
-        (PlayerController.playerInjured(player), List(msg), None)
+        def trapOutcome(p: Player): (Player, List[String], Option[Monster]) =
+          if Random.nextBoolean() then
+            val msg = "You triggered a trap! HP and MP were halved."
+            (PlayerController.playerInjured(p), List(msg), None)
+          else
+            val exp = Random.between(1, 100) * player.level
+            val msg = "You narrowly avoided the trap — lucky you!"
+            (PlayerController.gainXP(p, exp), List(msg), None)
+
+        def escapeOutcome(p: Player): (Player, List[String], Option[Monster]) =
+          (p, List("You sensed danger and escaped the trap."), None)
+
+        if useDialogs then SpecialEventDialog.showDungeonTrapDialog() match
+          case Some(true) => trapOutcome(player)
+          case Some(false) => escapeOutcome(player)
+          case None =>
+            if Random.nextBoolean() then trapOutcome(player)
+            else escapeOutcome(player)
+        else if Random.nextBoolean() then trapOutcome(player) else escapeOutcome(player)
+
 
       case 5 =>
         if useDialogs then
@@ -345,10 +372,27 @@ object GameEventModule:
           (PlayerController.gainXP(player, gain), List(msg), None)
 
       case 6 =>
-        if useDialogs then SpecialEventDialog.showGameOverTrapDialog()
-        val msg = "It was a trap! You died instantly. Game over!"
-        val (p2, msgs, result) = GameOverEvent.action(player)
-        (p2, msg :: msgs, result)
+        def deadlyTrapOutcome(p: Player): (Player, List[String], Option[Monster]) =
+          if Random.nextBoolean() then
+            val msg = "It was a deadly trap! You died instantly."
+            val (p2, msgs, result) = GameOverEvent.action(p)
+            (p2, msg :: msgs, result)
+          else
+            val (hp, mp) = (Random.between(1, 4) * p.level, Random.between(1, 4) * p.level)
+            val msg = "You evaded the deadly trap just in time! You have increased your maximum hp by and mp"
+            (p, List(msg), None)
+
+        def safeEscapeOutcome(p: Player): (Player, List[String], Option[Monster]) =
+          (p, List("You noticed something was wrong and carefully backed away."), None)
+
+        if useDialogs then SpecialEventDialog.showGameOverTrapDialog() match
+          case Some(true) => deadlyTrapOutcome(player)
+          case Some(false) => safeEscapeOutcome(player)
+          case None =>
+            if Random.nextBoolean() then deadlyTrapOutcome(player)
+            else safeEscapeOutcome(player)
+        else if Random.nextBoolean() then deadlyTrapOutcome(player) else safeEscapeOutcome(player)
+
 
       case 7 =>
         if useDialogs then SpecialEventDialog.showTheftDialog()
@@ -383,3 +427,41 @@ object GameEventModule:
     def action(player: Player): (Player, List[String], Option[Monster]) =
       val msg = "GAME OVER!"
       (player.withCurrentHp(0), List(msg), None)
+
+  /**
+   * Learns a new skill, or upgrades it if the player already knows it.
+   *
+   * @param player the player to modify
+   * @return a tuple: (updated player, descriptive message)
+   */
+  private def learnOrUpgradeSkill(player: Player): (Player, String) =
+    val newSkill = SkillFactory.randomSkill()
+    val (updatedPlayer, isNew) = PlayerController.addSkill(player, newSkill)
+    val msg =
+      if isNew then s"Learned new skill: ${newSkill.name}"
+      else s"Upgraded existing skill: ${newSkill.name} to level ${newSkill.poweredUp.powerLevel}"
+    (updatedPlayer, msg)
+
+
+  /**
+   * Attempts to equip a new equipment or power up an existing one.
+   *
+   * @param player        The player to modify
+   * @param upgradeChance Probability (0.0 to 1.0) of upgrading existing equipment
+   * @return A new Player with equipment changes and a descriptive message
+   */
+  def forgeOrUpgradeEquipment(player: Player, upgradeChance: Double = 0.5): (Player, String) =
+    val newEq = EquipmentFactory.probBased(player.attributes.lucky, player.level)
+    val maybeExisting: Option[Equipment] = player.equipment(newEq.get.slot)
+
+    if maybeExisting.isDefined && Random.nextDouble() < upgradeChance then
+      val upgraded = EquipmentFactory.powerUpEquip(maybeExisting.get)
+      val updatedPlayer = PlayerController.equipmentOn(player, upgraded.slot, upgraded)
+      (updatedPlayer, s"Upgraded equipment: ${maybeExisting.get.name} with ${maybeExisting.get.value} ${upgraded.name}, now worth ${upgraded.value}")
+    else
+      EquipmentFactory.alwaysDrop(player.level) match
+        case Some(newEq) =>
+          val updatedPlayer = PlayerController.equipmentOn(player, newEq.slot, newEq)
+          (updatedPlayer, s"Equipped new item: ${newEq.name}")
+        case None =>
+          (player, "No equipment was forged.")

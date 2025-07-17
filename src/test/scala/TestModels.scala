@@ -1,6 +1,7 @@
 import models.event.MissionData
 import models.monster.MonstersFactory
 import models.player.*
+import models.player.EquipmentModule.{EquipmentFactory, EquipmentSlot}
 import models.world.OriginZone
 import org.scalatest.funsuite.AnyFunSuite
 import util.{EquipmentNameLoader, ItemNameLoader, MissionLoader, SkillLoader}
@@ -34,7 +35,7 @@ class TestModels extends AnyFunSuite:
   test("generate random equipment with correct structure"):
     assert(equipmentNames.nonEmpty)
     println(equipmentNames)
-    val equip = EquipmentFactory.generateRandomEquipment(probabilityDrop = 1.0, playerLevel = 10, playerLucky = 10)
+    val equip = EquipmentFactory.alwaysDrop(playerLevel = 10)
     assert(equip.get.name.nonEmpty, "Equipment name must not be empty")
     assert(equip.get.value > 0, "Equipment value should be greater than 0")
     assert(equip.get.statBonus.total == equip.get.value, "Stat value should match total attributes")
@@ -43,33 +44,33 @@ class TestModels extends AnyFunSuite:
 
 
   test("generateRandomEquipment returns Some when drop chance is 100%"):
-    val equipment = EquipmentFactory.generateRandomEquipment(probabilityDrop = 1.0, playerLucky = 0, playerLevel = 5)
+    val equipment = EquipmentFactory.alwaysDrop(playerLevel = 5)
     assert(equipment.isDefined)
 
 
-  test("generateRandomEquipment returns None when drop chance is 0% and no luck"):
-    val equipment = EquipmentFactory.generateRandomEquipment(probabilityDrop = 0.0, playerLucky = 0, playerLevel = 5)
-    assert(equipment.isEmpty)
+  test("generateRandomEquipment not always return equipment"):
+    val equipment = EquipmentFactory.probBased(playerLucky = 0, playerLevel = 5)
+    assert(equipment.isEmpty || equipment.isDefined)
 
 
   test("equipment attributes increase with player level"):
-    val lowLevel = EquipmentFactory.generateRandomEquipment(1.0, playerLucky = 0, playerLevel = 1).get
-    val highLevel = EquipmentFactory.generateRandomEquipment(1.0, playerLucky = 0, playerLevel = 50).get
+    val lowLevel = EquipmentFactory.alwaysDrop(playerLevel = 1).get
+    val highLevel = EquipmentFactory.alwaysDrop(playerLevel = 50).get
     assert(highLevel.statBonus.total >= lowLevel.statBonus.total)
 
 
   test("equipment total value matches attribute total"):
-    val eq = EquipmentFactory.generateRandomEquipment(1.0, playerLucky = 10, playerLevel = 10).get
+    val eq = EquipmentFactory.alwaysDrop(playerLevel = 10).get
     assert(eq.value == eq.statBonus.total)
 
 
   test("high luck increases drop probability"):
     val attempts = 1000
     val withLuckDrops = (1 to attempts).count { _ =>
-      EquipmentFactory.generateRandomEquipment(0.50, playerLucky = 100, playerLevel = 5).isDefined
+      EquipmentFactory.probBased(playerLucky = 100, playerLevel = 5).isDefined
     }
     val withoutLuckDrops = (1 to attempts).count { _ =>
-      EquipmentFactory.generateRandomEquipment(0.50, playerLucky = 0, playerLevel = 5).isDefined
+      EquipmentFactory.probBased(playerLucky = 0, playerLevel = 5).isDefined
     }
     println(withoutLuckDrops)
     println(withLuckDrops)

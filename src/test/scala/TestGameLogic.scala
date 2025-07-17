@@ -4,6 +4,7 @@ import models.monster.*
 import models.event.*
 import controllers.{MissionController, PlayerController}
 import models.player.Behavior.BehaviorType
+import models.player.EquipmentModule.EquipmentFactory
 
 class TestGameLogic extends AnyFunSuite:
 
@@ -47,7 +48,7 @@ class TestGameLogic extends AnyFunSuite:
 
   test("Player equips an equipment") {
     val player = Player("Warrior", identity, attributes, Behavior.BehaviorType.Aggressive)
-    val item = EquipmentFactory.generateRandomEquipment(1.0, attributes.lucky, player.level).get
+    val item = EquipmentFactory.alwaysDrop(player.level).get
     val equipped = PlayerController.equipmentOn(player, item.slot, item)
     assert(equipped.equipment(item.slot).contains(item))
   }

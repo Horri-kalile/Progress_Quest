@@ -1,4 +1,5 @@
-import models.player.{Attributes, EquipmentSlot}
+import models.player.Attributes
+import models.player.EquipmentModule.EquipmentSlot
 import org.scalatest.funsuite.AnyFunSuite
 
 class TestPlayerAttributes extends AnyFunSuite:

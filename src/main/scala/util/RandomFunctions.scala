@@ -82,41 +82,4 @@ object RandomFunctions:
   def tryGenerateStrongMonster(): Boolean =
     Random.nextBoolean()
 
-  /**
-   * Learns a new skill, or upgrades it if the player already knows it.
-   *
-   * @param player the player to modify
-   * @return a tuple: (updated player, descriptive message)
-   */
-  def learnOrUpgradeSkill(player: Player): (Player, String) =
-    val newSkill = SkillFactory.randomSkill()
-    val (updatedPlayer, isNew) = PlayerController.addSkill(player, newSkill)
-    val msg =
-      if isNew then s"Learned new skill: ${newSkill.name}"
-      else s"Upgraded existing skill: ${newSkill.name} to level ${newSkill.poweredUp.powerLevel}"
-    (updatedPlayer, msg)
-
-
-
-  /**
-   * Attempts to equip a new equipment or power up an existing one.
-   *
-   * @param player        The player to modify
-   * @param upgradeChance Probability (0.0 to 1.0) of upgrading existing equipment
-   * @return A new Player with equipment changes and a descriptive message
-   */
-  def forgeOrUpgradeEquipment(player: Player, upgradeChance: Double = 0.5): (Player, String) =
-    val newEq = EquipmentFactory.probBased(player.attributes.lucky, player.level)
-    val maybeExisting: Option[Equipment] = player.equipment(newEq.get.slot)
-
-    if maybeExisting.isDefined && Random.nextDouble() < upgradeChance then
-      val upgraded = EquipmentFactory.powerUpEquip(maybeExisting.get)
-      val updatedPlayer = PlayerController.equipmentOn(player, upgraded.slot, upgraded)
-      (updatedPlayer, s"Upgraded equipment: ${maybeExisting.get.name} with ${maybeExisting.get.value} ${upgraded.name}, now worth ${upgraded.value}")
-    else
-      EquipmentFactory.alwaysDrop(player.level) match
-        case Some(newEq) =>
-          val updatedPlayer = PlayerController.equipmentOn(player, newEq.slot, newEq)
-          (updatedPlayer, s"Equipped new item: ${newEq.name}")
-        case None =>
-          (player, "No equipment was forged.")
+ 

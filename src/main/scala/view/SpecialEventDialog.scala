@@ -205,16 +205,17 @@ object SpecialEventDialog:
         val noButton = new ButtonType(noText, ButtonData.No)
         dialog.buttonTypes = Seq(yesButton, noButton)
 
-        // Setup 5-second auto-random-choice timer
-        val timer = new Timer()
-        timer.schedule(new TimerTask:
-          def run(): Unit =
-            Platform.runLater(() =>
-              // Make a random choice and close dialog
-              val randomChoice = Random.nextBoolean()
-              dialogResult = Some(randomChoice)
-              dialog.close()
-            )
+          // Setup 5-second auto-random-choice timer
+          val timer = new Timer()
+          timer.schedule(new TimerTask:
+            def run(): Unit =
+              Platform.runLater(() =>
+                // Make a random choice and close dialog
+                val randomChoice = Random.nextBoolean()
+                dialogResult = Some(randomChoice)
+                dialog.close()
+              )
+
           , 5000) // 5000ms = 5 seconds
 
         // Show dialog and wait for user response or timeout

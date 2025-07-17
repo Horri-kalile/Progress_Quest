@@ -1,9 +1,10 @@
 import controllers.{CombatController, MonsterController, PlayerController}
 import models.event.GameEventModule.*
-import models.player.{Attributes, ClassType, Equipment, EquipmentFactory, EquipmentSlot, Identity, Item, ItemFactory, Player, Race}
+import models.player.{Attributes, ClassType, Identity, Item, ItemFactory, Player, Race}
 import models.monster.Monster
 import models.world.OriginZone.Plains
 import models.player.Behavior.BehaviorType
+import models.player.EquipmentModule.{Equipment, EquipmentFactory, EquipmentSlot}
 import org.scalatest.funsuite.AnyFunSuite
 
 class TestGameEvent extends AnyFunSuite:
@@ -12,11 +13,11 @@ class TestGameEvent extends AnyFunSuite:
   val player: Player = Player("Healer", identity, attributes, BehaviorType.Aggressive)
   val monster: Monster = MonsterController.getRandomMonsterForZone(player.level, player.attributes.lucky, player.currentZone)
   val item: Item = ItemFactory.randomItem(player.attributes.lucky)
-  val equipment: Equipment = EquipmentFactory.generateRandomEquipment(1.0, player.attributes.lucky, player.level).get
+  val equipment: Equipment = EquipmentFactory.alwaysDrop(player.level).get
 
   private def equipRandomGear(player: Player): Player =
     EquipmentSlot.values.foldLeft(player)((p, slot) =>
-      EquipmentFactory.generateRandomEquipment(1.0, p.attributes.lucky, p.level) match
+      EquipmentFactory.alwaysDrop(p.level) match
         case Some(equipment) if equipment.slot == slot =>
           PlayerController.equipmentOn(p, slot, equipment)
         case _ => p
