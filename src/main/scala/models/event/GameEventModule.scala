@@ -215,15 +215,8 @@ object GameEventModule:
         (MissionController.addMission(player, newMission), List(msg), None)
 
 
-  /** A special unpredictable event with 8 possible outcomes:
-   *      1. Level up or down
-   *         2. Loot rare equipment
-   *         3. Game over from defeat
-   *         4. Discover an item
-   *         5. Take trap damage
-   *         6. Gain XP by helping villagers
-   *         7. Instant death trap
-   *         8. Random item theft
+  /** A special unpredictable event with 8 possible outcomes.
+   * random choice fallback when player doesn't respond to dialogs.
    */
   private case object SpecialEvent extends GameEvent:
 
@@ -236,6 +229,10 @@ object GameEventModule:
      * @param player     the player involved
      * @param caseIndex  the specific case to trigger (0–7)
      * @param useDialogs whether to show interactive dialogs (true = gameplay, false = test mode)
+     * @return a tuple with updated player, messages, and optional monster
+     * 
+     * Interactive cases (0, 1, 3, 5) now handle timeout scenarios by making
+     * random choices automatically, ensuring all special events produce outcomes.
      */
     def actionWithCase(player: Player, caseIndex: Int, useDialogs: Boolean): (Player, List[String], Option[Monster]) = caseIndex match
       case 0 =>
@@ -252,7 +249,18 @@ object GameEventModule:
             case Some(false) =>
               (player, List("You ignored the shrine and continued on your path."), None)
             case None =>
-              (player, List("You hesitated too long and the shrine vanished."), None)
+              // Random choice fallback for timeout scenarios
+              val randomChoice = Random.nextBoolean()
+              if randomChoice then
+                val change = Random.between(1, 4)
+                val isBlessing = Random.nextBoolean()
+                val updated = (1 to change).foldLeft(player)((p, _) =>
+                  if isBlessing then PlayerController.levelUp(p) else PlayerController.levelDown(p)
+                )
+                val msg = if isBlessing then s"Random blessing! You leveled up $change times." else s"Random curse! You lost $change levels."
+                (updated, List(msg), None)
+              else
+                (player, List("You randomly ignored the shrine."), None)
         else
           val change = Random.between(1, 4)
           val isBlessing = Random.nextBoolean()
@@ -270,7 +278,11 @@ object GameEventModule:
             case Some(false) =>
               (player, List("You fled from the powerful monster and continued safely."), None)
             case None =>
-              (player, List("You hesitated too long! The monster attacked but you escaped."), None)
+              // Random choice fallback - should make random decision instead of fixed message
+              if Random.nextBoolean() then
+                generateEquipOutcome(player)
+              else
+                (player, List("You randomly decided to flee from the monster."), None)
         else
           generateEquipOutcome(player)
 
@@ -291,7 +303,14 @@ object GameEventModule:
             case Some(false) =>
               (player, List("You ignored the dungeon and continued."), None)
             case None =>
-              (player, List("You hesitated and the entrance collapsed."), None)
+              // Random choice fallback for timeout scenarios
+              if Random.nextBoolean() then
+                val item = ItemFactory.randomItem(player.attributes.lucky)
+                val msg1 = "You randomly decided to explore the dungeon and found an item!"
+                val msg2 = s"Found: ${item.name}, worth ${item.gold}."
+                (PlayerController.addItem(player, item), List(msg1, msg2), None)
+              else
+                (player, List("You randomly decided to ignore the dungeon."), None)
         else
           val item = ItemFactory.randomItem(player.attributes.lucky)
           val msg1 = "You discovered an item in a hidden dungeon."
@@ -313,7 +332,13 @@ object GameEventModule:
             case Some(false) =>
               (player, List("You ignored the villagers and moved on."), None)
             case None =>
-              (player, List("You hesitated and someone else helped them."), None)
+              // Random choice fallback for timeout scenarios
+              if Random.nextBoolean() then
+                val gain = Random.between(50, 151) * (1 + player.attributes.wisdom / 100)
+                val msg = s"You randomly decided to help villagers and gained $gain EXP."
+                (PlayerController.gainXP(player, gain), List(msg), None)
+              else
+                (player, List("You randomly decided to ignore the villagers."), None)
         else
           val gain = Random.between(50, 151) * (1 + player.attributes.wisdom / 100)
           val msg = s"You helped villagers and gained $gain EXP."
