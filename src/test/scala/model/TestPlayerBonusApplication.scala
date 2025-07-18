@@ -127,7 +127,6 @@ class TestPlayerBonusApplication extends AnyFunSuite:
       else
         assert(updated.skills.isEmpty, s"Did NOT expect starting skills for $classType")
 
-
   test("Equipment is added only for Human race"):
     for race <- Race.values do
       val player = basePlayer(race, ClassType.Mage)
@@ -137,4 +136,3 @@ class TestPlayerBonusApplication extends AnyFunSuite:
         assert(updated.equipment.nonEmpty, "Human should get equipment")
       else
         assert(updated.equipment.isEmpty, s"$race should not get equipment")
-
