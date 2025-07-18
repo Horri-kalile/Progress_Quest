@@ -2,12 +2,13 @@ package models.event
 
 import controllers.{CombatController, MissionController, MonsterController, PlayerController}
 import models.monster.Monster
-import models.player.EquipmentModule.{Equipment, EquipmentFactory}
+import models.player.EquipmentModule.{Equipment, EquipmentFactory, EquipmentSlot}
 import models.player.{ItemFactory, Player, SkillFactory}
 import models.world.World
-import util.GameConfig
+import util.{GameConfig, RandomFunctions}
 import view.SpecialEventDialog
 
+import scala.annotation.tailrec
 import scala.util.Random
 
 /** The GameEventModule contains the event system for player interactions during the game simulation.
@@ -223,40 +224,32 @@ object GameEventModule:
      *         Interactive cases (0, 1, 2, 3, 4, 5, 6) now handle timeout scenarios by making
      *         random choices automatically, ensuring all special events produce outcomes.
      */
+
+    @tailrec
     def actionWithCase(player: Player, caseIndex: Int, useDialogs: Boolean): (Player, List[String], Option[Monster]) = caseIndex match
       case 0 =>
-        if useDialogs then
-          SpecialEventDialog.showBlessingCurseDialog() match
-            case Some(true) =>
-              val change = Random.between(1, 4)
-              if Random.nextBoolean() then
-                val p2 = (1 to change).foldLeft(player)((p, _) => PlayerController.levelUp(p))
-                (p2, List(s"Blessing! You leveled up $change times."), None)
-              else
-                val p2 = (1 to change).foldLeft(player)((p, _) => PlayerController.levelDown(p))
-                (p2, List(s"Curse! You lost $change levels."), None)
-            case Some(false) =>
-              (player, List("You ignored the shrine and continued on your path."), None)
-            case None =>
-              val randomChoice = Random.nextBoolean()
-              if randomChoice then
-                val change = Random.between(1, 4)
-                val isBlessing = Random.nextBoolean()
-                val updated = (1 to change).foldLeft(player)((p, _) =>
-                  if isBlessing then PlayerController.levelUp(p) else PlayerController.levelDown(p)
-                )
-                val msg = if isBlessing then s"Random blessing! You leveled up $change times." else s"Random curse! You lost $change levels."
-                (updated, List(msg), None)
-              else
-                (player, List("You randomly ignored the shrine."), None)
-        else
+        def blessingOrCurse(p: Player): (Player, List[String], Option[Monster]) =
           val change = Random.between(1, 4)
           val isBlessing = Random.nextBoolean()
-          val updated = (1 to change).foldLeft(player)((p, _) =>
-            if isBlessing then PlayerController.levelUp(p) else PlayerController.levelDown(p)
+          val updated = (1 to change).foldLeft(p)((acc, _) =>
+            if isBlessing then PlayerController.levelUp(acc)
+            else PlayerController.levelDown(acc)
           )
-          val msg = if isBlessing then s"Blessing! You leveled up $change times." else s"Curse! You lost $change levels."
+          val msg = if isBlessing then s"Blessing! You leveled up $change times."
+          else s"Curse! You lost $change levels."
           (updated, List(msg), None)
+
+        def ignoreShrine(p: Player): (Player, List[String], Option[Monster]) =
+          (p, List("You ignored the shrine and continued on your path."), None)
+
+        if useDialogs then
+          SpecialEventDialog.showBlessingCurseDialog() match
+            case Some(true) => blessingOrCurse(player)
+            case Some(false) => ignoreShrine(player)
+            case None => actionWithCase(player, 0, useDialogs = false)
+        else if Random.nextBoolean() then blessingOrCurse(player)
+        else ignoreShrine(player)
+
 
       case 1 =>
         if useDialogs then
@@ -266,7 +259,6 @@ object GameEventModule:
             case Some(false) =>
               (player, List("You fled from the powerful monster and continued safely."), None)
             case None =>
-              // Random choice fallback - should make random decision instead of fixed message
               if Random.nextBoolean() then
                 generateEquipOutcome(player)
               else
@@ -450,18 +442,18 @@ object GameEventModule:
    * @param upgradeChance Probability (0.0 to 1.0) of upgrading existing equipment
    * @return A new Player with equipment changes and a descriptive message
    */
-  def forgeOrUpgradeEquipment(player: Player, upgradeChance: Double = 0.5): (Player, String) =
-    val newEq = EquipmentFactory.probBased(player.attributes.lucky, player.level)
-    val maybeExisting: Option[Equipment] = player.equipment(newEq.get.slot)
+  private def forgeOrUpgradeEquipment(player: Player, upgradeChance: Double = 0.5): (Player, String) =
+    val equipmentSlot: EquipmentSlot = RandomFunctions.randomEquipmentSlot()
+    val playerEquip = player.equipment(equipmentSlot)
 
-    if maybeExisting.isDefined && Random.nextDouble() < upgradeChance then
-      val upgraded = EquipmentFactory.powerUpEquip(maybeExisting.get)
+    if playerEquip.isDefined && Random.nextDouble() < upgradeChance then
+      val upgraded = EquipmentFactory.powerUpEquip(playerEquip.get)
       val updatedPlayer = PlayerController.equipmentOn(player, upgraded.slot, upgraded)
-      (updatedPlayer, s"Upgraded equipment: ${maybeExisting.get.name} with ${maybeExisting.get.value} ${upgraded.name}, now worth ${upgraded.value}")
+      (updatedPlayer, s"Upgraded equipment: ${playerEquip.get.name} with ${playerEquip.get.value} ${upgraded.name}, now worth ${upgraded.value}")
     else
-      EquipmentFactory.alwaysDrop(player.level) match
+      EquipmentFactory.probBased(player.attributes.lucky, player.level) match
         case Some(newEq) =>
           val updatedPlayer = PlayerController.equipmentOn(player, newEq.slot, newEq)
-          (updatedPlayer, s"Equipped new item: ${newEq.name}")
+          (updatedPlayer, s"Forged and equipped a new equipment: ${newEq.name}")
         case None =>
           (player, "No equipment was forged.")
