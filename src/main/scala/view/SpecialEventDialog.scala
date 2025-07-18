@@ -6,30 +6,26 @@ import scalafx.scene.control.ButtonBar.ButtonData
 import scalafx.application.Platform
 import java.util.{Timer, TimerTask}
 import java.util.concurrent.CountDownLatch
+import scala.util.Random  
 
 /**
  * Dialog utility for displaying special event popups during gameplay.
  * 
  * This object manages interactive dialogs that appear during random events,
  * providing players with choices that can affect their character's progress.
- * All choice dialogs include a 5-second auto-timeout mechanism to maintain
- * game flow and prevent the game from hanging if the player is away.
- * 
- * Features:
- * - Timed dialogs with automatic fallback choices
- * - Thread-safe dialog handling using JavaFX Platform
- * - Consistent styling and behavior across all event types
- * - Information-only dialogs for notifications
+ * All choice dialogs include a 5-second auto-timeout mechanism that makes
+ * a RANDOM CHOICE when the player doesn't respond in time.
  */
 object SpecialEventDialog:
   
   /**
-   * Show blessing/curse dialog with 5-second auto-ignore timer.
+   * Show blessing/curse dialog with 5-second auto-random timer.
    * 
    * Presents the player with a mysterious shrine that could provide
-   * beneficial or harmful effects when interacted with.
+   * beneficial or harmful effects when interacted with. If no choice
+   * is made within 5 seconds, a random decision is automatically selected.
    * 
-   * @return Some(true) if player chooses to pray, Some(false) if ignore, None if timeout
+   * @return Some(true) if player/random chooses to pray, Some(false) if ignore
    */
   def showBlessingCurseDialog(): Option[Boolean] =
     showTimedDialog(
@@ -41,12 +37,13 @@ object SpecialEventDialog:
     )
 
   /**
-   * Show powerful monster dialog with 5-second auto-flee timer.
+   * Show powerful monster dialog with 5-second auto-random timer.
    * 
    * Presents the player with a challenging combat encounter that
-   * offers high risk but potentially valuable rewards.
+   * offers high risk but potentially valuable rewards. If no choice
+   * is made within 5 seconds, a random decision is automatically selected.
    * 
-   * @return Some(true) if player chooses to fight, Some(false) if flee, None if timeout
+   * @return Some(true) if player/random chooses to fight, Some(false) if flee
    */
   def showPowerfulMonsterDialog(): Option[Boolean] =
     showTimedDialog(
@@ -58,12 +55,13 @@ object SpecialEventDialog:
     )
 
   /**
-   * Show hidden dungeon discovery dialog with 5-second auto-leave timer.
+   * Show hidden dungeon discovery dialog with 5-second auto-random timer.
    * 
    * Presents the player with an exploration opportunity that could
-   * contain valuable loot or dangerous traps.
+   * contain valuable loot or dangerous traps. If no choice is made
+   * within 5 seconds, a random decision is automatically selected.
    * 
-   * @return Some(true) if player chooses to explore, Some(false) if leave, None if timeout
+   * @return Some(true) if player/random chooses to explore, Some(false) if leave
    */
   def showHiddenDungeonDialog(): Option[Boolean] =
     showTimedDialog(
@@ -75,12 +73,13 @@ object SpecialEventDialog:
     )
   
   /**
-   * Show villager help request dialog with 5-second auto-ignore timer.
+   * Show villager help request dialog with 5-second auto-random timer.
    * 
    * Presents the player with an opportunity to help NPCs, potentially
-   * gaining experience based on their wisdom attribute.
+   * gaining experience based on their wisdom attribute. If no choice
+   * is made within 5 seconds, a random decision is automatically selected.
    * 
-   * @return Some(true) if player chooses to help, Some(false) if ignore, None if timeout
+   * @return Some(true) if player/random chooses to help, Some(false) if ignore
    */
   def showVillagerHelpDialog(): Option[Boolean] =
     showTimedDialog(
@@ -89,6 +88,16 @@ object SpecialEventDialog:
       content = "Do you want to help them?\n(May reward experience based on your wisdom!)",
       yesText = "Help",
       noText = "Ignore"
+    )
+
+
+  def showGameOverMonsterDialog(): Option[Boolean] =
+    showTimedDialog(
+      title = "Powerful Monster Encounter",
+      header = "A deadly monster appears!",
+      content = "This monster looks extremely dangerous!\nDo you want to face it or try to escape?",
+      yesText = "Fight",
+      noText = "Escape"
     )
 
   /**
@@ -102,6 +111,16 @@ object SpecialEventDialog:
       title = "Defeated!",
       header = "💀 You were defeated by a powerful monster!",
       content = "The powerful monster was too strong for you.\n\nGame Over!"
+    )
+
+
+  def showGameOverTrapDialog(): Option[Boolean] =
+    showTimedDialog(
+      title = "Deadly Trap!",
+      header = "You found a suspicious trap!",
+      content = "This trap looks lethal!\nDo you want to try to disarm it or avoid it?",
+      yesText = "Disarm",
+      noText = "Avoid"
     )
 
   /**
@@ -123,11 +142,13 @@ object SpecialEventDialog:
    * Displays a notification when the player triggers a trap that
    * damages but doesn't kill them, reducing HP and MP by half.
    */
-  def showDungeonTrapDialog(): Unit =
-    showInfoDialog(
+  def showDungeonTrapDialog(): Option[Boolean] =
+    showTimedDialog(
       title = "Dungeon Trap!",
-      header = "You triggered a dangerous trap!",
-      content = "You stepped on a hidden pressure plate!\n\nYour HP and MP have been halved!"
+      header = "You discovered a trap mechanism!",
+      content = "There's a trap here that might hurt you.\nDo you want to trigger it or find another way?",
+      yesText = "Trigger",
+      noText = "Find Another Way"
     )
 
   /**
@@ -144,18 +165,17 @@ object SpecialEventDialog:
     )
 
   /**
-   * Private helper method to show timed dialog with 5-second auto-close.
+   * Private helper method to show timed dialog with 5-second auto-random choice.
    * 
-   * Creates a confirmation dialog with two choices and an automatic timeout.
-   * Uses thread-safe mechanisms to handle JavaFX UI interactions from
-   * background threads without blocking the UI.
+   * Creates a confirmation dialog with two choices and an automatic random selection
+   * if the player doesn't respond within 5 seconds.
    * 
    * @param title The dialog window title
    * @param header The main dialog header text
    * @param content The detailed dialog content/question
    * @param yesText Text for the positive action button
    * @param noText Text for the negative action button
-   * @return Some(true) for yes choice, Some(false) for no choice, None for timeout
+   * @return Some(true) for yes choice, Some(false) for no choice (guaranteed non-None)
    */
   private def showTimedDialog(
     title: String,
@@ -178,17 +198,23 @@ object SpecialEventDialog:
         // Set dialog properties after creation to avoid type ambiguity
         dialog.title = title
         dialog.headerText = header
-        dialog.contentText = s"$content\n\n⏰ Auto-ignore in 5 seconds..."
+        dialog.contentText = s"$content\n\n⏰ Random choice in 5 seconds..."
 
         // Create custom button types for clearer user choices
         val yesButton = new ButtonType(yesText, ButtonData.Yes)
         val noButton = new ButtonType(noText, ButtonData.No)
         dialog.buttonTypes = Seq(yesButton, noButton)
 
-        // Setup 5-second auto-close timer to prevent game hanging
+        // Setup 5-second auto-random-choice timer
         val timer = new Timer()
         timer.schedule(new TimerTask:
-            def run(): Unit = Platform.runLater(() => dialog.close())
+            def run(): Unit = 
+              Platform.runLater(() => 
+                // Make a random choice and close dialog
+                val randomChoice = Random.nextBoolean()
+                dialogResult = Some(randomChoice)
+                dialog.close()
+              )
           , 5000) // 5000ms = 5 seconds
 
         // Show dialog and wait for user response or timeout
@@ -196,11 +222,13 @@ object SpecialEventDialog:
         timer.cancel() // Cancel timer if user made a choice before timeout
 
         // Process dialog result and convert to Option[Boolean]
-        dialogResult = result match
-          case Some(`yesButton`) => Some(true) // Player chose positive action
-          case Some(`noButton`) => Some(false) // Player chose negative action
-          case Some(_) => None // Any other button = treat as timeout
-          case None => None // Dialog closed without choice = timeout
+        // If dialogResult was already set by timer, keep that value
+        if dialogResult == null then
+          dialogResult = result match
+            case Some(`yesButton`) => Some(true) // Player chose positive action
+            case Some(`noButton`) => Some(false) // Player chose negative action
+            case Some(_) => Some(Random.nextBoolean()) // Any other button = random choice
+            case None => Some(Random.nextBoolean()) // Dialog closed without choice = random choice
           
       finally
         // Always signal completion to unblock waiting thread

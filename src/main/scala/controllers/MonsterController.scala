@@ -2,9 +2,10 @@ package controllers
 
 import models.monster.*
 import models.player.*
+import models.world.OriginZone
+import util.GameConfig.{dodgeBonusByDexterity, maxDodgeChance}
 import util.RandomFunctions
 
-import scala.math.max
 import scala.util.Random
 
 object MonsterController:
@@ -18,18 +19,29 @@ object MonsterController:
 
     (damagedMonster, explosion)
 
-  def attackPlayer(monster: Monster, player: Player): Int =
+  def attackPlayer(monster: Monster, player: Player): (Int, String, Monster) =
     val baseDamage = monster.attributes.attack + (player.level * 2)
-    if monster.berserk then
-      val bonus: Int = Random.between(1, 5 + monster.attributes.attack)
-      monster.copy(attributes = monster.attributes.copy(currentHp = (monster.attributes.currentHp - bonus).min(0)))
-      (baseDamage + bonus - player.attributes.constitution).max(1)
+
+    // Dodge chance based on dexterity
+    val dodgeChance = (player.attributes.dexterity * dodgeBonusByDexterity).min(maxDodgeChance)
+    val didDodge = Random.nextDouble() < dodgeChance
+
+    if didDodge then
+      (0, s"${player.name} dodged the attack!", monster)
+    else if monster.berserk then
+      val bonus = Random.between(1, 5 + monster.attributes.attack)
+      val selfDamage = bonus
+      val updatedMonster = monster.copy(attributes = monster.attributes.copy(currentHp = (monster.attributes.currentHp - selfDamage).max(0)))
+      val damage = (baseDamage + bonus - player.attributes.constitution).max(1)
+      (damage, s"[Berserk] ${monster.name} attacked for $damage and lost $selfDamage HP!", updatedMonster)
     else
-      (baseDamage - player.attributes.constitution).max(1)
+      val damage = (baseDamage - player.attributes.constitution).max(1)
+      (damage, s"${monster.name} attacked for $damage.", monster)
+
 
   def handleRegeneration(monster: Monster): (Monster, Option[String]) =
     if monster.regenerating && !monster.isDead then
-      val healAmount = Random.between(monster.level, 3 * monster.level)
+      val healAmount = Random.between(1, 2 * monster.level)
       val healed = monster.receiveHealing(healAmount)
       (healed, Some(s"[Regenerating] ${monster.name} recovered $healAmount HP."))
     else (monster, None)
@@ -57,5 +69,9 @@ object MonsterController:
   def getMonsterDefenceAndWeakness(monster: Monster): (Int, Double, Double) =
     (monster.attributes.defense, monster.attributes.weaknessPhysical, monster.attributes.weaknessMagic)
 
-
+  /**
+   * Generate a random monster for player's level and zone using MonstersFactory
+   */
+  def getRandomMonsterForZone(playerLevel: Int, playerLucky: Int, zone: OriginZone): Monster =
+    MonstersFactory.randomMonsterForZone(zone, playerLevel, playerLucky, RandomFunctions.tryGenerateStrongMonster())
 

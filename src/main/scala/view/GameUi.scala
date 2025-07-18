@@ -258,9 +258,14 @@ object GameUi:
         grid
 
       case None =>
-        new Label("No monster encountered yet...") {
-          style = "-fx-font-style: italic; -fx-text-fill: #888888;"
-        }
+        "No monster encountered yet..."
+    
+    new TextArea:
+      text = monsterText
+      editable = false
+      style = "-fx-font-family: monospace; -fx-font-size: 12; -fx-background-color: transparent"
+      mouseTransparent = true
+      focusTraversable = false
 
   private def createWorldContent(player: Player): Node =
     new VBox:
