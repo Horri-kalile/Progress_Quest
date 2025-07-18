@@ -248,8 +248,7 @@ object GameEventModule:
             case Some(true) => blessingOrCurse(player)
             case Some(false) => ignoreShrine(player)
             case None => actionWithCase(player, 0, useDialogs = false)
-        else if Random.nextBoolean() then blessingOrCurse(player)
-        else ignoreShrine(player)
+        else if Random.nextBoolean() then blessingOrCurse(player) else ignoreShrine(player)
 
 
       case 1 =>

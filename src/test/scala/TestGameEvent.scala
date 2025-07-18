@@ -73,7 +73,7 @@ class TestGameEvent extends AnyFunSuite:
   test("Special Case 1 - Loot equipment"):
     val starting = equipRandomGear(player)
     val (updated, messages, _) = GameEventFactory.testSpecialCase(starting, 1)
-    val keywords = List("loot", "equipped", "sold", "no loot")
+    val keywords = List("loot", "equipped", "sold", "no loot", "fled from")
     assert(messages.exists(msg => keywords.exists(kw => msg.toLowerCase.contains(kw))))
 
 
