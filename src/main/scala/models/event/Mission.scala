@@ -45,7 +45,7 @@ case class Mission(
 
 object MissionFactory:
 
-  private val missions: List[MissionData] = MissionLoader.loadMissions()
+  private lazy val missions: List[MissionData] = MissionLoader.loadMissions()
 
   /**
    * Generate a random mission with scaling rewards.

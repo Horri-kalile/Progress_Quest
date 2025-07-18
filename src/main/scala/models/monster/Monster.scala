@@ -115,7 +115,7 @@ object MonstersFactory:
    * Preloaded monster names organized by zone for consistent creature spawning.
    * Loaded once at startup from external data files.
    */
-  private val monsterNames: Map[String, List[String]] = MonsterLoader.loadMonsters()
+  private lazy val monsterNames: Map[String, List[String]] = MonsterLoader.loadMonsters()
 
   /**
    * Generates a random monster appropriate for the specified zone and player stats.

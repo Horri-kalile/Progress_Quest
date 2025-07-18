@@ -1,10 +1,8 @@
 package util
 
-import controllers.PlayerController
 import models.event.GameEventModule.EventType
 import models.event.GameEventModule.EventType.*
-import models.player.EquipmentModule.{Equipment, EquipmentFactory, EquipmentSlot}
-import models.player.{Player, SkillFactory}
+import models.player.EquipmentModule.EquipmentSlot
 import util.GameConfig.*
 
 import scala.util.Random
