@@ -3,7 +3,7 @@ package util
 import controllers.PlayerController
 import models.event.GameEventModule.EventType
 import models.event.GameEventModule.EventType.*
-import models.player.EquipmentModule.{Equipment, EquipmentFactory}
+import models.player.EquipmentModule.{Equipment, EquipmentFactory, EquipmentSlot}
 import models.player.{Player, SkillFactory}
 import util.GameConfig.*
 
@@ -81,5 +81,10 @@ object RandomFunctions:
    */
   def tryGenerateStrongMonster(): Boolean =
     Random.nextBoolean()
+
+  /** Selects a random equipment slot */
+  def randomEquipmentSlot(): EquipmentSlot =
+    EquipmentSlot.values(Random.nextInt(EquipmentSlot.values.length))
+
 
  
