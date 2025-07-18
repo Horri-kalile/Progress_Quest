@@ -68,11 +68,10 @@ class TestModels extends AnyFunSuite:
 
 
   test("high luck increases drop probability"):
-    val attempts = 1000
-    val withLuckDrops = (1 to attempts).count { _ =>
-      EquipmentFactory.probBased(playerLucky = 100, playerLevel = 5).isDefined
+    val withLuckDrops = (1 to 1000).count { _ =>
+      EquipmentFactory.probBased(playerLucky = 1000, playerLevel = 5).isDefined
     }
-    val withoutLuckDrops = (1 to attempts).count { _ =>
+    val withoutLuckDrops = (1 to 1000).count { _ =>
       EquipmentFactory.probBased(playerLucky = 0, playerLevel = 5).isDefined
     }
     println(withoutLuckDrops)
