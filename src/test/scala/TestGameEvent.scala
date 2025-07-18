@@ -66,8 +66,9 @@ class TestGameEvent extends AnyFunSuite:
 
   // Special Events
   test("Special Case 0 - Blessing or curse"):
-    val (updated, messages, _) = GameEventFactory.testSpecialCase(player, 0)
-    assert(updated.level != player.level || messages.exists(_.toLowerCase.contains("ignored")))
+    val newPlayer = player.withLevel(5)
+    val (updated, messages, _) = GameEventFactory.testSpecialCase(newPlayer, 0)
+    assert(updated.level != newPlayer.level || messages.exists(_.toLowerCase.contains("ignored")))
 
   test("Special Case 1 - Loot equipment"):
     val starting = equipRandomGear(player)
