@@ -3,6 +3,7 @@ package controllers
 import models.monster.*
 import models.player.*
 import models.player.EquipmentModule.Equipment
+import models.player.ItemModule.Item
 import models.world.OriginZone
 import util.GameConfig.{dodgeBonusByDexterity, maxDodgeChance}
 import util.RandomFunctions

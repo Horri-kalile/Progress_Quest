@@ -5,6 +5,7 @@ import models.event.*
 import controllers.{MissionController, PlayerController}
 import models.player.Behavior.BehaviorType
 import models.player.EquipmentModule.EquipmentFactory
+import models.player.ItemModule.ItemFactory
 
 class TestGameLogic extends AnyFunSuite:
 
@@ -41,7 +42,7 @@ class TestGameLogic extends AnyFunSuite:
 
   test("Player adds item to inventory") {
     val player = Player("Collector", identity, attributes, Behavior.BehaviorType.Aggressive)
-    val item = ItemFactory.randomItem(attributes.lucky)
+    val item = ItemFactory.alwaysCreate().createRandomItem(attributes.lucky).get
     val updated = PlayerController.addItem(player, item, 2)
     assert(updated.inventory.getOrElse(item, 0) == 2)
   }

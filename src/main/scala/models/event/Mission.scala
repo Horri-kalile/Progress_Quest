@@ -1,7 +1,9 @@
 package models.event
 
-import models.player.{Item, ItemFactory}
+import models.player.ItemModule
+import models.player.ItemModule.{Item, ItemFactory}
 import util.MissionLoader
+
 import java.util.UUID
 import scala.util.Random
 
@@ -56,7 +58,7 @@ object MissionFactory:
     val mission = Random.shuffle(missions).head
     val rewardExp = Random.between(50, 101) * playerLevel
     val rewardGold = Random.between(10, 51) * playerLevel
-    val rewardItem = Option.when(Random.nextBoolean())(ItemFactory.randomItem(playerLucky))
+    val rewardItem = ItemFactory.probBasedCreate().createRandomItem(playerLucky)
 
     Mission(
       id = UUID.randomUUID().toString,

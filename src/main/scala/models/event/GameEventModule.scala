@@ -3,7 +3,8 @@ package models.event
 import controllers.{CombatController, MissionController, MonsterController, PlayerController}
 import models.monster.Monster
 import models.player.EquipmentModule.{Equipment, EquipmentFactory, EquipmentSlot}
-import models.player.{ItemFactory, Player, SkillFactory}
+import models.player.ItemModule.ItemFactory
+import models.player.{Player, SkillFactory}
 import models.world.World
 import util.{GameConfig, RandomFunctions}
 import view.SpecialEventDialog
@@ -295,29 +296,28 @@ object GameEventModule:
 
 
       case 3 =>
+        def foundItem(p: Player): (Player, List[String], Option[Monster]) =
+          val itemOpt = ItemFactory.alwaysCreate().createRandomItem(p.attributes.lucky)
+          itemOpt match
+            case Some(item) =>
+              val p2 = PlayerController.addItem(p, item)
+              val msg1 = "You explored a hidden dungeon and found an item!"
+              val msg2 = s"Found: ${item.name}, worth ${item.gold} and rarity ${item.rarity}."
+              (p2, List(msg1, msg2), None)
+            case None =>
+              (p, List("No item found."), None)
+
+        def ignoreDungeon(p: Player): (Player, List[String], Option[Monster]) =
+          (p, List("You ignored the dungeon and continued."), None)
+
         if useDialogs then
           SpecialEventDialog.showHiddenDungeonDialog() match
-            case Some(true) =>
-              val item = ItemFactory.randomItem(player.attributes.lucky)
-              val msg1 = "You explored a hidden dungeon and found an item!"
-              val msg2 = s"Found: ${item.name}, worth ${item.gold}."
-              (PlayerController.addItem(player, item), List(msg1, msg2), None)
-            case Some(false) =>
-              (player, List("You ignored the dungeon and continued."), None)
-            case None =>
-              // Random choice fallback for timeout scenarios
-              if Random.nextBoolean() then
-                val item = ItemFactory.randomItem(player.attributes.lucky)
-                val msg1 = "You randomly decided to explore the dungeon and found an item!"
-                val msg2 = s"Found: ${item.name}, worth ${item.gold}."
-                (PlayerController.addItem(player, item), List(msg1, msg2), None)
-              else
-                (player, List("You randomly decided to ignore the dungeon."), None)
-        else
-          val item = ItemFactory.randomItem(player.attributes.lucky)
-          val msg1 = "You discovered an item in a hidden dungeon."
-          val msg2 = s"Item: ${item.name}, value: ${item.gold}"
-          (PlayerController.addItem(player, item), List(msg1, msg2), None)
+            case Some(true) => foundItem(player)
+            case Some(false) => ignoreDungeon(player)
+            case None => actionWithCase(player, 3, useDialogs = false) // recursive fallback without dialogs
+        else if Random.nextBoolean() then foundItem(player)
+        else ignoreDungeon(player)
+
 
       case 4 =>
         def trapOutcome(p: Player): (Player, List[String], Option[Monster]) =

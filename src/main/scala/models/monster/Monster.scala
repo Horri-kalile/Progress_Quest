@@ -1,8 +1,10 @@
 package models.monster
 
 import models.player.EquipmentModule.{Equipment, EquipmentFactory}
-import models.player.{Item, ItemFactory, Player}
+import models.player.ItemModule.{Item, ItemFactory}
+import models.player.{ItemModule, Player}
 import models.world.{OriginZone, World}
+import util.GameConfig.baseDropChance
 import util.MonsterLoader
 import util.RandomFunctions
 
@@ -205,9 +207,7 @@ object MonstersFactory:
     val factor = if strong then 2 else 1
     val gold = Random.between(1 * level, 20 * level) * factor
     val exp = Random.between(1 * level, 20 * level) * factor
-    var randomItem: Option[Item] = None
-    if RandomFunctions.randomDropFlags(playerLucky) then
-      randomItem = Some(ItemFactory.randomItem(playerLucky))
+    val randomItem: Option[Item] = ItemFactory.probBasedCreate(baseDropChance).createRandomItem(playerLucky)
 
     (gold, exp, randomItem, EquipmentFactory.probBased(playerLucky = playerLucky, playerLevel = playerLevel))
 

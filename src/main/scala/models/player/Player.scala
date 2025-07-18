@@ -3,6 +3,7 @@ package models.player
 import models.event.Mission
 import models.player.Behavior.*
 import models.player.EquipmentModule.{Equipment, EquipmentSlot}
+import models.player.ItemModule.Item
 import models.world.OriginZone
 
 /**

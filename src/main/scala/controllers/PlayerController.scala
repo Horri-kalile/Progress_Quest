@@ -5,6 +5,7 @@ import models.monster.Monster
 import models.player.*
 import models.player.Behavior.BehaviorType.{FastLeveling, Heal}
 import models.player.EquipmentModule.{Equipment, EquipmentSlot}
+import models.player.ItemModule.Item
 import models.world.OriginZone
 import util.GameConfig
 

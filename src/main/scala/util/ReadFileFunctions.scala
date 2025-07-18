@@ -7,7 +7,8 @@ import scala.util.Using
 import models.event.{MissionData, Missions}
 import models.monster.MonsterNameData
 import models.player.EquipmentModule.EquipmentSlot
-import models.player.{ItemNames, SkillNameData}
+import models.player.ItemModule.ItemNames
+import models.player.{SkillNameData}
 
 object ItemNameLoader:
   implicit val rw: ReadWriter[ItemNames] = macroRW

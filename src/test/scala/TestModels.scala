@@ -2,6 +2,7 @@ import models.event.MissionData
 import models.monster.MonstersFactory
 import models.player.*
 import models.player.EquipmentModule.{EquipmentFactory, EquipmentSlot}
+import models.player.ItemModule.ItemFactory
 import models.world.OriginZone
 import org.scalatest.funsuite.AnyFunSuite
 import util.{EquipmentNameLoader, ItemNameLoader, MissionLoader, SkillLoader}
@@ -22,7 +23,7 @@ class TestModels extends AnyFunSuite:
   // TestItem
   test("randomItem should create an item with valid name, gold > 0, and valid rarity"):
     assert(itemNames.nonEmpty)
-    val item = ItemFactory.randomItem(10)
+    val item = ItemFactory.alwaysCreate().createRandomItem(10).get
 
     assert(itemNames.contains(item.name), "Item name should be from base list")
     assert(item.gold > 0, "Gold value should be positive")
