@@ -14,5 +14,3 @@ class TestPlayerGenerationUi extends AnyFunSuite:
   test("Class descriptions should match expected text"):
     assert(PlayerGenerationUi.getClassDescription(ClassType.Warrior).contains("more Hp"))
     assert(PlayerGenerationUi.getClassDescription(ClassType.Mage).contains("magic"))
-
-

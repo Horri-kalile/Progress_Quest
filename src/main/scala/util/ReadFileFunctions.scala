@@ -20,7 +20,6 @@ object ItemNameLoader:
       parsed.items
     }
 
-
 object MissionLoader:
   implicit val missionDataRW: ReadWriter[MissionData] = macroRW
   implicit val missionsRW: ReadWriter[Missions] = macroRW
@@ -31,7 +30,6 @@ object MissionLoader:
       val parsed = read[Missions](raw)
       parsed.missions
     }
-
 
 object EquipmentNameLoader:
   def loadEquipmentNames(path: String = "assets/equipments.json"): Map[EquipmentSlot, List[String]] =
@@ -44,7 +42,6 @@ object EquipmentNameLoader:
         case (name, items) =>
           EquipmentSlot.values.find(_.toString == name).map(_ -> items).toList
     }
-
 
 object SkillLoader:
   implicit val skillDataRw: ReadWriter[SkillNameData] = macroRW

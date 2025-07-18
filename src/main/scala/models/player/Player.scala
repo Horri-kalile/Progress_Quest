@@ -6,11 +6,9 @@ import models.player.EquipmentModule.{Equipment, EquipmentSlot}
 import models.player.ItemModule.Item
 import models.world.OriginZone
 
-/**
- * The main Player trait.
- * Behavior logic is resolved from the BehaviorType.
- * All updates return new Player instances to keep immutability.
- */
+/** The main Player trait. Behavior logic is resolved from the BehaviorType. All updates return new Player instances to
+  * keep immutability.
+  */
 trait Player:
 
   def name: String
@@ -118,23 +116,23 @@ object Player:
 
   /** Validate params, throw exception if invalid */
   private def validateParams(
-                              name: String,
-                              identity: Identity,
-                              level: Int,
-                              exp: Int,
-                              hp: Int,
-                              mp: Int,
-                              currentHp: Int,
-                              currentMp: Int,
-                              baseAttributes: Attributes,
-                              behaviorType: BehaviorType,
-                              inventory: Map[Item, Int],
-                              equipment: Map[EquipmentSlot, Option[Equipment]],
-                              skills: List[Skill],
-                              missions: List[Mission],
-                              gold: Double,
-                              currentZone: OriginZone
-                            ): Unit =
+      name: String,
+      identity: Identity,
+      level: Int,
+      exp: Int,
+      hp: Int,
+      mp: Int,
+      currentHp: Int,
+      currentMp: Int,
+      baseAttributes: Attributes,
+      behaviorType: BehaviorType,
+      inventory: Map[Item, Int],
+      equipment: Map[EquipmentSlot, Option[Equipment]],
+      skills: List[Skill],
+      missions: List[Mission],
+      gold: Double,
+      currentZone: OriginZone
+  ): Unit =
     require(name.nonEmpty, "Player name cannot be empty")
     require(level > 0, "Level must be positive")
     require(exp >= 0, "Experience cannot be negative")
@@ -146,34 +144,36 @@ object Player:
 
   /** Apply factory method to create Player instances */
   def apply(
-             name: String,
-             identity: Identity,
-             level: Int,
-             exp: Int,
-             hp: Int,
-             mp: Int,
-             currentHp: Int,
-             currentMp: Int,
-             baseAttributes: Attributes,
-             behaviorType: BehaviorType,
-             inventory: Map[Item, Int] = Map.empty,
-             equipment: Map[EquipmentSlot, Option[Equipment]] = EquipmentSlot.values.map(_ -> None).toMap,
-             skills: List[Skill] = List.empty,
-             missions: List[Mission] = List.empty,
-             gold: Double,
-             currentZone: OriginZone
-           ): Player =
-    validateParams(name, identity, level, exp, hp, mp, currentHp, currentMp, baseAttributes, behaviorType, inventory, equipment, skills, missions, gold, currentZone)
-    val raw = PlayerImpl(name, identity, level, exp, hp, mp, currentHp, currentMp, baseAttributes, behaviorType, inventory, equipment, skills, missions, gold, currentZone)
+      name: String,
+      identity: Identity,
+      level: Int,
+      exp: Int,
+      hp: Int,
+      mp: Int,
+      currentHp: Int,
+      currentMp: Int,
+      baseAttributes: Attributes,
+      behaviorType: BehaviorType,
+      inventory: Map[Item, Int] = Map.empty,
+      equipment: Map[EquipmentSlot, Option[Equipment]] = EquipmentSlot.values.map(_ -> None).toMap,
+      skills: List[Skill] = List.empty,
+      missions: List[Mission] = List.empty,
+      gold: Double,
+      currentZone: OriginZone
+  ): Player =
+    validateParams(name, identity, level, exp, hp, mp, currentHp, currentMp, baseAttributes, behaviorType, inventory,
+      equipment, skills, missions, gold, currentZone)
+    val raw = PlayerImpl(name, identity, level, exp, hp, mp, currentHp, currentMp, baseAttributes, behaviorType,
+      inventory, equipment, skills, missions, gold, currentZone)
     raw.behavior.onGameStart(raw) // Apply behavior bonus when it needs
 
   /** Minimal factory method for convenience, using default level=1, exp=0, gold=0 */
   def apply(
-             name: String,
-             identity: Identity,
-             baseAttributes: Attributes,
-             behaviorType: BehaviorType
-           ): Player =
+      name: String,
+      identity: Identity,
+      baseAttributes: Attributes,
+      behaviorType: BehaviorType
+  ): Player =
     val baseHp = baseAttributes.constitution * 5
     val baseMp = baseAttributes.intelligence * 2
     val level = 1
@@ -201,7 +201,8 @@ object Player:
     )
 
   /** Extractor for pattern matching */
-  def unapply(p: Player): Option[(String, Identity, Int, Int, Int, Int, Int, Int, Attributes, BehaviorType, Map[Item, Int], Map[EquipmentSlot, Option[Equipment]], List[Skill], List[Mission], Double, OriginZone)] =
+  def unapply(p: Player): Option[(String, Identity, Int, Int, Int, Int, Int, Int, Attributes, BehaviorType,
+        Map[Item, Int], Map[EquipmentSlot, Option[Equipment]], List[Skill], List[Mission], Double, OriginZone)] =
     Some(
       (
         p.name,
@@ -225,23 +226,23 @@ object Player:
 
   /** Private implementation case class hidden from public */
   private case class PlayerImpl(
-                                 name: String,
-                                 identity: Identity,
-                                 level: Int,
-                                 exp: Int,
-                                 hp: Int,
-                                 mp: Int,
-                                 currentHp: Int,
-                                 currentMp: Int,
-                                 baseAttributes: Attributes,
-                                 behaviorType: BehaviorType,
-                                 inventory: Map[Item, Int],
-                                 equipment: Map[EquipmentSlot, Option[Equipment]],
-                                 skills: List[Skill],
-                                 missions: List[Mission],
-                                 gold: Double,
-                                 currentZone: OriginZone
-                               ) extends Player:
+      name: String,
+      identity: Identity,
+      level: Int,
+      exp: Int,
+      hp: Int,
+      mp: Int,
+      currentHp: Int,
+      currentMp: Int,
+      baseAttributes: Attributes,
+      behaviorType: BehaviorType,
+      inventory: Map[Item, Int],
+      equipment: Map[EquipmentSlot, Option[Equipment]],
+      skills: List[Skill],
+      missions: List[Mission],
+      gold: Double,
+      currentZone: OriginZone
+  ) extends Player:
 
     override def withHp(hp: Int): Player = copy(hp = hp)
 
@@ -259,7 +260,8 @@ object Player:
 
     override def withInventory(newInventory: Map[Item, Int]): Player = copy(inventory = newInventory)
 
-    override def withEquipment(newEquipment: Map[EquipmentSlot, Option[Equipment]]): Player = copy(equipment = newEquipment)
+    override def withEquipment(newEquipment: Map[EquipmentSlot, Option[Equipment]]): Player =
+      copy(equipment = newEquipment)
 
     override def withSkills(newSkills: List[Skill]): Player = copy(skills = newSkills)
 

@@ -14,7 +14,8 @@ class TestGameEvent extends AnyFunSuite:
   val identity: Identity = Identity(Race.Human, ClassType.Warrior)
   val attributes: Attributes = Attributes(10, 10, 10, 10, 10, 10)
   val player: Player = Player("Healer", identity, attributes, BehaviorType.Aggressive)
-  val monster: Monster = MonsterController.getRandomMonsterForZone(player.level, player.attributes.lucky, player.currentZone)
+  val monster: Monster =
+    MonsterController.getRandomMonsterForZone(player.level, player.attributes.lucky, player.currentZone)
   val item: Item = ItemFactory.alwaysCreate().createRandomItem(player.attributes.lucky).get
   val equipment: Equipment = EquipmentFactory.alwaysDrop(player.level).get
 
@@ -64,7 +65,11 @@ class TestGameEvent extends AnyFunSuite:
 
   test("CraftEvent equips or upgrades equipment"):
     val (updated, messages, _) = GameEventFactory.executeEvent(EventType.craft, player)
-    assert(messages.exists(msg => msg.toLowerCase.contains("equipped") || msg.toLowerCase.contains("upgraded") || msg.toLowerCase.contains("no equipment")))
+    assert(messages.exists(msg =>
+        msg.toLowerCase.contains("equipped") || msg.toLowerCase.contains("upgraded") || msg.toLowerCase.contains(
+          "no equipment"
+        )
+      ))
 
   // Special Events
   test("Special Case 0 - Blessing or curse"):
@@ -77,7 +82,6 @@ class TestGameEvent extends AnyFunSuite:
     val (updated, messages, _) = GameEventFactory.testSpecialCase(starting, 1)
     val keywords = List("loot", "equipped", "sold", "no loot", "fled from")
     assert(messages.exists(msg => keywords.exists(kw => msg.toLowerCase.contains(kw))))
-
 
   test("Special Case 2 - Fight deadly monster"):
     val (updated, messages, _) = GameEventFactory.testSpecialCase(player, 2)

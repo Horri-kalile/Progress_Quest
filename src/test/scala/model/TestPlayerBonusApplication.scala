@@ -1,6 +1,5 @@
 package model
 
-
 import models.player.*
 import models.player.Behavior.BehaviorType
 import models.player.PlayerBonusesApplication.applyRaceAndClassBonuses

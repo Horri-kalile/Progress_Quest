@@ -10,38 +10,37 @@ import scalafx.scene.layout.{BorderPane, HBox, VBox}
 
 import scala.util.Random
 
-/**
- * User interface for creating new player characters.
- * Provides interactive controls for selecting race, class, behavior and attributes.
- *
- * This object manages the character creation process, allowing users to:
- * - Enter a custom player name
- * - Select or randomly roll race, class, and behavior
- * - Generate random attributes with reroll capability
- * - View descriptive information for races and classes
- * - Create a fully configured player character
- */
+/** User interface for creating new player characters. Provides interactive controls for selecting race, class, behavior
+  * and attributes.
+  *
+  * This object manages the character creation process, allowing users to:
+  *   - Enter a custom player name
+  *   - Select or randomly roll race, class, and behavior
+  *   - Generate random attributes with reroll capability
+  *   - View descriptive information for races and classes
+  *   - Create a fully configured player character
+  */
 object PlayerGenerationUi extends JFXApp3:
 
   /** Callback function executed when a player is successfully created */
   private var onPlayerCreated: Player => Unit = _ => ()
   var mainStage: JFXApp3.PrimaryStage = _
 
-  /**
-   * Launches the player generation UI with a callback function.
-   *
-   * @param callback Function to handle the created player when character creation is complete
-   */
+  /** Launches the player generation UI with a callback function.
+    *
+    * @param callback
+    *   Function to handle the created player when character creation is complete
+    */
   def launch(callback: Player => Unit): Unit =
     onPlayerCreated = callback
     main(Array.empty)
 
-  /**
-   * Opens player generation UI directly without using launch() method.
-   * Used for restarting the character creation process.
-   *
-   * @param callback Function to handle the created player
-   */
+  /** Opens player generation UI directly without using launch() method. Used for restarting the character creation
+    * process.
+    *
+    * @param callback
+    *   Function to handle the created player
+    */
   def openPlayerGeneration(callback: Player => Unit): Unit =
     onPlayerCreated = callback
     resetSelections()
@@ -78,7 +77,8 @@ object PlayerGenerationUi extends JFXApp3:
     identity = Identity(race = selectedRace, classType = selectedClass)
 
   /** Creates styled Label with common font and color settings */
-  private def createStyledLabel(text: String, fontSize: Int = 14, bold: Boolean = true, color: String = "#2c3e50", wrapText: Boolean = false, maxWidth: Double = Double.MaxValue): Label =
+  private def createStyledLabel(text: String, fontSize: Int = 14, bold: Boolean = true, color: String = "#2c3e50",
+      wrapText: Boolean = false, maxWidth: Double = Double.MaxValue): Label =
     val lbl = new Label(text)
     lbl.style = s"-fx-font-size: ${fontSize}px;${if bold then " -fx-font-weight: bold;" else ""} -fx-text-fill: $color;"
     if wrapText then
@@ -89,12 +89,14 @@ object PlayerGenerationUi extends JFXApp3:
   /** Creates a button with a roll icon and common styling */
   private def createRollButton(onClick: () => Unit): Button =
     val btn = new Button("🎲 Roll")
-    btn.style = "-fx-background-color: #8B8B8B; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5 10; -fx-border-radius: 5px; -fx-background-radius: 5px;"
+    btn.style =
+      "-fx-background-color: #8B8B8B; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5 10; -fx-border-radius: 5px; -fx-background-radius: 5px;"
     btn.onAction = _ => onClick()
     btn
 
   /** Updates attribute labels from current randomAttributes */
-  private def updateAttributeLabels(strengthLabel: Label, constitutionLabel: Label, dexterityLabel: Label, intelligenceLabel: Label, wisdomLabel: Label, luckyLabel: Label): Unit =
+  private def updateAttributeLabels(strengthLabel: Label, constitutionLabel: Label, dexterityLabel: Label,
+      intelligenceLabel: Label, wisdomLabel: Label, luckyLabel: Label): Unit =
     strengthLabel.text = s"Strength: ${randomAttributes.strength}"
     constitutionLabel.text = s"Constitution: ${randomAttributes.constitution}"
     dexterityLabel.text = s"Dexterity: ${randomAttributes.dexterity}"
@@ -102,17 +104,18 @@ object PlayerGenerationUi extends JFXApp3:
     wisdomLabel.text = s"Wisdom: ${randomAttributes.wisdom}"
     luckyLabel.text = s"Lucky: ${randomAttributes.lucky}"
 
-  /**
-   * Creates and displays the player generation window using a regular Stage.
-   * This method is used for reopening the UI without launching a new JFXApp3 instance.
-   */
+  /** Creates and displays the player generation window using a regular Stage. This method is used for reopening the UI
+    * without launching a new JFXApp3 instance.
+    */
   private def createPlayerGenerationWindow(): BorderPane =
     val raceLabel = createStyledLabel(selectedRace.toString)
     val classLabel = createStyledLabel(selectedClass.toString)
     val behaviorLabel = createStyledLabel(selectedBehavior.toString)
 
-    val raceDescriptionLabel = createStyledLabel(getRaceDescription(selectedRace), fontSize = 12, bold = false, color = "#7f8c8d", wrapText = true, maxWidth = 250)
-    val classDescriptionLabel = createStyledLabel(getClassDescription(selectedClass), fontSize = 12, bold = false, color = "#7f8c8d", wrapText = true, maxWidth = 250)
+    val raceDescriptionLabel = createStyledLabel(getRaceDescription(selectedRace), fontSize = 12, bold = false,
+      color = "#7f8c8d", wrapText = true, maxWidth = 250)
+    val classDescriptionLabel = createStyledLabel(getClassDescription(selectedClass), fontSize = 12, bold = false,
+      color = "#7f8c8d", wrapText = true, maxWidth = 250)
 
     val playerNameLabel = new TextField:
       promptText = "Enter your Player name"
@@ -120,13 +123,18 @@ object PlayerGenerationUi extends JFXApp3:
       style = "-fx-font-size: 14px; -fx-padding: 8px; -fx-border-radius: 5px; -fx-background-radius: 5px;"
       prefWidth = 200
 
-
-    val strengthLabel = createStyledLabel(s"Strength: ${randomAttributes.strength}", fontSize = 13, bold = false, color = "#34495e")
-    val constitutionLabel = createStyledLabel(s"Constitution: ${randomAttributes.constitution}", fontSize = 13, bold = false, color = "#34495e")
-    val dexterityLabel = createStyledLabel(s"Dexterity: ${randomAttributes.dexterity}", fontSize = 13, bold = false, color = "#34495e")
-    val intelligenceLabel = createStyledLabel(s"Intelligence: ${randomAttributes.intelligence}", fontSize = 13, bold = false, color = "#34495e")
-    val wisdomLabel = createStyledLabel(s"Wisdom: ${randomAttributes.wisdom}", fontSize = 13, bold = false, color = "#34495e")
-    val luckyLabel = createStyledLabel(s"Lucky: ${randomAttributes.lucky}", fontSize = 13, bold = false, color = "#34495e")
+    val strengthLabel =
+      createStyledLabel(s"Strength: ${randomAttributes.strength}", fontSize = 13, bold = false, color = "#34495e")
+    val constitutionLabel = createStyledLabel(s"Constitution: ${randomAttributes.constitution}", fontSize = 13,
+      bold = false, color = "#34495e")
+    val dexterityLabel =
+      createStyledLabel(s"Dexterity: ${randomAttributes.dexterity}", fontSize = 13, bold = false, color = "#34495e")
+    val intelligenceLabel = createStyledLabel(s"Intelligence: ${randomAttributes.intelligence}", fontSize = 13,
+      bold = false, color = "#34495e")
+    val wisdomLabel =
+      createStyledLabel(s"Wisdom: ${randomAttributes.wisdom}", fontSize = 13, bold = false, color = "#34495e")
+    val luckyLabel =
+      createStyledLabel(s"Lucky: ${randomAttributes.lucky}", fontSize = 13, bold = false, color = "#34495e")
 
     def updateRace(): Unit =
       selectedRace = Random.shuffle(Race.values.toList).head
@@ -221,10 +229,12 @@ object PlayerGenerationUi extends JFXApp3:
           )
         ,
         new Button("🎲 Roll All Attributes"):
-          style = "-fx-background-color: #8B8B8B; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 15; -fx-border-radius: 5px; -fx-background-radius: 5px; -fx-font-weight: bold;"
+          style =
+            "-fx-background-color: #8B8B8B; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 15; -fx-border-radius: 5px; -fx-background-radius: 5px; -fx-font-weight: bold;"
           onAction = _ =>
             randomAttributes = Attributes.random()
-            updateAttributeLabels(strengthLabel, constitutionLabel, dexterityLabel, intelligenceLabel, wisdomLabel, luckyLabel)
+            updateAttributeLabels(strengthLabel, constitutionLabel, dexterityLabel, intelligenceLabel, wisdomLabel,
+              luckyLabel)
       )
 
     val bottomButtonBar = new HBox:
@@ -257,11 +267,8 @@ object PlayerGenerationUi extends JFXApp3:
       bottom = bottomButtonBar
       padding = Insets(15)
 
-
-  /**
-   * Entry point for the JFXApp3 application.
-   * Sets up the primary stage with the player generation UI.
-   */
+  /** Entry point for the JFXApp3 application. Sets up the primary stage with the player generation UI.
+    */
   override def start(): Unit =
     resetSelections()
     mainStage = new JFXApp3.PrimaryStage:
@@ -273,13 +280,13 @@ object PlayerGenerationUi extends JFXApp3:
 
     stage = mainStage
 
-
-  /**
-   * Provides descriptive text for each race to help users understand their characteristics.
-   *
-   * @param race The race enum value to get description for
-   * @return A user-friendly description string explaining the race's traits
-   */
+  /** Provides descriptive text for each race to help users understand their characteristics.
+    *
+    * @param race
+    *   The race enum value to get description for
+    * @return
+    *   A user-friendly description string explaining the race's traits
+    */
   def getRaceDescription(race: Race): String = race match
     case Race.Human => "Balanced race, good for beginners. Starts with a random Equipment"
     case Race.Titan => "Massive beings with high strength."
@@ -290,12 +297,13 @@ object PlayerGenerationUi extends JFXApp3:
     case Race.PandaMan => "Peaceful but wise and lucky."
     case Race.Gundam => "Mechanical warriors, more strength and wisdom."
 
-  /**
-   * Provides descriptive text for each class to help users understand their combat role.
-   *
-   * @param classType The class enum value to get description for
-   * @return A user-friendly description string explaining the class's abilities and playstyle
-   */
+  /** Provides descriptive text for each class to help users understand their combat role.
+    *
+    * @param classType
+    *   The class enum value to get description for
+    * @return
+    *   A user-friendly description string explaining the class's abilities and playstyle
+    */
   def getClassDescription(classType: ClassType): String = classType match
     case ClassType.Warrior => "Starts with more Hp"
     case ClassType.Poisoner => "Starts with more Mp"
@@ -304,4 +312,3 @@ object PlayerGenerationUi extends JFXApp3:
     case ClassType.Assassin => "Starts with physical skill"
     case ClassType.Mage => "Starts with magic skill"
     case ClassType.Cleric => "Starts with random magic"
-

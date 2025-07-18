@@ -6,7 +6,6 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class TestMonster extends AnyFunSuite:
 
-
   private def createTestMonster(): Monster =
     Monster(
       name = "Test Goblin",
@@ -42,7 +41,7 @@ class TestMonster extends AnyFunSuite:
 
     assert(damaged.attributes.currentHp == 50) // 80 - 30 = 50
     assert(damaged.attributes.hp == 100) // max HP
-    assert(monster.attributes.currentHp == 80) 
+    assert(monster.attributes.currentHp == 80)
   }
 
   test("receiveDamage should not reduce HP below 0") {
@@ -58,7 +57,7 @@ class TestMonster extends AnyFunSuite:
     val healed = monster.receiveHealing(20)
 
     assert(healed.attributes.currentHp == 60) // 40 + 20 = 60
-    assert(healed.attributes.hp == 100) // max HP 
+    assert(healed.attributes.hp == 100) // max HP
   }
 
   test("receiveHealing should not exceed maximum HP") {
@@ -89,7 +88,7 @@ class TestMonster extends AnyFunSuite:
 
     assert(modified.name == "Super Goblin")
     assert(modified.level == 10)
-    assert(modified.attributes == original.attributes) 
+    assert(modified.attributes == original.attributes)
     assert(original.name == "Test Goblin")
   }
 

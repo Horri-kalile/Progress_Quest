@@ -10,12 +10,10 @@ class TestReadFile extends AnyFunSuite:
     val items = ItemNameLoader.loadItemNames()
     assert(items.nonEmpty)
 
-
   test("MissionLoader should load missions from JSON"):
     val missions: List[MissionData] = MissionLoader.loadMissions()
     assert(missions.nonEmpty)
     assert(missions.head.name.nonEmpty)
-
 
   test("EquipmentNameLoader should load equipment names and map to slots"):
     val equipmentMap = EquipmentNameLoader.loadEquipmentNames()
@@ -25,17 +23,13 @@ class TestReadFile extends AnyFunSuite:
     assert(equipmentMap(EquipmentSlot.Jewelry1).nonEmpty)
     assert(equipmentMap.contains(EquipmentSlot.Jewelry2))
 
-
   test("SkillLoader should load skill names from JSON")
   val skills: SkillNameData = SkillLoader.loadSkillNames()
   assert(skills.magic.nonEmpty)
   assert(skills.healing.nonEmpty)
   assert(skills.physical.nonEmpty)
 
-
   test("MonsterLoader should load monsters grouped by category")
   val monsters: Map[String, List[String]] = MonsterLoader.loadMonsters()
   assert(monsters.contains("Forest"))
   assert(monsters("Forest").contains("Wild Boar"))
-
-

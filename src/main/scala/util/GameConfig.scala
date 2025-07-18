@@ -30,7 +30,8 @@ object GameConfig:
   val panelBody: String = "-fx-background-color: white; -fx-border-color: #ccc; -fx-border-width: 0 1 1 1"
   val backgroundMain: String = "-fx-background-color: #e0e0e0"
   val textAreaStyle: String = s"$baseFont; -fx-background-color: transparent"
-  val buttonGreen: String = "-fx-background-color: #4caf50; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20"
+  val buttonGreen: String =
+    "-fx-background-color: #4caf50; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20"
   val buttonRed: String = "-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20"
   val progressBarHP: String = "-fx-accent: #4682b4"
   val progressBarMP: String = "-fx-accent: #9370db"

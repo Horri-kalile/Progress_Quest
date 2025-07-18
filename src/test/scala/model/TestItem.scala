@@ -1,12 +1,10 @@
 package model
 
-
 import models.player.ItemModule.*
 import org.scalatest.funsuite.AnyFunSuite
 
 class TestItem extends AnyFunSuite:
   val AlwaysCreate: ItemFactory = ItemFactory.alwaysCreate()
-
 
   test("AlwaysCreateFactory always returns an item"):
     val result = AlwaysCreate.createRandomItem(10)
@@ -35,7 +33,6 @@ class TestItem extends AnyFunSuite:
     println(lowLuckSuccesses)
     assert(highLuckSuccesses > lowLuckSuccesses)
 
-
   test("Higher luck increases chance of rare items (probabilistically)"):
     val lowRarities = (1 to 1000).flatMap(_ => AlwaysCreate.createRandomItem(0)).map(_.rarity)
     val highRarities = (1 to 1000).flatMap(_ => AlwaysCreate.createRandomItem(1000)).map(_.rarity)
@@ -48,7 +45,6 @@ class TestItem extends AnyFunSuite:
     println(highCount)
     println(lowCount)
     assert(highCount >= lowCount)
-
 
   test("AlwaysCreateFactory returns Legendary sometimes with high luck"):
     val factory = ItemFactory.alwaysCreate()

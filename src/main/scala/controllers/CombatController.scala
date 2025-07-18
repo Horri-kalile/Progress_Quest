@@ -7,9 +7,8 @@ import util.GameConfig.maxTurnBattle
 import scala.annotation.tailrec
 import scala.util.Random
 
-/**
- * Handles turn-based combat logic between a player and a monster.
- */
+/** Handles turn-based combat logic between a player and a monster.
+  */
 object CombatController:
 
   /** Internal reference to last fought monster (for tracking/debugging). */
@@ -22,17 +21,20 @@ object CombatController:
   def setLastMonster(monster: Monster): Unit =
     _lastMonster = Some(monster)
 
-  /**
-   * Simulates a full turn-based combat between player and monster.
-   *
-   * @param player  the player character
-   * @param monster the enemy monster
-   * @return a list of (Player state, optional Monster state, log message) for each action
-   */
+  /** Simulates a full turn-based combat between player and monster.
+    *
+    * @param player
+    *   the player character
+    * @param monster
+    *   the enemy monster
+    * @return
+    *   a list of (Player state, optional Monster state, log message) for each action
+    */
   def simulateFight(player: Player, monster: Monster): List[(Player, Option[Monster], String)] =
 
     @tailrec
-    def loop(p: Player, m: Monster, acc: List[(Player, Option[Monster], String)], turn: Int): List[(Player, Option[Monster], String)] =
+    def loop(p: Player, m: Monster, acc: List[(Player, Option[Monster], String)], turn: Int)
+        : List[(Player, Option[Monster], String)] =
       if !p.isAlive || m.isDead then acc.reverse
       else if turn > maxTurnBattle then
         val msg = "The enemy is too exhaustive, better run away."
@@ -71,15 +73,16 @@ object CombatController:
 
     loop(player, monster, Nil, 1)
 
-
-  /**
-   * Handles equipment drop after a monster is defeated.
-   * Compares new equipment to existing, either equipping or selling it.
-   *
-   * @param player  the player
-   * @param monster the defeated monster
-   * @return (updatedPlayer, resultMessage)
-   */
+  /** Handles equipment drop after a monster is defeated. Compares new equipment to existing, either equipping or
+    * selling it.
+    *
+    * @param player
+    *   the player
+    * @param monster
+    *   the defeated monster
+    * @return
+    *   (updatedPlayer, resultMessage)
+    */
   def handleEquipDrop(player: Player, monster: Monster): (Player, String) =
     MonsterController.getEquipReward(monster) match
       case Some(newEquip) =>
@@ -93,13 +96,15 @@ object CombatController:
             (updated, s"You equipped: ${newEquip.name} ($slot).")
       case None => (player, "No equipment drop.")
 
-  /**
-   * Handles item drop after a monster is defeated.
-   *
-   * @param player  the player
-   * @param monster the defeated monster
-   * @return (updatedPlayer, resultMessage)
-   */
+  /** Handles item drop after a monster is defeated.
+    *
+    * @param player
+    *   the player
+    * @param monster
+    *   the defeated monster
+    * @return
+    *   (updatedPlayer, resultMessage)
+    */
   def handleItemDrop(player: Player, monster: Monster): (Player, String) =
     MonsterController.getItemReward(monster) match
       case Some(item) =>

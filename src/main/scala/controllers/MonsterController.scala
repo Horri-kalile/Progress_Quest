@@ -33,13 +33,14 @@ object MonsterController:
     else if monster.berserk then
       val bonus = Random.between(1, 5 + monster.attributes.attack)
       val selfDamage = bonus
-      val updatedMonster = monster.copy(attributes = monster.attributes.copy(currentHp = (monster.attributes.currentHp - selfDamage).max(0)))
+      val updatedMonster = monster.copy(
+        attributes = monster.attributes.copy(currentHp = (monster.attributes.currentHp - selfDamage).max(0))
+      )
       val damage = (baseDamage + bonus - player.attributes.constitution).max(1)
       (damage, s"[Berserk] ${monster.name} attacked for $damage and lost $selfDamage HP!", updatedMonster)
     else
       val damage = (baseDamage - player.attributes.constitution).max(1)
       (damage, s"${monster.name} attacked for $damage.", monster)
-
 
   def handleRegeneration(monster: Monster): (Monster, Option[String]) =
     if monster.regenerating && !monster.isDead then
@@ -48,9 +49,10 @@ object MonsterController:
       (healed, Some(s"[Regenerating] ${monster.name} recovered $healAmount HP."))
     else (monster, None)
 
-
   def heal(monster: Monster, amount: Int): Monster =
-    monster.copy(attributes = monster.attributes.copy(currentHp = (monster.attributes.currentHp + amount).min(monster.attributes.hp)))
+    monster.copy(attributes = monster.attributes.copy(
+      currentHp = (monster.attributes.currentHp + amount).min(monster.attributes.hp)
+    ))
 
   def describe(monster: Monster): String = {
     s"${monster.name} (Level ${monster.level}) - ${monster.monsterType} from ${monster.originZone}: ${monster.description}"
@@ -71,9 +73,7 @@ object MonsterController:
   def getMonsterDefenceAndWeakness(monster: Monster): (Int, Double, Double) =
     (monster.attributes.defense, monster.attributes.weaknessPhysical, monster.attributes.weaknessMagic)
 
-  /**
-   * Generate a random monster for player's level and zone using MonstersFactory
-   */
+  /** Generate a random monster for player's level and zone using MonstersFactory
+    */
   def getRandomMonsterForZone(playerLevel: Int, playerLucky: Int, zone: OriginZone): Monster =
     MonstersFactory.randomMonsterForZone(zone, playerLevel, playerLucky, RandomFunctions.tryGenerateStrongMonster())
-

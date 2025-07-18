@@ -7,29 +7,26 @@ import util.MissionLoader
 import java.util.UUID
 import scala.util.Random
 
-/**
- * Data used to define mission templates (loaded from file).
- */
+/** Data used to define mission templates (loaded from file).
+  */
 case class MissionData(name: String, description: String)
 
-/**
- * Container of loaded mission data
- */
+/** Container of loaded mission data
+  */
 case class Missions(missions: List[MissionData])
 
-/**
- * Represents a single mission assigned to a player.
- */
+/** Represents a single mission assigned to a player.
+  */
 case class Mission(
-                    id: String,
-                    name: String,
-                    description: String,
-                    progression: Int = 0,
-                    goal: Int = 1,
-                    rewardExp: Int,
-                    rewardGold: Int,
-                    rewardItem: Option[Item] = None
-                  ):
+    id: String,
+    name: String,
+    description: String,
+    progression: Int = 0,
+    goal: Int = 1,
+    rewardExp: Int,
+    rewardGold: Int,
+    rewardItem: Option[Item] = None
+):
 
   /** Whether the mission is completed. */
   def isCompleted: Boolean = progression >= goal
@@ -42,18 +39,19 @@ case class Mission(
   /** Mark as fully completed (for test/debug or reward preview). */
   def complete: Mission = copy(progression = goal)
 
-
 object MissionFactory:
 
   private lazy val missions: List[MissionData] = MissionLoader.loadMissions()
 
-  /**
-   * Generate a random mission with scaling rewards.
-   *
-   * @param playerLucky how lucky the player is (affects item reward)
-   * @param playerLevel used to scale reward XP/Gold
-   * @return a new randomized Mission
-   */
+  /** Generate a random mission with scaling rewards.
+    *
+    * @param playerLucky
+    *   how lucky the player is (affects item reward)
+    * @param playerLevel
+    *   used to scale reward XP/Gold
+    * @return
+    *   a new randomized Mission
+    */
   def randomMission(playerLucky: Int, playerLevel: Int): Mission =
     val mission = Random.shuffle(missions).head
     val rewardExp = Random.between(50, 101) * playerLevel

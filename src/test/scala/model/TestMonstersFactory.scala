@@ -10,7 +10,8 @@ class TestMonstersFactory extends AnyFunSuite:
     val monster = MonstersFactory.randomMonsterForZone(
       zone = OriginZone.Forest,
       playerLevel = 5,
-      playerLucky = 10)
+      playerLucky = 10
+    )
 
     assert(monster.name.nonEmpty)
     assert(monster.level > 0)
@@ -22,14 +23,14 @@ class TestMonstersFactory extends AnyFunSuite:
     assert(monster.goldReward > 0)
     assert(monster.experienceReward > 0)
 
-
   test("strong monsters should have appropriate level scaling"):
     val playerLevel = 10
 
     val normalMonster = MonstersFactory.randomMonsterForZone(
       OriginZone.Plains,
       playerLevel,
-      5)
+      5
+    )
     val strongMonster = MonstersFactory.randomMonsterForZone(
       OriginZone.Plains,
       playerLevel,
@@ -45,7 +46,6 @@ class TestMonstersFactory extends AnyFunSuite:
     assert(strongMonster.level >= playerLevel + 1)
     assert(strongMonster.level <= playerLevel + 2)
 
-
   test("monster attributes should scale with level"):
     val lowLevelMonster = MonstersFactory.randomMonsterForZone(OriginZone.Forest, 1, 5)
     val highLevelMonster = MonstersFactory.randomMonsterForZone(OriginZone.Forest, 20, 5)
@@ -54,7 +54,6 @@ class TestMonstersFactory extends AnyFunSuite:
     // (This is probabilistic, so we'll check that it's not obviously wrong)
     assert(highLevelMonster.attributes.hp > lowLevelMonster.attributes.hp)
     assert(lowLevelMonster.level < highLevelMonster.level)
-
 
   test("strong monsters should have reduced weaknesses"):
     // Generate multiple monsters to account for randomness
@@ -70,7 +69,6 @@ class TestMonstersFactory extends AnyFunSuite:
       assert(monster.attributes.weaknessMagic <= 1.5)
     }
 
-
   test("regular monsters should have standard weaknesses"):
     val regularMonsters = (1 to 5).map(_ => MonstersFactory.randomMonsterForZone(OriginZone.Forest, 10, 5))
 
@@ -82,12 +80,10 @@ class TestMonstersFactory extends AnyFunSuite:
       assert(monster.attributes.weaknessMagic <= 2.0)
     }
 
-
   test("monster should have valid MonsterType"):
     val monster = MonstersFactory.randomMonsterForZone(OriginZone.Desert, 5, 10)
     val validTypes = MonsterType.values.toSet
     assert(validTypes.contains(monster.monsterType))
-
 
   test("strong monsters should have better rewards"):
     val normalMonster = MonstersFactory.randomMonsterForZone(OriginZone.Swamp, 10, 5)
@@ -99,11 +95,9 @@ class TestMonstersFactory extends AnyFunSuite:
     assert(strongMonster.goldReward > normalMonster.goldReward)
     assert(strongMonster.experienceReward > normalMonster.experienceReward)
 
-
   test("monster minimum level should be 1"):
     val monster = MonstersFactory.randomMonsterForZone(OriginZone.Forest, 1, 5)
     assert(monster.level >= 1)
-
 
   test("multiple monsters should have variety"):
     val monsters = (1 to 10).map(_ => MonstersFactory.randomMonsterForZone(OriginZone.Forest, 5, 10))
@@ -115,4 +109,3 @@ class TestMonstersFactory extends AnyFunSuite:
     // With 10 monsters, we should get some variety
     assert(uniqueNames.size > 1 || uniqueNames.head == "Unknown Monster") // unless no names loaded
     assert(uniqueTypes.nonEmpty) // at least some type variety
-

@@ -1,4 +1,3 @@
-
 import models.event.GameEventModule.EventType
 import org.scalatest.funsuite.AnyFunSuite
 import util.RandomFunctions

@@ -11,13 +11,13 @@ object ItemModule:
   enum ItemRarity:
     case Common, Uncommon, Rare, Epic, Legendary
 
-  /**
-   * Holds a list of possible item names.
-   *
-   * This is typically used to load and cache predefined names from file or config.
-   *
-   * @param items list of item name strings
-   */
+  /** Holds a list of possible item names.
+    *
+    * This is typically used to load and cache predefined names from file or config.
+    *
+    * @param items
+    *   list of item name strings
+    */
   case class ItemNames(items: List[String])
 
   /** Item data model */
@@ -26,12 +26,13 @@ object ItemModule:
   /** Factory trait for polymorphic item creation */
   trait ItemFactory:
 
-    /**
-     * Generates a random item based on player luck
-     *
-     * @param playerLucky luck stat influencing rarity and value
-     * @return Some(Item) or None if creation fails (e.g. probabilistic)
-     */
+    /** Generates a random item based on player luck
+      *
+      * @param playerLucky
+      *   luck stat influencing rarity and value
+      * @return
+      *   Some(Item) or None if creation fails (e.g. probabilistic)
+      */
     def createRandomItem(playerLucky: Int): Option[Item]
 
   /** Companion object providing factory methods */
@@ -77,7 +78,6 @@ object ItemModule:
         case r if r < legendaryThreshold => ItemRarity.Legendary
         case _ => ItemRarity.Legendary
 
-
     /** Creates an item with a name, rarity, and calculated gold value */
     protected def createItem(name: String, playerLucky: Int): Item =
       val rarity = randomRarity(playerLucky)
@@ -90,7 +90,7 @@ object ItemModule:
 
     override def createRandomItem(playerLucky: Int): Option[Item] =
       for name <- randomName()
-        yield createItem(name, playerLucky)
+      yield createItem(name, playerLucky)
 
   /** Creates item probabilistically based on baseChance + luck */
   private case class ProbBasedFactory(baseChance: Double) extends ItemFactory with ItemFactoryHelpers:
@@ -99,5 +99,5 @@ object ItemModule:
       val chance = (baseChance + playerLucky * specialBonusPerLucky).min(1.0)
       if Random.nextDouble() < chance then
         for name <- randomName()
-          yield createItem(name, playerLucky)
+        yield createItem(name, playerLucky)
       else None

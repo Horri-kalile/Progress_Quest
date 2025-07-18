@@ -27,30 +27,33 @@ sealed trait Skill:
 
 /** A simple implementation of [[Skill]], used as a general-purpose ability. */
 case class GenericSkill(
-                         name: String,
-                         effectType: SkillEffectType,
-                         manaCost: Int,
-                         baseMultiplier: Double,
-                         powerLevel: Int = 1
-                       ) extends Skill:
+    name: String,
+    effectType: SkillEffectType,
+    manaCost: Int,
+    baseMultiplier: Double,
+    powerLevel: Int = 1
+) extends Skill:
   override def poweredUp: Skill = copy(powerLevel = powerLevel + 1)
 
 /** Factory for generating random or class-based skills.
- *
- * This utility loads skill names and provides methods for:
- * - Generating a class-appropriate starting skill
- * - Generating a fully random skill from any category
- */
+  *
+  * This utility loads skill names and provides methods for:
+  *   - Generating a class-appropriate starting skill
+  *   - Generating a fully random skill from any category
+  */
 object SkillFactory:
 
   private lazy val data: SkillNameData = SkillLoader.loadSkillNames()
 
   /** Generates a starting skill based on the player's class and level.
-   *
-   * @param playerLevel Level to scale mana cost and power
-   * @param classType   Player's class
-   * @return An optional [[Skill]] matching the class
-   */
+    *
+    * @param playerLevel
+    *   Level to scale mana cost and power
+    * @param classType
+    *   Player's class
+    * @return
+    *   An optional [[Skill]] matching the class
+    */
   def generateStartingSkill(playerLevel: Int, classType: ClassType): Option[Skill] =
     val mana = randomManaCost(playerLevel)
     val multiplier = randomMultiplier()
@@ -62,9 +65,10 @@ object SkillFactory:
       case _ => None
 
   /** Generates a completely random skill from any effect type.
-   *
-   * @param playerLevel Optional level to scale mana cost
-   */
+    *
+    * @param playerLevel
+    *   Optional level to scale mana cost
+    */
   def randomSkill(playerLevel: Int = 1): Skill =
     val mana = randomManaCost(playerLevel)
     val multiplier = randomMultiplier()

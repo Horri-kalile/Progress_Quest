@@ -4,16 +4,21 @@ import models.player.EquipmentModule.EquipmentSlot
 
 import scala.util.Random
 
-/**
- * Represents a player's core RPG attributes.
- *
- * @param strength     affects physical damage
- * @param constitution affects defense
- * @param dexterity    affects dodge rate
- * @param intelligence affects magic damage
- * @param wisdom       affects experience gain
- * @param lucky        affects loot drop rates and special events
- */
+/** Represents a player's core RPG attributes.
+  *
+  * @param strength
+  *   affects physical damage
+  * @param constitution
+  *   affects defense
+  * @param dexterity
+  *   affects dodge rate
+  * @param intelligence
+  *   affects magic damage
+  * @param wisdom
+  *   affects experience gain
+  * @param lucky
+  *   affects loot drop rates and special events
+  */
 case class Attributes(strength: Int, constitution: Int, dexterity: Int, intelligence: Int, wisdom: Int, lucky: Int):
   /** Returns the total of all attribute values. */
   def total: Int = strength + constitution + dexterity + intelligence + wisdom + lucky
@@ -29,10 +34,10 @@ case class Attributes(strength: Int, constitution: Int, dexterity: Int, intellig
       lucky + other.lucky
     )
 
-
 object Attributes:
   /** List of attribute field names. */
-  private val attributeNames: Seq[String] = Seq("strength", "constitution", "dexterity", "intelligence", "wisdom", "lucky")
+  private val attributeNames: Seq[String] =
+    Seq("strength", "constitution", "dexterity", "intelligence", "wisdom", "lucky")
 
   /** Map of +1 increment by attribute name. */
   private val increments: Map[String, Attributes] = attributeNames.map(n => n -> singleAttribute(n, 1)).toMap
@@ -89,32 +94,32 @@ object Attributes:
 
   private def getDecrements: Map[String, Attributes] = decrements
 
-  /**
-   * Extension methods for the [[Attributes]] class to allow random mutation.
-   */
+  /** Extension methods for the [[Attributes]] class to allow random mutation.
+    */
   extension (attr: Attributes)
 
-    /**
-     * Randomly increments 1 to 6 attribute fields by small predefined amounts.
-     *
-     * The incremented fields are chosen randomly, and their values are increased
-     * according to [[Attributes.getIncrements]] for each field.
-     *
-     * @return a new [[Attributes]] instance with modified values
-     */
+    /** Randomly increments 1 to 6 attribute fields by small predefined amounts.
+      *
+      * The incremented fields are chosen randomly, and their values are increased according to
+      * [[Attributes.getIncrements]] for each field.
+      *
+      * @return
+      *   a new [[Attributes]] instance with modified values
+      */
     def incrementRandomAttributes(): Attributes =
-      val selected = Random.shuffle(Attributes.attributeNames).take(Random.between(1, Attributes.attributeNames.size + 1))
+      val selected =
+        Random.shuffle(Attributes.attributeNames).take(Random.between(1, Attributes.attributeNames.size + 1))
       selected.foldLeft(attr)(_ + Attributes.getIncrements(_))
 
-    /**
-     * Randomly decrements 1 to 6 attribute fields by small predefined amounts.
-     *
-     * The decremented fields are chosen randomly, and their values are decreased
-     * according to [[Attributes.getDecrements]] for each field.
-     *
-     * @return a new [[Attributes]] instance with modified values
-     */
+    /** Randomly decrements 1 to 6 attribute fields by small predefined amounts.
+      *
+      * The decremented fields are chosen randomly, and their values are decreased according to
+      * [[Attributes.getDecrements]] for each field.
+      *
+      * @return
+      *   a new [[Attributes]] instance with modified values
+      */
     def decrementRandomAttributes(): Attributes =
-      val selected = Random.shuffle(Attributes.attributeNames).take(Random.between(1, Attributes.attributeNames.size + 1))
+      val selected =
+        Random.shuffle(Attributes.attributeNames).take(Random.between(1, Attributes.attributeNames.size + 1))
       selected.foldLeft(attr)(_ + Attributes.getDecrements(_))
-
