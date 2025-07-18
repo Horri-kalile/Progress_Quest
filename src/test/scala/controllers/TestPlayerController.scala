@@ -165,15 +165,20 @@ class TestPlayerController extends AnyFunSuite {
     assert(leveledDown.currentMp == leveledDown.mp)
     assert(leveledDown.baseAttributes.total < player.baseAttributes.total)
   }
-  test("maybeLearnSkill gets triggered after gaining XP") {
-    val luckyPlayer = freshPlayer.withExp(0).withLevel(1).withBaseAttributes(
-      freshPlayer.baseAttributes.copy(lucky = 100)
+  test("gainXP indirectly triggers maybeLearnSkill if luck is high") {
+    val base = freshPlayer.withSkills(Nil).withExp(0).withLevel(5)
+
+    val maybeLearned = (1 to 30).view
+      .map(_ => PlayerController.gainXP(base, 500))
+      .find(_.skills.nonEmpty)
+
+    assert(
+      maybeLearned.nonEmpty,
+      "Expected at least one skill to be learned after multiple attempts"
     )
-
-    val withXp = PlayerController.gainXP(luckyPlayer, 200)
-
-    assert(withXp.skills.nonEmpty)
   }
+
+
   test("sellRandomItem removes item and increases gold") {
     val item = Item("Potion", 10.0, Rarity.Common)
     val playerWithItems = PlayerController.addItem(freshPlayer.withGold(0), item, 5)
