@@ -21,7 +21,7 @@ lazy val root = (project in file("."))
   .settings(
     name := "ProgressQuest",
     scalafmtOnCompile := true,
-    coverageEnabled := false,
+    coverageEnabled := true,
     libraryDependencies ++= Seq(
       "org.scalafx" %% "scalafx" % "21.0.0-R32",
       "com.typesafe.akka" %% "akka-actor-typed" % "2.8.5",
