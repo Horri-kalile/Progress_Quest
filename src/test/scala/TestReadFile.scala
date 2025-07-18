@@ -23,13 +23,13 @@ class TestReadFile extends AnyFunSuite:
     assert(equipmentMap(EquipmentSlot.Jewelry1).nonEmpty)
     assert(equipmentMap.contains(EquipmentSlot.Jewelry2))
 
-  test("SkillLoader should load skill names from JSON")
-  val skills: SkillNameData = SkillLoader.loadSkillNames()
-  assert(skills.magic.nonEmpty)
-  assert(skills.healing.nonEmpty)
-  assert(skills.physical.nonEmpty)
+  test("SkillLoader should load skill names from JSON"):
+    val skills: SkillNameData = SkillLoader.loadSkillNames()
+    assert(skills.magic.nonEmpty)
+    assert(skills.healing.nonEmpty)
+    assert(skills.physical.nonEmpty)
 
-  test("MonsterLoader should load monsters grouped by category")
-  val monsters: Map[String, List[String]] = MonsterLoader.loadMonsters()
-  assert(monsters.contains("Forest"))
-  assert(monsters("Forest").contains("Wild Boar"))
+  test("MonsterLoader should load monsters grouped by category"):
+    val monsters: Map[String, List[String]] = MonsterLoader.loadMonsters()
+    assert(monsters.contains("Forest"))
+    assert(monsters("Forest").contains("Wild Boar"))
