@@ -186,7 +186,7 @@ object MonstersFactory:
     else
       (Random.between(1.0, 1.5), Random.between(1.0, 1.5))
     val hp = Random.between(20, 40) * level
-    val attack = Random.between(15, 50) * level
+    val attack = Random.between(1, 5) * level
     val defense = Random.between(1, 5) * level
     MonsterAttributes(hp, hp, attack, defense, physicalWeakness, magicalWeakness)
 
