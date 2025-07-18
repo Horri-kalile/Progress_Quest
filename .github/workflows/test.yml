@@ -15,6 +15,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Step to extract coverageEnabled value from build.sbt
+      - name: Check if coverage is enabled
+        id: coverage-check
+        run: |
+          # Extract the line with coverageEnabled, e.g. coverageEnabled := true
+          enabled=$(grep -E '^\s*coverageEnabled\s*:=' build.sbt | sed -E 's/.*:=\s*(true|false).*/\1/')
+          echo "Coverage enabled: $enabled"
+          # Default to false if not found
+          if [[ "$enabled" != "true" ]]; then
+            enabled=false
+          fi
+          echo "::set-output name=coverage::$enabled"
+
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -37,19 +50,24 @@ jobs:
         with:
           apps: sbt
 
+      # Run tests with coverage only if coverageEnabled is true in build.sbt
       - name: Run tests & coverage
         run: sbt clean coverage test coverageReport
+        if: steps.coverage-check.outputs.coverage == 'true'
 
       - name: List coverage report directory
         run: ls -l ./target/scala-*/scoverage-report/
+        if: steps.coverage-check.outputs.coverage == 'true'
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
           files: ./target/scala-*/scoverage-report/scoverage.xml
           fail_ci_if_error: true
+        if: steps.coverage-check.outputs.coverage == 'true'
 
       - name: Check formatting
         run: sbt scalafmtCheck
+
 
 
