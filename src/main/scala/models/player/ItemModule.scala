@@ -63,16 +63,20 @@ object ItemModule:
     /** Random rarity influenced by luck */
     private def randomRarity(playerLucky: Int): ItemRarity =
       val roll = Random.nextDouble()
-      val bonus = specialBonusPerLucky * playerLucky
-      val legendaryThreshold = 0.96 + bonus.min(0.03)
+      val bonus = (specialBonusPerLucky * playerLucky).min(0.1) // Cap total bonus at 10%
+
+      val rareThreshold = 0.70 + bonus
+      val epicThreshold = 0.80 + bonus
+      val legendaryThreshold = (0.90 + bonus).min(1.0)
 
       roll match
-        case r if r < 0.50 => ItemRarity.Common
-        case r if r < 0.80 => ItemRarity.Uncommon
-        case r if r < 0.90 + bonus => ItemRarity.Rare
-        case r if r < 0.96 + bonus => ItemRarity.Epic
+        case r if r < 0.30 => ItemRarity.Common
+        case r if r < 0.50 => ItemRarity.Uncommon
+        case r if r < rareThreshold => ItemRarity.Rare
+        case r if r < epicThreshold => ItemRarity.Epic
         case r if r < legendaryThreshold => ItemRarity.Legendary
-        case _ => ItemRarity.Common
+        case _ => ItemRarity.Legendary
+
 
     /** Creates an item with a name, rarity, and calculated gold value */
     protected def createItem(name: String, playerLucky: Int): Item =
@@ -85,9 +89,8 @@ object ItemModule:
   private case class AlwaysCreateFactory() extends ItemFactory with ItemFactoryHelpers:
 
     override def createRandomItem(playerLucky: Int): Option[Item] =
-      for
-        name <- randomName()
-      yield createItem(name, playerLucky)
+      for name <- randomName()
+        yield createItem(name, playerLucky)
 
   /** Creates item probabilistically based on baseChance + luck */
   private case class ProbBasedFactory(baseChance: Double) extends ItemFactory with ItemFactoryHelpers:
