@@ -1,5 +1,7 @@
-import models.world.{World, OriginZone}
-import models.monster.{Monster, MonsterAttributes, MonsterBehavior, MonsterType, Aggressive}
+package model
+
+import models.monster.*
+import models.world.{OriginZone, World}
 import org.scalatest.funsuite.AnyFunSuite
 
 class TestWorld extends AnyFunSuite:

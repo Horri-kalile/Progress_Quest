@@ -1,6 +1,8 @@
-import models.player.{Attributes, Behavior, ClassType, Identity, Player, Race}
+package model
+
 import models.player.Behavior.*
 import models.player.Behavior.BehaviorType.*
+import models.player.*
 import models.world.OriginZone.Desert
 import org.scalatest.funsuite.AnyFunSuite
 

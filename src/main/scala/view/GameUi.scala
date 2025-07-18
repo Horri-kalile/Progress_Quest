@@ -75,6 +75,18 @@ object GameUi:
     new Label(text):
       style = combineStyles(styles: _*)
 
+
+  /**
+   * Reset every information when restart the game
+   *
+   * */
+  def resetData(): Unit =
+    eventMessages = List.empty
+    combatMessages = List.empty
+    currentMonster = None
+    heroDiaryProgressBar = None
+
+
   /**
    * Opens the main game UI window.
    *
@@ -83,14 +95,15 @@ object GameUi:
    *
    * @throws Exception if no player has been set via playerOpt
    */
-  def open(): Unit =
+  def open(stage: Stage): Unit =
     val player = playerOpt.getOrElse(throw new Exception("Player not set"))
     val root = createRoot(player)
-    val stage = new Stage:
-      title = "ProgressQuest"
-      width = screenWidth * 0.8
-      height = screenHeight * 0.8
-      scene = new Scene(root)
+    stage.title = "Progress Quest"
+    stage.width = screenWidth * 0.8
+    stage.height = screenHeight * 0.8
+    stage.x = (screenWidth - stage.width.value) / 2
+    stage.y = (screenHeight - stage.height.value) / 2
+    stage.scene = new Scene(root)
     stage.show()
     stageOpt = Some(stage)
 
@@ -516,8 +529,6 @@ object GameUi:
                 style = buttonGreen
                 onAction = _ =>
                   gameOverStage.close()
-                  stageOpt.foreach(_.close())
-                  stageOpt = None
                   playerOpt = None
                   onRestart()
               ,
@@ -528,6 +539,7 @@ object GameUi:
                   stageOpt.foreach(_.close())
                   stageOpt = None
                   playerOpt = None
+                  Platform.exit()
             )
         )
 

@@ -1,3 +1,5 @@
+package model
+
 import models.event.MissionData
 import models.monster.MonstersFactory
 import models.player.*

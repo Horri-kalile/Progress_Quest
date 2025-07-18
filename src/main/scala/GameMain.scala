@@ -3,7 +3,7 @@ import controllers.GameController
 
 /**
  * Main entry point for the Progress Quest application.
- * 
+ *
  * This object launches the character creation interface and then starts
  * the main game when a player is created.
  */
@@ -19,11 +19,11 @@ object GameMain extends App:
 
     // Start the game logic with the created player
     GameController.startGame(player)
-    
+
     // Set the player reference for UI updates
     GameUi.playerOpt = Some(player)
-    
+
     // Open the main game interface
-    GameUi.open()
+    GameUi.open(PlayerGenerationUi.mainStage)
   )
 

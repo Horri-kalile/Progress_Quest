@@ -1,11 +1,13 @@
-import org.scalatest.funsuite.AnyFunSuite
-import models.player.*
-import models.monster.*
-import models.event.*
+package controller
+
 import controllers.{MissionController, PlayerController}
+import models.event.*
+import models.monster.*
+import models.player.*
 import models.player.Behavior.BehaviorType
 import models.player.EquipmentModule.EquipmentFactory
 import models.player.ItemModule.ItemFactory
+import org.scalatest.funsuite.AnyFunSuite
 
 class TestGameLogic extends AnyFunSuite:
 

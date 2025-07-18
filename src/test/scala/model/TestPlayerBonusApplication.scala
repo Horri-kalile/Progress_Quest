@@ -1,9 +1,11 @@
+package model
 
-import org.scalatest.funsuite.AnyFunSuite
+
 import models.player.*
 import models.player.Behavior.BehaviorType
 import models.player.PlayerBonusesApplication.applyRaceAndClassBonuses
 import models.world.OriginZone.Desert
+import org.scalatest.funsuite.AnyFunSuite
 
 class TestPlayerBonusApplication extends AnyFunSuite:
   def basePlayer(race: Race, classType: ClassType): Player =

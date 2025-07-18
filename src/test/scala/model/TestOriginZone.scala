@@ -1,3 +1,5 @@
+package model
+
 import models.world.OriginZone
 import org.scalatest.funsuite.AnyFunSuite
 

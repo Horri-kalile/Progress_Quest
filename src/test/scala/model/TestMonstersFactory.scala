@@ -1,4 +1,6 @@
-import models.monster.{MonstersFactory, MonsterType}
+package model
+
+import models.monster.{MonsterType, MonstersFactory}
 import models.world.OriginZone
 import org.scalatest.funsuite.AnyFunSuite
 

@@ -1,3 +1,5 @@
+package model
+
 
 import models.player.ItemModule.*
 import org.scalatest.funsuite.AnyFunSuite

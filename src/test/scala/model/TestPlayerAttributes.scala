@@ -1,3 +1,5 @@
+package model
+
 import models.player.Attributes
 import models.player.EquipmentModule.EquipmentSlot
 import org.scalatest.funsuite.AnyFunSuite

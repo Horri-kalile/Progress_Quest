@@ -1,4 +1,6 @@
-import models.monster.{Monster, MonsterAttributes, MonsterBehavior, Aggressive, Defensive, MoreHp, Berserk, OneShot, Explosive, Regenerating, MonsterType}
+package model
+
+import models.monster.*
 import models.world.OriginZone
 import org.scalatest.funsuite.AnyFunSuite
 

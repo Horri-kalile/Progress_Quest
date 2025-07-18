@@ -1,11 +1,13 @@
+package model
+
 import controllers.{CombatController, MonsterController, PlayerController}
 import models.event.GameEventModule.*
-import models.player.{Attributes, ClassType, Identity, Player, Race}
 import models.monster.Monster
-import models.world.OriginZone.Plains
 import models.player.Behavior.BehaviorType
 import models.player.EquipmentModule.{Equipment, EquipmentFactory, EquipmentSlot}
 import models.player.ItemModule.{Item, ItemFactory}
+import models.player.*
+import models.world.OriginZone.Plains
 import org.scalatest.funsuite.AnyFunSuite
 
 class TestGameEvent extends AnyFunSuite:
