@@ -2,20 +2,32 @@ package models.monster
 
 import models.player.EquipmentModule.{Equipment, EquipmentFactory}
 import models.player.ItemModule.{Item, ItemFactory}
-import models.player.{ItemModule, Player}
+import models.player.ItemModule
 import models.world.{OriginZone, World}
 import util.GameConfig.baseDropChance
 import util.MonsterLoader
-import util.RandomFunctions
+
 
 import scala.util.Random
 
 /**
- * Enumeration of monster types that determine creature classification and behavior patterns.
- * Each type represents different categories of creatures with distinct characteristics.
+ * Enumeration of monster types.
+ * Each type represents a different category of creatures with distinct characteristics,
+ * combat tendencies, and reward profiles.
  */
 enum MonsterType:
-  case Beast, Undead, Humanoid, Dragon, Demon, Elemental
+  /** Beasts tend to be physical attackers with moderate loot chances. */
+  case Beast
+  /** Undead monsters often have magical vulnerabilities and higher XP rewards. */
+  case Undead
+  /** Humanoids have balanced stats and good item and equipment drop rates. */
+  case Humanoid
+  /** Dragons are powerful monsters with high gold and experience rewards. */
+  case Dragon
+  /** Demons have high attack and experience rewards but lower equipment drops. */
+  case Demon
+  /** Elements resist magic and have moderate loot chances. */
+  case Elemental
 
 /**
  * Data structure for organizing monster names by zones.
@@ -134,9 +146,9 @@ object MonstersFactory:
     val names = monsterNames.getOrElse(zone.toString, Nil)
     val name = Random.shuffle(names).headOption.getOrElse("Unknown Monster")
     val monsterLevel = scaleLevel(playerLevel, strong)
-    val attributes = generateAttributes(monsterLevel, strong)
-    val rewards: (Int, Int, Option[Item], Option[Equipment]) = generateRewards(monsterLevel, playerLevel, playerLucky, strong)
     val monsterType = Random.shuffle(MonsterType.values.toList).head
+    val attributes = generateAttributes(monsterLevel, strong, monsterType)
+    val rewards: (Int, Int, Option[Item], Option[Equipment]) = generateRewards(monsterLevel, playerLevel, playerLucky, strong, monsterType)
     val behavior = MonsterBehavior.randomBehavior
     val monster = Monster(
       name = name,
@@ -180,7 +192,7 @@ object MonstersFactory:
    * @param strong Whether this is a strong monster with enhanced stats
    * @return MonsterAttributes with HP, attack, defense, and damage weaknesses
    */
-  private def generateAttributes(level: Int, strong: Boolean): MonsterAttributes =
+  private def generateAttributes(level: Int, strong: Boolean, monsterType: MonsterType): MonsterAttributes =
     val (physicalWeakness, magicalWeakness) = if strong then
       (Random.between(0.5, 1.0), Random.between(0.5, 1.0))
     else
@@ -188,26 +200,54 @@ object MonstersFactory:
     val hp = Random.between(20, 40) * level
     val attack = Random.between(1, 5) * level
     val defense = Random.between(1, 5) * level
-    MonsterAttributes(hp, hp, attack, defense, physicalWeakness, magicalWeakness)
+    val base = MonsterAttributes(hp, hp, attack, defense, physicalWeakness, magicalWeakness)
+    applyTypeModifiers(base, monsterType)
 
   /**
-   * Calculates rewards for defeating the monster based on level and player stats.
+   * Applies monster type-specific modifications to base attributes.
    *
-   * Strong monsters provide double rewards. Item drops are influenced by player
-   * luck attribute. Equipment drops are generated with consideration for player
-   * level and luck to provide appropriate gear upgrades.
+   * Example: Undead take more magical damage but less physical, Dragons have high HP etc...
    *
-   * @param level       Monster's level affecting reward magnitude
-   * @param playerLevel Player's level for equipment scaling
-   * @param playerLucky Player's luck attribute affecting drop rates
-   * @param strong      Whether this is a strong monster with enhanced rewards
-   * @return Tuple of (gold, experience, optional item, optional equipment)
+   * @param attrs Base MonsterAttributes to modify.
+   * @param t     MonsterType specifying which modifiers to apply.
+   * @return Modified MonsterAttributes with type-specific adjustments.
    */
-  private def generateRewards(level: Int, playerLevel: Int, playerLucky: Int, strong: Boolean): (Int, Int, Option[Item], Option[Equipment]) =
-    val factor = if strong then 2 else 1
-    val gold = Random.between(1 * level, 20 * level) * factor
-    val exp = Random.between(1 * level, 20 * level) * factor
-    val randomItem: Option[Item] = ItemFactory.probBasedCreate(baseDropChance).createRandomItem(playerLucky)
+  private def applyTypeModifiers(attrs: MonsterAttributes, t: MonsterType): MonsterAttributes = t match
+    case MonsterType.Undead => attrs.copy(weaknessMagic = (attrs.weaknessMagic * 1.5).min(2.0), weaknessPhysical = (attrs.weaknessPhysical * 0.8).max(0.5))
+    case MonsterType.Dragon => attrs.copy(hp = (attrs.hp * 1.1).toInt, currentHp = (attrs.currentHp * 1.1).toInt)
+    case MonsterType.Demon => attrs.copy(attack = (attrs.attack * 1.1).toInt)
+    case MonsterType.Elemental => attrs.copy(weaknessPhysical = attrs.weaknessPhysical * 1.1)
+    case MonsterType.Beast => attrs.copy(weaknessMagic = (attrs.weaknessMagic * 1.3).min(2.0))
+    case MonsterType.Humanoid => attrs.copy(defense = (attrs.defense * 0.9).max(0.5).toInt)
+
+
+  /**
+   * Calculates rewards granted by a monster based on its level, type, player stats, and strength.
+   *
+   * Rewards include gold, experience points, and optional item drops.
+   * MonsterType influences multipliers on gold and XP, and increases item drop chances.
+   *
+   * @param level       Monster's level for base reward scaling.
+   * @param playerLevel Player's level to scale equipment drops.
+   * @param playerLucky Player's luck attribute, increasing drop chances.
+   * @param strong      Whether monster is a strong variant doubling rewards.
+   * @param monsterType The monster's type affecting reward profile.
+   * @return Tuple of (gold: Int, experience: Int, item: Option[Item], equipment: Option[Equipment])
+   */
+  private def generateRewards(level: Int, playerLevel: Int, playerLucky: Int, strong: Boolean, monsterType: MonsterType): (Int, Int, Option[Item], Option[Equipment]) =
+    val baseFactor = if strong then 2 else 1
+    val (goldMult, expMult, itemDropBonus) = monsterType match
+      case MonsterType.Dragon => (1.5, 1.5, 0.15)
+      case MonsterType.Demon => (1.2, 1.5, 0.05)
+      case MonsterType.Humanoid => (1.0, 1.0, 0.03)
+      case MonsterType.Beast => (1.2, 0.8, 0.04)
+      case MonsterType.Undead => (0.8, 1.3, 0.10)
+      case MonsterType.Elemental => (1.0, 1.0, 0.02)
+
+    val gold = (Random.between(1, 20) * level * goldMult * baseFactor).toInt
+    val exp = (Random.between(1, 20) * level * expMult * baseFactor).toInt
+
+    val randomItem: Option[Item] = ItemFactory.probBasedCreate(baseDropChance + itemDropBonus).createRandomItem(playerLucky)
 
     (gold, exp, randomItem, EquipmentFactory.probBased(playerLucky = playerLucky, playerLevel = playerLevel))
 
