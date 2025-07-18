@@ -5,7 +5,7 @@ ThisBuild / scalaVersion := "3.3.6"
 ThisBuild / fork := true
 
 // Automatic JavaFX dependency handling
-lazy val javaFXVersion = "21.0.1"
+lazy val javaFXVersion = "21.0.8"
 lazy val osName = System.getProperty("os.name").toLowerCase match {
   case n if n.contains("linux") => "linux"
   case n if n.contains("mac") => "mac"
