@@ -1,6 +1,6 @@
 package controllers
 
-import models.event.Mission
+
 import models.monster.Monster
 
 import models.player.*
@@ -117,6 +117,20 @@ object PlayerController:
       else player.inventory - item
     player.withInventory(updatedInventory)
 
+
+  /**
+   * Removes (consumes) an item from the player's inventory.
+   * Primarily intended for testing or explicit item usage.
+   *
+   * @param player the player consuming the item
+   * @param item   the item to remove
+   * @param qty    the quantity to remove
+   * @return updated Player instance with item(s) removed
+   */
+  def consumeItem(player: Player, item: Item, qty: Int = 1): Player =
+    removeItem(player, item, qty)
+
+
   /**
    * Equips an equipment item on the player in the specified slot.
    *
@@ -125,6 +139,7 @@ object PlayerController:
    * @param equipment the equipment to equip
    * @return updated Player instance with new equipment
    */
+  
   def equipmentOn(player: Player, slot: EquipmentSlot, equipment: Equipment): Player =
     val updatedEquipment = player.equipment + (slot -> Some(equipment))
     player.withEquipment(updatedEquipment)
@@ -170,8 +185,6 @@ object PlayerController:
   def spendGold(player: Player, amount: Double): Player =
     if player.gold >= amount then player.withGold(player.gold - amount) else player
 
-  def addMission(player: Player, mission: Mission): Player =
-    player.copy(missions = player.missions :+ mission)
 
   /**
    * Adds a skill to the player's skill list.

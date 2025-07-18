@@ -23,7 +23,7 @@ object GameUi:
   // Event log storage
   private var eventMessages: List[String] = List.empty
   private var combatMessages: List[String] = List.empty
-  
+
   // Current monster info storage
   private var currentMonster: Option[models.monster.Monster] = None
 
@@ -66,12 +66,12 @@ object GameUi:
       prefWidth = screenWidth * 0.5
       children = Seq(
         createPanelWithHeader("Character", "\uD83D\uDC64", new VBox(createCharacterContent(player)*)),
-          createPanelWithHeader("Stats", "\uD83D\uDCCA", new VBox(createStatsContent(player)*)),
-          createPanelWithHeader("World", "\uD83C\uDF0D", createWorldContent(player)),
-          createPanelWithHeader("Mission List", "\uD83D\uDCDC", createMissionContent(player)),
-          createPanelWithHeader("Skills", "\u2728", createSkillsContent(player)),
-          createPanelWithHeader("Equipment", "\uD83D\uDEE1", new VBox(createEquipmentContent(player)*)),
-          createPanelWithHeader("Inventory", "\uD83D\uDCC3", createInventoryContent(player))
+        createPanelWithHeader("Stats", "\uD83D\uDCCA", new VBox(createStatsContent(player)*)),
+        createPanelWithHeader("World", "\uD83C\uDF0D", createWorldContent(player)),
+        createPanelWithHeader("Mission List", "\uD83D\uDCDC", createMissionContent(player)),
+        createPanelWithHeader("Skills", "\u2728", createSkillsContent(player)),
+        createPanelWithHeader("Equipment", "\uD83D\uDEE1", new VBox(createEquipmentContent(player)*)),
+        createPanelWithHeader("Inventory", "\uD83D\uDCC3", createInventoryContent(player))
 
       )
   private def createRightColumn(): VBox =
@@ -108,7 +108,7 @@ object GameUi:
             new Label(icon):
               style = "-fx-font-size: 16px;",
 
-          new Label(title):
+            new Label(title):
               style = "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
           ),
 
@@ -258,14 +258,9 @@ object GameUi:
         grid
 
       case None =>
-        "No monster encountered yet..."
-    
-    new TextArea:
-      text = monsterText
-      editable = false
-      style = "-fx-font-family: monospace; -fx-font-size: 12; -fx-background-color: transparent"
-      mouseTransparent = true
-      focusTraversable = false
+        new Label("No monster encountered yet...") {
+          style = "-fx-font-style: italic; -fx-text-fill: #888888;"
+        }
 
   private def createWorldContent(player: Player): Node =
     new VBox:
@@ -396,7 +391,7 @@ object GameUi:
       override def run(): Unit =
         animateHeroDiaryProgress()
         animationTimer.cancel()
-    , 100) // Small delay to ensure UI is fully updated
+      , 100) // Small delay to ensure UI is fully updated
 
   /**
    * Update the current monster info
@@ -404,14 +399,14 @@ object GameUi:
   def updateMonsterInfo(monster: Option[Monster]): Unit =
     currentMonster = monster
     updateCurrentUI()
-  
+
   def showGameOverWithRestart(onRestart: () => Unit): Unit =
     // Create a simple game over window with restart option
     val gameOverStage = new Stage:
       title = "Game Over"
       width = 400
       height = 200
-      
+
     val gameOverScene = new Scene:
       root = new VBox:
         spacing = 20
@@ -449,7 +444,7 @@ object GameUi:
                   playerOpt = None
             )
         )
-    
+
     gameOverStage.scene = gameOverScene
     gameOverStage.show()
 
@@ -528,4 +523,3 @@ object GameUi:
       )
       animationThread.setDaemon(true)
       animationThread.start()
-

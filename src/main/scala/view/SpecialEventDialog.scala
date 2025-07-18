@@ -106,7 +106,7 @@ object SpecialEventDialog:
    * Displays a notification when the player is defeated by a powerful
    * monster encounter, signaling the end of the game session.
    */
-  def showGameOverMonsterDialog(): Unit =
+  def showGameOverMonsterDialogg(): Unit =
     showInfoDialog(
       title = "Defeated!",
       header = "💀 You were defeated by a powerful monster!",
@@ -129,7 +129,7 @@ object SpecialEventDialog:
    * Displays a notification when the player is killed by a trap,
    * signaling the end of the game session.
    */
-  def showGameOverTrapDialog(): Unit =
+  def showGameOverTrapDialogg(): Unit =
     showInfoDialog(
       title = "Deadly Trap!",
       header = "💀 It was a trap!",
