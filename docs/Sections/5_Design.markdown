@@ -18,7 +18,7 @@ Ogni pannello è creato tramite funzioni dedicate, favorendo riuso e chiarezza d
 
 ## Pattern e Scelte di Design
 
-- **MVC/MVVM**: Separazione tra View (ScalaFX), Model (strutture dati e logica di dominio), Controller (gestione eventi e logica di gioco).
+- **MVC**: Separazione tra View (ScalaFX), Model (strutture dati e logica di dominio), Controller (gestione eventi e logica di gioco).
 - **Factory/Builder**: Per la generazione casuale di attributi, razze, classi e comportamenti del personaggio.
 - **Singleton/Object**: Uso di oggetti Scala per gestire costanti, utility e collezioni di mostri/eventi.
 
