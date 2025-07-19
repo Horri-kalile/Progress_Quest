@@ -9,7 +9,7 @@ Il progetto appartiene al genere dei zero-player game (ZPG), in cui il personagg
 ---
 
 ## Gameplay
-
+![Video Demo](gameplay.gif)
 ---
 
 ---
