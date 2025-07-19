@@ -4,6 +4,7 @@ title: Kalile horri
 nav_order: 1
 parent: Implementazione
 ---
+
 # Implementazione - Kalile Horri
 
 ## Monster Model
@@ -12,7 +13,7 @@ parent: Implementazione
 Ho sviluppato il modulo Monster con l'obiettivo di rappresentare in maniera dettagliata e flessibile i mostri presenti nel mondo di gioco. Ogni mostro è un'entità con caratteristiche uniche legate a statistiche di combattimento, tipo, zona di origine, ricompense e comportamenti speciali. Il design del modulo è stato pensato per essere estensibile e facilmente integrabile con altri sistemi del gioco come il World, il sistema di ricompense (Item ed Equipment) e (MonsterBehavior). La generazione dei mostri avviene in modo procedurale tramite una factory (MonstersFactory) che tiene conto del livello del giocatore, della zona e della fortuna, rendendo ogni incontro variabile e bilanciato.
 
 <details>
-<summary><u>Full details</u></summary>
+<summary><strong>➤ Full details</strong></summary>
 
 ### Aspetti implementativi
 
@@ -52,7 +53,7 @@ Il modulo World gestisce la logica del mondo di gioco, con un focus specifico su
 L'interazione tra World e Monster permette la creazione di mostri ambientati e bilanciati in funzione del contesto in cui vengono generati.
 
 <details>
-<summary><u>Full details</u></summary>
+<summary><strong>➤ Full details</strong></summary>
 
 ### Aspetti implementativi
 
@@ -85,7 +86,7 @@ Questo modulo si occupa di visualizzare tutte le informazioni rilevanti per il g
 Il design è stato pensato per essere reattivo, modulare e facilmente aggiornabile in tempo reale, offrendo una user experience chiara e coinvolgente.
 
 <details>
-<summary><u>Full details</u></summary>
+<summary><strong>➤ Full details</strong></summary>
 
 ### Aspetti implementativi
 
@@ -124,7 +125,7 @@ Questo controller coordina l'interazione tra i modelli di gioco (giocatore, most
 Il design permette di avviare, fermare e riavviare il gioco, oltre a gestire in modo reattivo gli aggiornamenti della UI e le transizioni tra gli stati.
 
 <details>
-<summary><u>Full details</u></summary>
+<summary><strong>➤ Full details</strong></summary>
 
 ### Aspetti implementativi
 
