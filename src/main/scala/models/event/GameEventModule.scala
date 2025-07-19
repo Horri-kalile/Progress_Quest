@@ -13,54 +13,56 @@ import scala.annotation.tailrec
 import scala.util.Random
 
 /** The GameEventModule contains the event system for player interactions during the game simulation.
- *
- * It provides:
- *   - The [[GameEvent]] trait representing a single type of game interaction
- *   - The [[EventType]] enumeration for all possible event kinds
- *   - The [[GameEventFactory]] for executing and dispatching events
- */
+  *
+  * It provides:
+  *   - The [[GameEvent]] trait representing a single type of game interaction
+  *   - The [[EventType]] enumeration for all possible event kinds
+  *   - The [[GameEventFactory]] for executing and dispatching events
+  */
 object GameEventModule:
 
   /** Enumeration of supported event types that can occur in the game.
-   *
-   * - `fight`: A battle against a monster
-   * - `mission`: Accepting or progressing a mission
-   * - `changeWorld`: Moving to a new zone
-   * - `training`: Passive XP gain
-   * - `restore`: Full player restoration
-   * - `power`: Power up player stats if he has enough gold
-   * - `sell`: Selling items from inventory
-   * - `special`: Randomized, unpredictable event
-   * - `craft`: Craft new equip or power up an old one
-   * - `magic`: Learn new skill or power up an existing one
-   * - `gameOver`: Ends the game
-   *
-   */
+    *
+    *   - `fight`: A battle against a monster
+    *   - `mission`: Accepting or progressing a mission
+    *   - `changeWorld`: Moving to a new zone
+    *   - `training`: Passive XP gain
+    *   - `restore`: Full player restoration
+    *   - `power`: Power up player stats if he has enough gold
+    *   - `sell`: Selling items from inventory
+    *   - `special`: Randomized, unpredictable event
+    *   - `craft`: Craft new equip or power up an old one
+    *   - `magic`: Learn new skill or power up an existing one
+    *   - `gameOver`: Ends the game
+    */
   enum EventType:
     case fight, mission, changeWorld, training, restore, power, sell, special, craft, magic, gameOver
 
   /** A game event represents a single action that may modify the player's state.
-   *
-   * Each event implementation is immutable and returns a tuple:
-   *   - The updated player state
-   *   - A list of summary messages describing the outcome
-   *   - Optionally, a monster involved in the event
-   */
+    *
+    * Each event implementation is immutable and returns a tuple:
+    *   - The updated player state
+    *   - A list of summary messages describing the outcome
+    *   - Optionally, a monster involved in the event
+    */
   private trait GameEvent:
     def action(player: Player): (Player, List[String], Option[Monster])
 
   /** Factory and dispatcher for game events.
-   *
-   * Provides access to the correct [[GameEvent]] implementation based on an [[EventType]].
-   */
+    *
+    * Provides access to the correct [[GameEvent]] implementation based on an [[EventType]].
+    */
   object GameEventFactory:
 
     /** Executes the appropriate [[GameEvent]] based on the provided [[EventType]].
-     *
-     * @param eventType The type of event to execute (e.g. `fight`, `mission`, etc.)
-     * @param player    The player affected by the event
-     * @return A tuple of the updated player, a list of event messages, and an optional monster (if relevant)
-     */
+      *
+      * @param eventType
+      *   The type of event to execute (e.g. `fight`, `mission`, etc.)
+      * @param player
+      *   The player affected by the event
+      * @return
+      *   A tuple of the updated player, a list of event messages, and an optional monster (if relevant)
+      */
     def executeEvent(eventType: EventType, player: Player): (Player, List[String], Option[Monster]) =
       val event = resolve(eventType)
       val (updated, messages, result) = event.action(player)
@@ -68,14 +70,17 @@ object GameEventModule:
       (updated, header +: messages, result)
 
     /** Test-only entry point to directly trigger a specific SpecialEvent case by index.
-     *
-     * This method is intended solely for unit testing to ensure all branches of
-     * [[SpecialEvent]] behave correctly. It should never be used in production logic.
-     *
-     * @param player    the player involved in the event
-     * @param caseIndex the specific branch (0–7) to execute within [[SpecialEvent]]
-     * @return a tuple with updated player, messages, and optional monster
-     */
+      *
+      * This method is intended solely for unit testing to ensure all branches of [[SpecialEvent]] behave correctly. It
+      * should never be used in production logic.
+      *
+      * @param player
+      *   the player involved in the event
+      * @param caseIndex
+      *   the specific branch (0–7) to execute within [[SpecialEvent]]
+      * @return
+      *   a tuple with updated player, messages, and optional monster
+      */
     def testSpecialCase(player: Player, caseIndex: Int): (Player, List[String], Option[Monster]) =
       SpecialEvent.actionWithCase(player, caseIndex, false)
 
@@ -97,9 +102,9 @@ object GameEventModule:
   // Internal Game Event Implementations
   // ---------------------------
 
-  /** Resolves a post-fight between the player and the last encountered monster.
-   * Rewards XP and gold, and possibly drops equipment or items.
-   */
+  /** Resolves a post-fight between the player and the last encountered monster. Rewards XP and gold, and possibly drops
+    * equipment or items.
+    */
   private case object FightEvent extends GameEvent:
     def action(player: Player): (Player, List[String], Option[Monster]) =
       if !player.isAlive then
@@ -127,7 +132,6 @@ object GameEventModule:
           case None =>
             val msg = "No monster was found for the fight."
             (player, List(msg), None)
-
 
   /** Manages mission progression or generates a new random mission. */
   private case object MissionEvent extends GameEvent:
@@ -199,16 +203,14 @@ object GameEventModule:
       val (updatedPlayer, msg) = learnOrUpgradeSkill(player: Player)
       (updatedPlayer, List(msg), None)
 
-
   private case object CraftEvent extends GameEvent:
     def action(player: Player): (Player, List[String], Option[Monster]) =
       val (updatedPlayer, msg) = forgeOrUpgradeEquipment(player: Player)
       (updatedPlayer, List(msg), None)
 
-
-  /** A special unpredictable event with 8 possible outcomes.
-   * random choice fallback when player doesn't respond to dialogs.
-   */
+  /** A special unpredictable event with 8 possible outcomes. random choice fallback when player doesn't respond to
+    * dialogs.
+    */
   private case object SpecialEvent extends GameEvent:
 
     override def action(player: Player): (Player, List[String], Option[Monster]) =
@@ -216,15 +218,19 @@ object GameEventModule:
       actionWithCase(player, randomCase, useDialogs = true)
 
     /** Executes a specific special case.
-     *
-     * @param player     the player involved
-     * @param caseIndex  the specific case to trigger (0–7)
-     * @param useDialogs whether to show interactive dialogs (true = gameplay, false = test mode)
-     * @return a tuple with updated player, messages, and optional monster
-     *
-     *         Interactive cases (0, 1, 2, 3, 4, 5, 6, 7) now handle timeout scenarios by making
-     *         random choices automatically, ensuring all special events produce outcomes.
-     */
+      *
+      * @param player
+      *   the player involved
+      * @param caseIndex
+      *   the specific case to trigger (0–7)
+      * @param useDialogs
+      *   whether to show interactive dialogs (true = gameplay, false = test mode)
+      * @return
+      *   a tuple with updated player, messages, and optional monster
+      *
+      * Interactive cases (0, 1, 2, 3, 4, 5, 6, 7) now handle timeout scenarios by making random choices automatically,
+      * ensuring all special events produce outcomes.
+      */
 
     def actionWithCase(player: Player, caseIndex: Int, useDialogs: Boolean): (Player, List[String], Option[Monster]) =
       caseIndex match
@@ -270,7 +276,6 @@ object GameEventModule:
             else handleDeadlyTrapEscape(p)
           handleWithDialogOrRandom(player, useDialogs)(SpecialEventDialog.showGameOverTrapDialog())(handler)
 
-
         case 7 =>
           if useDialogs then SpecialEventDialog.showTheftDialog()
           val (p2, msg) = PlayerController.stealRandomItem(player)
@@ -298,19 +303,19 @@ object GameEventModule:
         case None =>
           (player, List("You found no loot."), None)
 
-
   /** Marks the player as dead and ends the game. */
   private case object GameOverEvent extends GameEvent:
     def action(player: Player): (Player, List[String], Option[Monster]) =
       val msg = "GAME OVER!"
       (player.withCurrentHp(0), List(msg), None)
 
-  /**
-   * Learns a new skill, or upgrades it if the player already knows it.
-   *
-   * @param player the player to modify
-   * @return a tuple: (updated player, descriptive message)
-   */
+  /** Learns a new skill, or upgrades it if the player already knows it.
+    *
+    * @param player
+    *   the player to modify
+    * @return
+    *   a tuple: (updated player, descriptive message)
+    */
   private def learnOrUpgradeSkill(player: Player): (Player, String) =
     val newSkill = SkillFactory.randomSkill()
     val (updatedPlayer, isNew) = PlayerController.addSkill(player, newSkill)
@@ -319,14 +324,15 @@ object GameEventModule:
       else s"Upgraded existing skill: ${newSkill.name} to level ${newSkill.poweredUp.powerLevel}"
     (updatedPlayer, msg)
 
-
-  /**
-   * Attempts to equip a new equipment or power up an existing one.
-   *
-   * @param player        The player to modify
-   * @param upgradeChance Probability (0.0 to 1.0) of upgrading existing equipment
-   * @return A new Player with equipment changes and a descriptive message
-   */
+  /** Attempts to equip a new equipment or power up an existing one.
+    *
+    * @param player
+    *   The player to modify
+    * @param upgradeChance
+    *   Probability (0.0 to 1.0) of upgrading existing equipment
+    * @return
+    *   A new Player with equipment changes and a descriptive message
+    */
   private def forgeOrUpgradeEquipment(player: Player, upgradeChance: Double = 0.5): (Player, String) =
     val equipmentSlot: EquipmentSlot = RandomFunctions.randomEquipmentSlot()
     val playerEquip = player.equipment(equipmentSlot)
@@ -334,7 +340,10 @@ object GameEventModule:
     if playerEquip.isDefined && Random.nextDouble() < upgradeChance then
       val upgraded = EquipmentFactory.powerUpEquip(playerEquip.get)
       val updatedPlayer = PlayerController.equipmentOn(player, upgraded.slot, upgraded)
-      (updatedPlayer, s"Upgraded equipment: ${playerEquip.get.name} with ${playerEquip.get.value} ${upgraded.name}, now worth ${upgraded.value}")
+      (
+        updatedPlayer,
+        s"Upgraded equipment: ${playerEquip.get.name} with ${playerEquip.get.value} ${upgraded.name}, now worth ${upgraded.value}"
+      )
     else
       EquipmentFactory.probBased(player.attributes.lucky, player.level) match
         case Some(newEq) =>
@@ -343,15 +352,14 @@ object GameEventModule:
         case None =>
           (player, "No equipment was forged.")
 
-
-  /**
-   * Executes an event handler based on dialog input or a fallback random choice.
-   */
+  /** Executes an event handler based on dialog input or a fallback random choice.
+    */
   private def handleWithDialogOrRandom(
-                                        player: Player,
-                                        useDialogs: Boolean
-                                      )(dialogResult: => Option[Boolean])
-                                      (handler: (Player, Boolean) => (Player, List[String], Option[Monster])): (Player, List[String], Option[Monster]) =
+      player: Player,
+      useDialogs: Boolean
+  )(
+      dialogResult: => Option[Boolean]
+  )(handler: (Player, Boolean) => (Player, List[String], Option[Monster])): (Player, List[String], Option[Monster]) =
     if useDialogs then
       dialogResult match
         case Some(accept) => handler(player, accept)

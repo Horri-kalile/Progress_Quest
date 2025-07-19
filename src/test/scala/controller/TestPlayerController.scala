@@ -1,14 +1,15 @@
+package controller
+
 import models.player.*
 import models.player.EquipmentModule.{Equipment, EquipmentSlot}
 import models.player.ItemModule.{Item, ItemRarity}
-import models.monster.*
 import models.world.OriginZone
 import controllers.PlayerController
 import org.scalatest.funsuite.AnyFunSuite
 
 class TestPlayerController extends AnyFunSuite:
 
-  val baseAttr = Attributes(10, 10, 10, 10, 10, 10)
+  val baseAttr: Attributes = Attributes(10, 10, 10, 10, 10, 10)
 
   def freshPlayer: Player = Player(
     name = "Hero",

@@ -1,5 +1,6 @@
-package controllers
+package controller
 
+import controllers.MissionController
 import models.event.Mission
 import models.player.*
 import models.player.Behavior.BehaviorType

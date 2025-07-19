@@ -1,3 +1,5 @@
+package controller
+
 import controllers.MonsterController
 import models.monster.*
 import models.player.*
@@ -6,8 +8,8 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class TestMonsterController extends AnyFunSuite:
 
-  val baseAttributes = MonsterAttributes(100, 100, 20, 10, 1.2, 1.5)
-  val dummyMonster = Monster(
+  val baseAttributes: MonsterAttributes = MonsterAttributes(100, 100, 20, 10, 1.2, 1.5)
+  val dummyMonster: Monster = Monster(
     name = "Orc",
     level = 5,
     monsterType = MonsterType.Humanoid,
@@ -23,7 +25,7 @@ class TestMonsterController extends AnyFunSuite:
     regenerating = false
   )
 
-  val player = Player(
+  val player: Player = Player(
     name = "Hero",
     identity = Identity(Race.Human, ClassType.Warrior),
     baseAttributes = Attributes(10, 10, 10, 10, 10, 10),

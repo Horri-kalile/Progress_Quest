@@ -22,23 +22,23 @@ object PlayerBonusesModule:
   /** Trait representing a race-specific bonus application strategy. */
   trait RaceBonusStrategy:
     /** Applies race-specific bonuses to the given player.
-     *
-     * @param player
-     * The player to modify.
-     * @return
-     * Tuple of (HP multiplier, MP multiplier, updated player with attribute/equipment changes applied)
-     */
+      *
+      * @param player
+      *   The player to modify.
+      * @return
+      *   Tuple of (HP multiplier, MP multiplier, updated player with attribute/equipment changes applied)
+      */
     def applyBonuses(player: Player): (Double, Double, Player)
 
   /** Trait representing a class-specific bonus application strategy. */
   trait ClassBonusStrategy:
     /** Applies class-specific HP and MP bonuses.
-     *
-     * @param player
-     * The player to modify (can be used for context if needed)
-     * @return
-     * Tuple of (HP bonus, MP bonus)
-     */
+      *
+      * @param player
+      *   The player to modify (can be used for context if needed)
+      * @return
+      *   Tuple of (HP bonus, MP bonus)
+      */
     def applyBonuses(player: Player): (Int, Int)
 
   /** Factory object to retrieve the appropriate [[RaceBonusStrategy]] for a given [[Race]]. */
@@ -73,51 +73,51 @@ object PlayerBonusesModule:
   private object ElfRaceBonus extends RaceBonusStrategy:
     def applyBonuses(player: Player): (Double, Double, Player) =
       val updated = player.withBaseAttributes(player.baseAttributes.copy(
-        dexterity = player.baseAttributes.dexterity + Random.between(1, 5)
-      ))
+          dexterity = player.baseAttributes.dexterity + Random.between(1, 5)
+        ))
       (0.6, 1.4, updated)
 
   private object DwarfRaceBonus extends RaceBonusStrategy:
     def applyBonuses(player: Player): (Double, Double, Player) =
       val updated = player.withBaseAttributes(player.baseAttributes.copy(
-        constitution = player.baseAttributes.constitution + Random.between(1, 5)
-      ))
+          constitution = player.baseAttributes.constitution + Random.between(1, 5)
+        ))
       (1.5, 0.5, updated)
 
   private object OrcRaceBonus extends RaceBonusStrategy:
     def applyBonuses(player: Player): (Double, Double, Player) =
       val updated = player.withBaseAttributes(player.baseAttributes.copy(
-        wisdom = player.baseAttributes.wisdom + Random.between(1, 5)
-      ))
+          wisdom = player.baseAttributes.wisdom + Random.between(1, 5)
+        ))
       (1.7, 0.3, updated)
 
   private object GnomeRaceBonus extends RaceBonusStrategy:
     def applyBonuses(player: Player): (Double, Double, Player) =
       val updated = player.withBaseAttributes(player.baseAttributes.copy(
-        intelligence = player.baseAttributes.intelligence + Random.between(1, 5)
-      ))
+          intelligence = player.baseAttributes.intelligence + Random.between(1, 5)
+        ))
       (0.8, 1.2, updated)
 
   private object TitanRaceBonus extends RaceBonusStrategy:
     def applyBonuses(player: Player): (Double, Double, Player) =
       val updated = player.withBaseAttributes(player.baseAttributes.copy(
-        strength = player.baseAttributes.strength + Random.between(1, 5)
-      ))
+          strength = player.baseAttributes.strength + Random.between(1, 5)
+        ))
       (1.6, 0.4, updated)
 
   private object PandaManRaceBonus extends RaceBonusStrategy:
     def applyBonuses(player: Player): (Double, Double, Player) =
       val updated = player.withBaseAttributes(player.baseAttributes.copy(
-        lucky = player.baseAttributes.lucky + Random.between(1, 5)
-      ))
+          lucky = player.baseAttributes.lucky + Random.between(1, 5)
+        ))
       (0.8, 1.3, updated)
 
   private object GundamRaceBonus extends RaceBonusStrategy:
     def applyBonuses(player: Player): (Double, Double, Player) =
       val updated = player.withBaseAttributes(player.baseAttributes.copy(
-        wisdom = player.baseAttributes.wisdom + Random.between(1, 3),
-        strength = player.baseAttributes.strength + Random.between(1, 3)
-      ))
+          wisdom = player.baseAttributes.wisdom + Random.between(1, 3),
+          strength = player.baseAttributes.strength + Random.between(1, 3)
+        ))
       (1.3, 0.7, updated)
 
   private object NoClassBonus extends ClassBonusStrategy:
@@ -132,23 +132,21 @@ object PlayerBonusesModule:
   private object CowBoyBonus extends ClassBonusStrategy:
     def applyBonuses(player: Player): (Int, Int) = (Random.between(5, 25), Random.between(5, 10))
 
-
 /** Public-facing object responsible for applying race and class bonuses to a player. */
 object PlayerBonusesApplication:
 
   import PlayerBonusesModule.*
 
   /** Applies race- and class-specific bonuses to the given player.
-   *
-   * Race affects HP/MP multipliers and base attributes.
-   * Class grants fixed HP and/or MP bonuses.
-   * Also adds starting skills based on class.
-   *
-   * @param player
-   * The original player
-   * @return
-   * A new player instance with all bonuses applied
-   */
+    *
+    * Race affects HP/MP multipliers and base attributes. Class grants fixed HP and/or MP bonuses. Also adds starting
+    * skills based on class.
+    *
+    * @param player
+    *   The original player
+    * @return
+    *   A new player instance with all bonuses applied
+    */
   def applyRaceAndClassBonuses(player: Player): Player =
     val raceStrategy = RaceBonusStrategyFactory.getStrategy(player.identity.race)
     val (hpMultiplier, mpMultiplier, playerWithRaceBonuses) = raceStrategy.applyBonuses(player)
