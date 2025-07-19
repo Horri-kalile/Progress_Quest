@@ -6,29 +6,29 @@ nav_order: 2
 
 # **Processo di Sviluppo**
 
-Il team ha adottato un processo di sviluppo ispirato alla metodologia **Scrum**, con approccio **iterativo e incrementale**, volto a garantire flessibilità, adattamento continuo e miglioramento progressivo del prodotto.  
-Lo sviluppo è organizzato in **sprint** della durata di circa **10 giorni**, durante i quali vengono pianificati obiettivi chiari e assegnati i relativi task.
+Il team ha adottato un processo di sviluppo ispirato alla metodologia **Scrum**, seguendo un approccio **iterativo e incrementale** che garantisce flessibilità, adattamento continuo e miglioramento progressivo del prodotto.  
+Lo sviluppo è suddiviso in **sprint** della durata di circa **10 giorni**, ciascuno con obiettivi chiari e task assegnati individualmente.
 
-Sono stati identificati i ruoli chiave per coordinare le attività:
+Sono stati definiti ruoli chiave per coordinare il lavoro e facilitare il processo:
 
-- **Product Owner**: definisce la visione del progetto e le priorità.
-- **Scrum Master**: facilita il processo, organizzazione meeting e report dei cambiamenti possibili.
-- **Sviluppatori**: realizzano le funzionalità, testano e validano il codice.
+- **Product Owner**: definisce la visione progettuale e le priorità funzionali.
+- **Scrum Master**: facilita il processo, organizza i meeting e coordina eventuali adattamenti.
+- **Sviluppatore**: implementano funzionalità, scrivono test e validano il codice.
 
 ---
 
 ## **Organizzazione del Team**
 
-Durante il meeting iniziale sono stati assegnati i seguenti ruoli:
+Durante il kick-off iniziale sono stati assegnati i seguenti ruoli:
 
 - **Kalile Horri** – _Product Owner_ & Sviluppatore  
-  Responsabile della gestione del progetto, definizione degli obiettivi assieme al scrum master e supervisione del repository GitHub.
+  Responsabile della gestione generale del progetto, definizione degli obiettivi insieme al Scrum Master e supervisione del repository GitHub.
 
 - **Jiahao Guo** – _Scrum Master_ & Sviluppatore  
-  Facilita le attività del team, gestisce la pubblicazione tramite GitHub Pages e strutturazione del report.
+  Facilita l’attività del team, gestisce la pubblicazione tramite GitHub Pages e la stesura del report. È responsabile dei test automatici e dell'integrazione continua.
 
-- **Intissar** – _Responsabile Test_ & Sviluppatrice  
-  Si occupa dei test automatici e dell'integrazione continua, contribuendo allo sviluppo delle funzionalità principali.
+- **Intissar Meldebub** – Sviluppatrice  
+  Si occupa della progettazione della view e della struttura del gioco, contribuendo allo sviluppo delle funzionalità principali e della strategia di testing.
 
 ---
 
@@ -36,51 +36,86 @@ Durante il meeting iniziale sono stati assegnati i seguenti ruoli:
 
 ### Sprint Planning
 
-All’inizio di ogni sprint, il team si riunisce per pianificare:
+All’inizio di ogni sprint il team pianifica:
 
-- Obiettivi dello sprint
-- Assegnazione dei task
-- Revisione dei risultati dello sprint precedente
-- Analisi dell’andamento generale del progetto
+- Gli obiettivi da raggiungere
+- L’assegnazione dei task
+- La revisione dello sprint precedente
+- L’analisi dell’andamento complessivo del progetto
 
-> Durata media dello Sprint Planning: **1–2 ore**
+> Durata tipica dello Sprint Planning: **1–3 ore**
 
 ### Task Management
 
-- La gestione operativa è affidata a **Trello**, dove i task vengono assegnati, monitorati e categorizzati per sprint.
-- I task incompleti o bloccati vengono temporaneamente spostati nella colonna _paused_ in attesa di completamento o revisione.
-- Ogni task è collegato a uno specifico branch Git, in base al contesto di lavoro (`models`, `view`, `controller`, ecc.).
+- La gestione operativa avviene tramite **Trello**, dove i task vengono creati, assegnati e monitorati per sprint.
+- I task bloccati vengono spostati temporaneamente nella colonna _paused_, in attesa di risoluzione.
+- Ogni task è collegato a un **branch Git tematico**, coerente con il contesto di sviluppo (`models`, `view`, `controller`, ecc.).
 
-### Completion of task
+### Completamento dei Task
 
 Un task è considerato completato solo quando:
 
-- È stato integrato correttamente in `main`
-- Ha superato i test previsti
-- È stato verificato nel contesto funzionale generale
+- È integrato nel branch `main`
+- Ha superato i test automatici previsti
+- È stato verificato nel contesto funzionale complessivo
 
 ---
 
 ## **Comunicazione e Coordinamento**
 
-La comunicazione interna si svolge principalmente **da remoto**, attraverso due tipologie di meeting:
+La comunicazione interna è gestita principalmente da remoto, attraverso due tipologie di meeting:
 
-- **Long Meeting**: incontri strutturati dedicati all’analisi del lavoro svolto, utili per valutare l’efficacia del processo e identificare task nei cicli successivi.
+- **Long Meeting**: incontri strutturati dedicati all’analisi dei progressi, alla valutazione dell’efficacia del processo e alla pianificazione dei cicli successivi.
 
-- **Short Meeting**: brevi sessioni (20–40 minuti) focalizzate sulla risoluzione di problemi imprevisti, ridefinizione dei task o, se necessario, rimodellazione parziale del dominio.
+- **Short Meeting**: sessioni rapide (20–40 minuti) per affrontare problemi urgenti, ridefinire task o rimodellare parte della struttura del gioco.
 
 ---
 
 ## **Strumenti di Supporto**
 
-Per facilitare e strutturare il processo di sviluppo, il team utilizza una serie di strumenti che supportano il versionamento del codice, la collaborazione e l'automazione.
+Per strutturare e automatizzare il flusso di lavoro, il team utilizza una serie di strumenti fondamentali:
 
-Il controllo di versione è gestito tramite **Git**, con l’utilizzo di **branch tematici** per lo sviluppo parallelo delle diverse componenti del progetto. Questo approccio consente un’organizzazione chiara del lavoro e facilita l’integrazione graduale delle funzionalità.
+- **Git**: controllo di versione con branch tematici per sviluppo parallelo
+- **GitHub**: repository centrale, gestione issue e pubblicazione documentazione tramite **GitHub Pages**
+- **Trello**: organizzazione dei task per sprint
+- **GitHub Actions**: automazione dei processi di build, test e deployment
 
-Il team utilizzerà il **versioning** per il rilascio delle **versioni stabili del gioco**, seguendo lo **schema semantico (Semantic Versioning)** nel formato `MAJOR.MINOR.PATCH`.
+Lo schema di versionamento adottato è il **Semantic Versioning** (`MAJOR.MINOR.PATCH`), utile per il rilascio di versioni stabili e tracciabili del gioco.
 
-La documentazione viene pubblicata tramite **GitHub Pages**, permettendo un accesso rapido e centralizzato alle informazioni chiave del progetto (report, glossario, specifiche, ecc.).
+---
 
-Per l’automazione del flusso di lavoro, viene impiegato **GitHub Actions**, che consente di automatizzare processi di deployment.
+## **Continuous Integration & Deployment**
 
-Questi strumenti permettono al team di mantenere un processo di sviluppo efficiente, tracciabile e facilmente scalabile.
+Per garantire qualità, tracciabilità e velocità nel rilascio, il team ha configurato un sistema di **Integrazione e Deployment Continui (CI/CD)** basato su **GitHub Actions**. Questo processo automatizzato prevede:
+
+- **Test e release** automatici a ogni push o pull request su branch
+- **Deploy** automatico della documentazione su **GitHub Pages** a ogni rilascio stabile
+- Notifiche sugli esiti della pipeline per un monitoraggio costante
+
+---
+
+## **Workflow Git per Test e Rilascio**
+
+Il team adotta un **Git Workflow** chiaro e scalabile:
+
+1. Branch di sviluppo per ogni elemento (model,view,controller)
+2. Merge nel branch `main solo dopo review e con superamento dei test
+3. Release su `main` per ogni versione dopo un intervallo di tempo, associato a un tag e descrizione.
+
+Questo approccio garantisce stabilità al codice rilasciato e facilita la collaborazione.
+
+---
+
+## **Code Coverage**
+
+Per monitorare la qualità dei test automatici, viene calcolata la **code coverage**, ovvero la percentuale di codice effettivamente coperta da test.  
+L’obiettivo minimo è mantenere una copertura superiore al **50%**, con particolare attenzione alle classi core del modello e della logica di gioco.
+
+Strumenti utilizzati:
+
+- **sbt-coverage** per Scala
+- **scalafmt per la formattazione del codice**
+- Report generati automaticamente e consultabili nel repository
+
+Questo consente di identificare facilmente le aree meno testate e migliorare la robustezza generale del progetto.
+

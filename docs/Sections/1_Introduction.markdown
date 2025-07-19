@@ -5,22 +5,38 @@ nav_order: 1
 ---
 
 # Introduzione
-Progress Quest è una replica in Scala dell’omonimo zero-player game, sviluppata come progetto didattico per il corso Programming Paradigms and Development (Università di Bologna, sede di Cesena). Il sistema automatizza il ciclo di gioco – missioni, combattimenti, bottini ed eventi – tramite meccaniche stocastiche, modellando un gameplay passivo. A differenza dell’originale, integra un modulo opzionale di interazione ispirato a Godville, che consente decisioni utente in momenti critici, mantenendo l’architettura automatizzata di base.
+Progress Quest è una replica in Scala dell’omonimo zero-player game, sviluppata come progetto didattico per il corso PARADIGMI DI PROGRAMMAZIONE E SVILUPPO (Università di Bologna, sede di Cesena). Il sistema automatizza il ciclo di gioco – missioni, combattimenti, bottini ed eventi – tramite meccaniche randomiche, modellando un gameplay automatico. A differenza dell’originale, integra un modulo opzionale di interazione ispirato a Godville, che consente decisioni utente in momenti critici, mantenendo l’architettura automatizzata di base.
 
 ---
 
 ## G**lossario dei termini**
 
 - **Player**:  
-  Il personaggio principale gestito dal sistema. Possiede statistiche/attributes (es. **forza**, **costituzione**, **destrezza**, **intelligenza**, **saggezza**, **fortuna**), HP (punti vita), MP (punti mana), livello, gold, **inventario**, **equipaggiamento**, **skill** e **behavior**.  
-  Le **skill** possono essere di tipo fisico o magico, e vengono utilizzate automaticamente in combattimento. Il **behavior** definisce il passivo speciale, come *OneShot*, che consente di eliminare un mostro con un colpo solo.
+  Il personaggio principale gestito dal sistema. Possiede statistiche/**attributes** (es. **forza**, **costituzione**, **destrezza**, **intelligenza**, **saggezza**, **fortuna**), HP (punti vita), MP (punti mana), livello, gold, exp, **inventory**, **equipment**, **skill** e **behavior**.  
+  Le **skill** vengono utilizzate automaticamente durante il combattimento, in base al tipo e al contesto. Il **behavior** definisce il passivo speciale, come ad esempio *OneShot*, che consente di eliminare un mostro con un colpo solo.
+
+- **Attributes**:  
+  Ogni attributo influenza un aspetto diverso del comportamento in gioco:
+  - `strength`: aumenta il danno fisico
+  - `constitution`: migliora la difesa complessiva
+  - `dexterity`: aumenta la probabilità di schivata
+  - `intelligence`: aumenta il danno magico
+  - `wisdom`: aumenta la quantità di esperienza e di gold guadagnata
+  - `lucky`: migliora la probabilità di loot(aumentato la rarità degli item ottenuti, che valgono più gold) e attiva più probabilemnte gli eventi speciali
+
+- **Skill**:  
+  Abilità automatiche utilizzate in combattimento. Si suddividono in tre categorie principali:
+  - `physical`: infliggono danni fisici, influenzati da **strength**
+  - `magic`: infliggono danni magici, influenzati da **intelligence**
+  - `healing`: rigenerano HP del player.  
+    Le skill possono essere potenziate tramite eventi e aumentando di livello.
 
 - **Identity**:  
   L’identità del **player**, composta da due elementi: **razza** (*race*, es. *human*, *elf*) e **classe** (*class*, es. *warrior*, *mage*).  
   Ogni combinazione razza/classe determina una configurazione iniziale casuale, che può includere:
   - Statistiche iniziali modificate (es. più HP o MP)
-  - Una **skill** iniziale (fisica o magica)
-  - Un **equipment** di partenza (es. arma o armatura iniziale)  
+  - Una **skill** iniziale (fisica o magica o curativa)
+  - Un **equipment** di partenza (es. scelta in modo casuale)  
     Questo sistema introduce varietà e rigiocabilità, influenzando il comportamento iniziale del personaggio nel ciclo di gioco automatizzato.
 
 - **World**:  
@@ -44,14 +60,14 @@ Progress Quest è una replica in Scala dell’omonimo zero-player game, sviluppa
   - `gameOver`: Termine della partita
 
 - **Inventory**:  
-  Raccolta di materiali ottenuti da eventi e **quest**. I materiali possono essere venduti per ottenere gold, che può essere speso per migliorare le statistiche del **player**.
+  Raccolta di materiali ottenuti da eventi, missioni e fight. I materiali possono essere venduti per ottenere gold, che può essere speso per migliorare le statistiche del **player**.
 
 - **Equipment**:  
-  Oggetti equipaggiati dal **player** (armi, armature, accessori) che modificano direttamente le statistiche e influenzano l’esito dei combattimenti. Possono essere ottenuti tramite eventi o **fight**.
+  Oggetti equipaggiati dal **player** (armi, armature, accessori etc...) che modificano direttamente le statistiche e influenzano l’esito dei combattimenti. Possono essere ottenuti tramite **eventi** o **fight**.
 
 - **Mission**:  
   Missioni da completare attraverso una sequenza di azioni automatiche.  
-  Una **mission** può richiedere più fasi e fornisce ricompense come gold, EXP, **item** di vendita.
+  Una **mission** può richiedere più fasi e fornisce ricompense come gold, EXP, **item** di vendita. Vengono completato e progredito mediante l'evento `mission`.
 
 - **Behavior**:  
   Caratteristica associata a **player** o **monster** che altera le loro abilità in battaglia.
