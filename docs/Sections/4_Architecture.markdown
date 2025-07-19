@@ -6,15 +6,15 @@ nav_order: 4
 
 # Architettura
 
-L’architettura di Progress Quest è progettata per massimizzare la modularità, la scalabilità e la separazione delle responsabilità tra le componenti principali del sistema. Il progetto segue un approccio a componenti, sfruttando il modello ad attori per la gestione della concorrenza e l’automazione del ciclo di gioco.
+L’architettura di Progress Quest è progettata per massimizzare la modularità, la scalabilità e la separazione delle responsabilità tra le componenti principali del sistema.
 
 ## **Panoramica dei Componenti Principali**
 
-- **UI (ScalaFX)**: Gestisce l’interfaccia grafica, visualizza lo stato del gioco, riceve input opzionali dall’utente e mostra log, inventario, missioni, ecc.
+- **GameUI (ScalaFX)**: Gestisce l’interfaccia grafica, visualizza lo stato del gioco, riceve input opzionali dall’utente e mostra log, inventario, missioni, ecc.
 - **Controller**: Coordina il flusso del gioco tra UI, Game Loop e Modelli. Contiene sottocontroller specializzati per player, mostri, battaglie, missioni ed eventi.
-- **Game Loop**: Coordina l’avanzamento automatico del gioco, gestendo eventi, combattimenti, quest e progressione del personaggio tramite attori Scala.
+- **GameLoopController**: Coordina l’avanzamento automatico del gioco, gestendo eventi, richiamando controller dedicati in base agli eventi e aggiorna al view progressione del player.
 - **Modelli (Models)**: Definisce le strutture dati principali (Player, Monster, Inventory, Equipment, Skill, World, ecc.) e le relative logiche di dominio.
-- **Gestione Eventi**: Modulo responsabile della generazione casuale di eventi (combattimento, missioni, eventi speciali) e della loro risoluzione.
+- **Gestione Eventi**: Modulo responsabile della generazione casuale di eventi (combattimento, missioni, eventi speciali, etc...) e della loro risoluzione.
 
 ## **Schema Architetturale**
 
@@ -33,6 +33,9 @@ stateDiagram
 
 ## **Descrizione dei Componenti**
 
+### Main
+- Entry point del programma.
+- 
 ### PlayerGenerationUi
 - Creazione del player per poi entrare in gioco.
 
@@ -54,16 +57,11 @@ stateDiagram
 - Rappresentano le entità principali: Player, Monster, World, Inventory, Equipment, Skill, Events, Identity, etc...
 
 
-### Gestione Eventi
-
-- Genera eventi casuali (combattimento, missioni, eventi speciali, allenamento, etc...).
-- Risolve gli eventi e aggiorna lo stato del gioco di conseguenza.
-
 ## **Flusso Principale del Gioco**
 
 1. Il Game Loop attiva il timer degli eventi.
 2. Viene generato un evento casuale.
-3. L’evento viene risolto automaticamente (o con input opzionale dell’utente).
+3. L’evento viene risolto automaticamente dal controller(o con input opzionale dell’utente).
 4. Il risultato aggiorna i modelli (Player, Inventory, ecc.).
 5. La UI viene aggiornata per riflettere il nuovo stato.
 6. Il ciclo si ripete fino alla fine della partita (morte del personaggio o chiusura del gioco).
