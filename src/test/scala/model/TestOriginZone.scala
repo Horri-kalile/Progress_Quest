@@ -5,7 +5,7 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class TestOriginZone extends AnyFunSuite:
 
-  test("OriginZone should have all expected zones") {
+  test("OriginZone should have all expected zones"):
     val zones = OriginZone.values.toSet
     val expectedZones = Set(
       OriginZone.Forest,
@@ -17,32 +17,32 @@ class TestOriginZone extends AnyFunSuite:
 
     assert(zones == expectedZones)
     assert(zones.size == 5)
-  }
+  
 
-  test("OriginZone values should be accessible") {
+  test("OriginZone values should be accessible"):
     assert(OriginZone.Forest != null)
     assert(OriginZone.Swamp != null)
     assert(OriginZone.Desert != null)
     assert(OriginZone.Volcano != null)
     assert(OriginZone.Plains != null)
-  }
+  
 
-  test("OriginZone should support equality comparison") {
+  test("OriginZone should support equality comparison"):
     assert(OriginZone.Forest == OriginZone.Forest)
     assert(OriginZone.Desert == OriginZone.Desert)
     assert(OriginZone.Forest != OriginZone.Desert)
     assert(OriginZone.Swamp != OriginZone.Volcano)
-  }
+  
 
-  test("OriginZone should have string representation") {
+  test("OriginZone should have string representation"):
     assert(OriginZone.Forest.toString == "Forest")
     assert(OriginZone.Swamp.toString == "Swamp")
     assert(OriginZone.Desert.toString == "Desert")
     assert(OriginZone.Volcano.toString == "Volcano")
     assert(OriginZone.Plains.toString == "Plains")
-  }
+  
 
-  test("OriginZone.values should return all zones") {
+  test("OriginZone.values should return all zones"):
     val allZones = OriginZone.values
     assert(allZones.length == 5)
     assert(allZones.contains(OriginZone.Forest))
@@ -50,9 +50,9 @@ class TestOriginZone extends AnyFunSuite:
     assert(allZones.contains(OriginZone.Desert))
     assert(allZones.contains(OriginZone.Volcano))
     assert(allZones.contains(OriginZone.Plains))
-  }
+  
 
-  test("OriginZone should support pattern matching") {
+  test("OriginZone should support pattern matching"):
     def classifyZone(zone: OriginZone): String = zone match
       case OriginZone.Forest => "Natural"
       case OriginZone.Swamp => "Wetland"
@@ -65,4 +65,4 @@ class TestOriginZone extends AnyFunSuite:
     assert(classifyZone(OriginZone.Desert) == "Arid")
     assert(classifyZone(OriginZone.Volcano) == "Volcanic")
     assert(classifyZone(OriginZone.Plains) == "Grassland")
-  }
+  
