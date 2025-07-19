@@ -40,7 +40,7 @@ Le sue responsabilità spaziano dalla gestione dell’esperienza e del livello, 
 - **Encapsulation**  
   Le operazioni critiche (come l'incremento dell'inventario o la modifica dell’oro) sono incapsulate in metodi autonomi, migliorando la riusabilità.
 
- ## Comportamento dettagliato
+## Comportamento dettagliato
 
 ### `calculatePlayerAttack(player, monster)`
 Calcola il danno inflitto da un giocatore a un mostro combinando i seguenti elementi:
