@@ -35,7 +35,7 @@ stateDiagram
 
 ### Main
 - Entry point del programma.
-- 
+
 ### PlayerGenerationUi
 - Creazione del player per poi entrare in gioco.
 

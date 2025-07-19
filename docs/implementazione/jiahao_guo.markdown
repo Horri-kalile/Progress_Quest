@@ -242,21 +242,21 @@ Enumerazioni fondamentali
 
 Modulo PlayerBonusesModule
 
-Contiene le strategie per l’applicazione dei bonus di razza e classe tramite:
+Contiene le strategie per l’applicazione dei bonus di race e class tramite:
 
 - **RaceBonusStrategy**: applica bonus specifici di razza, restituendo un moltiplicatore per HP, MP e un nuovo `Player` con modifiche ad attributi o equipaggiamento.
 - **ClassBonusStrategy**: applica bonus fissi di HP e MP legati alla classe del giocatore.
 
 Factory di Strategie
 
-- `RaceBonusStrategyFactory`: restituisce la strategia corretta per la razza del giocatore.
-- `ClassBonusStrategyFactory`: restituisce la strategia corretta per la classe del giocatore.
+- `RaceBonusStrategyFactory`: restituisce la strategia corretta per il race del player.
+- `ClassBonusStrategyFactory`: restituisce la strategia corretta per il class del player.
 
 ---
 
 Implementazioni private
 
-Ogni razza modifica attributi specifici (es. Elf aumenta destrezza, Dwarf costituzione, Titan forza, ecc.) e può influenzare i moltiplicatori di HP e MP. Alcune razze assegnano anche equipaggiamenti iniziali (es. Human).
+Ogni race modifica attributi specifici (es. Elf aumenta destrezza, Dwarf costituzione, Titan forza, ecc.) e può influenzare i moltiplicatori di HP e MP. Alcune razze assegnano anche equipaggiamenti iniziali (es. Human).
 
 Le classi forniscono bonus HP e MP variabili o nulli (es. Warrior bonus HP, Poisoner bonus MP, Mage nessun bonus).
 
@@ -266,11 +266,11 @@ Applicazione dei bonus
 
 L’oggetto `PlayerBonusesApplication` gestisce l’applicazione combinata dei bonus di razza e classe:
 
-1. Ottiene la strategia di razza e applica i bonus al giocatore.
-2. Ottiene la strategia di classe e applica i bonus di HP/MP.
+1. Ottiene la strategia di race e applica i bonus al player.
+2. Ottiene la strategia di class e applica i bonus di HP/MP.
 3. Calcola i nuovi valori di HP e MP moltiplicati e aggiunti ai bonus.
-4. Aggiunge le skill iniziali appropriate alla classe e livello.
-5. Restituisce un nuovo `Player` aggiornato con tutti i bonus e le abilità.
+4. Aggiunge le skill iniziali appropriate ad alcuni class.
+5. Restituisce un nuovo `Player` aggiornato con tutti i bonus e la skill.
 
 ```scala
 object RaceBonusStrategyFactory:
@@ -327,7 +327,7 @@ Il `CombatController` è responsabile della gestione del combattimento a turni t
 Responsabilità principali
 
 - Simulare il combattimento a turni tra giocatore e mostro, gestendo attacchi, uso di abilità, rigenerazione, danni e stati di morte.
-- Tracciare il mostro con cui si è combattuto per ultime (utile per debug o statistiche).
+- Tracciare il mostro con cui si è combattuto per ultimo (utile per debug o statistiche).
 - Gestire la logica di drop di equipaggiamenti e oggetti una volta sconfitto il mostro, decidendo se equipaggiare o vendere un equipment sostituito da quello migliore.
 
 ---
@@ -350,7 +350,7 @@ Generazione di messaggi di log
 
 Simulazione del combattimento (`simulateFight`)
 
-- Riceve un giocatore e un mostro e restituisce una lista di tuple `(Player, Option[Monster], String)`, contenente lo stato del giocatore, dello (eventuale) mostro e messaggi di log per ogni azione.
+- Riceve un giocatore e un mostro e restituisce una lista di tuple `(Player, Option[Monster], String)`, contenente lo stato del giocatore, dell'eventuale mostro e messaggi di log per ogni azione.
 - La simulazione è ricorsiva e termina se:
     - Il giocatore muore (`!p.isAlive`),
     - Il mostro muore (`m.isDead`),
@@ -362,9 +362,9 @@ Simulazione del combattimento (`simulateFight`)
         - Altrimenti effettua un attacco base calcolato.
         - Il mostro subisce danni, può esplodere causando danni secondari al giocatore.
     3. Se il mostro è morto, si registra la sconfitta.
-    4. Il mostro rigenera eventualmente salute.
+    4. Se il mostro è vivo e ha come behavior regeneration, si rigenera eventualmente la salute.
     5. Il mostro attacca il giocatore, che subisce danni.
-    6. Se il giocatore muore, la simulazione termina.
+    6. Se il giocatore muore, la simulazione termina, ritornando il giocatore morto.
     7. Altrimenti si passa al turno successivo.
 
 ---
