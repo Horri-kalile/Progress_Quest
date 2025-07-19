@@ -318,6 +318,69 @@ object RaceBonusStrategyFactory:
 
 
 
-## Controller CombattController
+## Controller CombatController
+Descrizione del CombatController
+
+Il `CombatController` è responsabile della gestione del combattimento a turni tra un giocatore (`Player`) e un mostro (`Monster`).
+
+---
+Responsabilità principali
+
+- Simulare il combattimento a turni tra giocatore e mostro, gestendo attacchi, uso di abilità, rigenerazione, danni e stati di morte.
+- Tracciare il mostro con cui si è combattuto per ultime (utile per debug o statistiche).
+- Gestire la logica di drop di equipaggiamenti e oggetti una volta sconfitto il mostro, decidendo se equipaggiare o vendere un equipment sostituito da quello migliore.
+
+---
+
+Funzionalità principali
+
+Stato e tracciamento
+
+- Variabile privata `_lastMonster`: memorizza l’ultimo mostro affrontato.
+- Metodi `lastMonster` e `setLastMonster`: permettono di leggere e impostare questo valore.
+
+---
+
+Generazione di messaggi di log
+
+- Funzioni private currificate per creare messaggi di azione, eventi con player e mostro, o solo player o solo mostro.
+- Questi messaggi aiutano a tracciare passo passo cosa accade durante il combattimento (es. "Player attacked Slime for 5 damage").
+
+---
+
+Simulazione del combattimento (`simulateFight`)
+
+- Riceve un giocatore e un mostro e restituisce una lista di tuple `(Player, Option[Monster], String)`, contenente lo stato del giocatore, dello (eventuale) mostro e messaggi di log per ogni azione.
+- La simulazione è ricorsiva e termina se:
+    - Il giocatore muore (`!p.isAlive`),
+    - Il mostro muore (`m.isDead`),
+    - O viene superato un limite massimo di turni (`maxTurnBattle`).
+- Per ogni turno:
+    1. Viene aggiunto un messaggio di inizio turno.
+    2. Il giocatore attacca:
+        - Usa una skill se ha MP e abilità disponibili (scelta casuale).
+        - Altrimenti effettua un attacco base calcolato.
+        - Il mostro subisce danni, può esplodere causando danni secondari al giocatore.
+    3. Se il mostro è morto, si registra la sconfitta.
+    4. Il mostro rigenera eventualmente salute.
+    5. Il mostro attacca il giocatore, che subisce danni.
+    6. Se il giocatore muore, la simulazione termina.
+    7. Altrimenti si passa al turno successivo.
+
+---
+
+### Gestione drop
+
+- `handleEquipDrop`:
+    - Verifica se il mostro lascia un equipaggiamento.
+    - Se il nuovo oggetto è migliore di quello equipaggiato, il giocatore lo equipaggia, altrimenti lo vende ottenendo oro.
+- `handleItemDrop`:
+    - Verifica se il mostro lascia un item.
+    - Lo aggiunge all’inventario del giocatore.
+    - Esso potrà essere venduto al sellEvent, ottenedo gold per poi usarli al powerUp Event (Che potenzia in modo randomico gli attributes del player)
+
+---
+
+
 
 
