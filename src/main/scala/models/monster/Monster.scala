@@ -259,7 +259,7 @@ object MonstersFactory:
     */
   private def generateRewards(level: Int, playerLevel: Int, playerLucky: Int, strong: Boolean, monsterType: MonsterType)
       : (Int, Int, Option[Item], Option[Equipment]) =
-    val baseFactor = if strong then 2 else 1
+    val baseFactor = if strong then 3 else 1
     val (goldMult, expMult, itemDropBonus) = monsterType match
       case MonsterType.Dragon => (1.5, 1.5, 0.15)
       case MonsterType.Demon => (1.2, 1.5, 0.05)
