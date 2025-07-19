@@ -77,15 +77,7 @@ Consente l’uso di una **Skill attiva**, sottraendo il **mana** richiesto e app
 
 #### Output: una tripla (giocatore aggiornato, mostro aggiornato, messaggio descrittivo)
 Usa pattern **matching** per distinguere i comportamenti in modo chiaro e tip-safe.
-## Altre funzionalità supportate
 
-- `addItem`, `removeItem`: gestione dell’inventario e delle quantità
-- `addGold`, `spendGold`: modifica del bilancio d’oro
-- `addSkill`: apprendimento di skill uniche o potenziamento di quelle già presenti
-- `equipmentOn` / `equipmentOff`: gestione dell’equipaggiamento per slot specifico
-- `changeWorld`: modifica della zona del mondo in cui si trova il giocatore
-- `levelUp` / `levelDown`: modifiche a HP/MP e statistiche con randomness controllato
-- `playerInjured`, `stealRandomItem`, `sellRandomItem`: eventi casuali legati alla perdita o alla vendita di oggetti
 ## Aspetti Implementativi
 
 - **Separazione netta tra effetti collaterali** e aggiornamenti allo stato del giocatore.
@@ -144,25 +136,13 @@ In tal caso, se il mostro **muore**, restituisce anche il **danno da esplosione*
 
 
 ### `handleRegeneration(monster)`
-Gestisce la rigenerazione automatica per i mostri con comportamento `Regenerating`.
+Gestisce la rigenerazione automatica per i mostri con comportamento `Regenerating`. Se attiva e il mostro è vivo, cura una quantità casuale tra: ```text 1 e 2 * livello```
 
-Se attiva e il mostro è vivo, cura una quantità casuale tra: ```text 1 e 2 * livello```
+**Messaggio prodotto**: notifica testuale del recupero HP.
 
-  **Messaggio prodotto**: notifica testuale del recupero HP.
 Comportamento utile per aumentare la difficoltà in modo dinamico.
 
-## Altre funzionalità supportate
 
-- `heal`: funzione diretta per rigenerare HP, usata internamente o da eventi di supporto.
-
-- `getEquipReward`, `getItemReward`: restituiscono oggetti o equipaggiamenti come ricompensa per la sconfitta del mostro.
-
-- `getExpReward`, `getGoldReward`: calcolano le ricompense in esperienza e oro, basate sul profilo del mostro.
-
-- `getMonsterDefenceAndWeakness`: funzione di supporto usata dal `PlayerController` per i calcoli di danno.
-
-- `getRandomMonsterForZone`: genera un mostro adatto a livello e zona del giocatore, bilanciando casualità e difficoltà.  
-  Supporta la generazione di mostri rari o potenziati tramite:    ```text RandomFunctions.tryGenerateStrongMonster() ```
 
 ## Aspetti Implementativi
 
@@ -175,6 +155,68 @@ Comportamento utile per aumentare la difficoltà in modo dinamico.
 
 - **Probabilità e valori configurabili** esternamente tramite GameConfig, migliorando la flessibilità nel tuning del gioco.
 
+# Controller: MissionController
+
+## Descrizione
+Il MissionController gestisce la logica di generazione, assegnazione, avanzamento e completamento delle missioni nel gioco. Agisce come intermediario tra il `Player` e il `MissionFactory`, garantendo che ogni missione sia coerente con il profilo del giocatore (livello e fortuna) e applicando correttamente le ricompense previste al completamento.
+
+## Pattern principali
+
+- **Contesto dinamico:** la generazione di missioni avviene sulla base degli attributi del giocatore (`lucky`, `level`), offrendo difficoltà e ricompense bilanciate
+
+- **Manipolazione immutabile dello stato:**  tutte le operazioni restituiscono un nuovo `Player`, con missioni aggiornate o premi applicati.
+ 
+
+- **Pipeline di ricompense:** in caso di completamento, le ricompense vengono applicate in sequenza (gold, XP, item) tramite i metodi del `PlayerController`.
+ 
+- **Separazione delle responsabilità:**  la logica di generazione è delegata a `MissionFactory`, mentre il controller si occupa solo dell'interazione con il `Player`.
+
+## Comportamento dettagliato
+
+### `createRandomMission(player)`
+Crea una nuova missione basata su:
+- **Fortuna** (`player.attributes.lucky`): influenza la qualità delle ricompense.
+ 
+- **Livello** (`player.level`): influisce sulla difficoltà dell’obiettivo.
+
+La generazione è gestita tramite `MissionFactory`, che assicura varietà e adeguatezza della missione.
+
+### `addMission(player, mission)`
+Aggiunge una missione alla lista attuale del giocatore.
+La lista delle missioni non ha limiti imposti, ma la gestione della saturazione può essere implementata a livello di gameplay.
+
+-  Output `Player` aggiornato con la missione in coda.
+-  Metodo utile per inserire missioni provenienti da eventi, NPC o reward.
+
+ ### `progressMission(player, mission)`
+Metodo centrale della logica missione. Gestisce:
+
+1. **Avanzamento** della missione  (`progressed()`).
+2. **Verifica** dello stato completato (`isCompleted`).
+3. **Applicazione** ricompense, nel seguente ordine:
+ 
+ - **Oro**:`addGold`
+ - **Esperienza**: `gainXP`
+ - **Oggetti opzionali**: `addItem` (se `Some(item)`)
+
+Se la missione è completata, viene **rimossa dalla lista attiva**. L’intera operazione è trasparente e atomica dal punto di vista del giocatore.
+
+## Aspetti Implementativi
+
+- **Design reattivo**: il controller reagisce dinamicamente all’evoluzione della missione, senza mutare direttamente i dati, ma creando nuove istanze coerenti.
+
+- **Architettura modulare**: `MissionController` non si occupa della logica interna delle missioni (progresso, completamento, reward), ma si appoggia alle API esposte da `Mission` e `MissionFactory`.
+
+- **Scalabilità**: l’approccio utilizzato permette di estendere facilmente con nuove tipologie di missioni o ricompense, mantenendo l'interfaccia pubblica invariata.
+
+- **Efficienza**: l’uso di `map` e `filterNot` sulla lista delle missioni garantisce operazioni precise e performanti, anche con missioni multiple attive  
+
+
+
+
+
+
+ 
 
 
 
