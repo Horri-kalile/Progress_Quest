@@ -45,19 +45,20 @@ Il team si è riunito in presenza per analizzare le specifiche del progetto e de
 
 ---
 
-## 👥 Assegnazione dei Task
+## Assegnazione dei Task
 
 ### Kalile
 - Implementazione del modello **Monster**
 - Sketch e prototipo iniziale della **view**
 
-### Guo Jiahao
+### Guo
 - Sviluppo dei modelli relativi al **Player**
 - Strutturazione dei **Behavior**
+- Mockup della **view**
 
 ### Intissar
 - Analisi e progettazione del **Controller**
-
+- Progettazione del modello **GameEvent**
 ---
 
 ## Sprint Review – 11/06/2025
@@ -66,12 +67,15 @@ Il team si è riunito in presenza per analizzare le specifiche del progetto e de
 
 - Progetto inizializzato con tutti gli strumenti necessari
 - Modello base del mostro completato
-- Modelli fondamentali del player implementati
+- Modelli base fondamentali del player implementati
+- Controller di supporto definiti
 
 ---
 
-## 🔜 Prossimi Step
+## Prossimi Step
 
-- Inizio implementazione dei **Factory**
+- Inizio implementazione dei **Test**
 - Sviluppo e affinamento della **view**
-- Costruzione del **primo game loop** di gioco
+- Prototipazione playerSelectionUi
+- Strutturazione del **primo game loop** di gioco
+- Ottimizzazione dei modelli ove necessario
