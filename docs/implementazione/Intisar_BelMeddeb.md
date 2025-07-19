@@ -211,9 +211,54 @@ Se la missione è completata, viene **rimossa dalla lista attiva**. L’intera o
 
 - **Efficienza**: l’uso di `map` e `filterNot` sulla lista delle missioni garantisce operazioni precise e performanti, anche con missioni multiple attive  
 
+# Controller: EventController
+
+## Descrizione
+
+L’`EventController` si occupa dell’esecuzione degli eventi di gioco dinamici per un determinato `Player`, sulla base della tipologia dell’evento. Agisce come livello di coordinamento tra il giocatore e il modulo `GameEventFactory`, delegando a quest’ultimo la logica interna di esecuzione e garantendo un’interfaccia coerente verso il resto del sistema.
+
+## Pattern principali
+
+- **Delegation**: la logica dettagliata dell’evento (combattimento, missione, allenamento...) è completamente incapsulata in `GameEventFactory`.
+
+- **Modularità**: aggiungere nuove tipologie di eventi è possibile semplicemente estendendo il tipo  `EventType` e aggiornando il `GameEventFactory`, senza modificare il controller.
+
+- **Design orientato agli effetti**: l’output dell’evento include modifiche al `Player`, messaggi descrittivi, ed eventualmente un `Monster` (solo in caso di combattimento o eventi che ne     richiedano la comparsa).
+
+- **Tripla restituzione**: l'interfaccia restituisce una tupla tripla per garantire separazione tra stato del gioco (Player), messaggistica e interazioni extra (es. mostro generato).
+ 
+## Comportamento dettagliato
+
+### `runEvent(eventType: EventType, player: Player)`
+Metodo principale ed unico del controller.
 
 
+#### Input:
 
+- `eventType`: specifica la tipologia dell’evento  da eseguire (es. `Fight`, `Mission`, `Training`, ecc.).
+
+- `player`: stato attuale del giocatore che partecipa all’evento.
+
+### Output:
+
+- `player`: giocatore aggiornato dopo l’evento.
+
+- `List[String]`: messaggi descrittivi per il log o l’interfaccia.
+
+- `Option[Monster]`: mostro eventualmente incontrato (solo per eventi di combattimento).
+
+Questo metodo rappresenta un punto d’ingresso uniforme per l’interazione con qualsiasi evento, permettendo di mantenere il sistema modulare e aperto all’estensione.
+
+
+## Aspetti Implementativi
+
+- L’implementazione utilizza direttamente `GameEventFactory.executeEvent`, funzione che si occupa dell’intera orchestrazione dell’evento scelto.
+
+- Non viene effettuato alcun controllo specifico a livello di controller, rendendolo un **thin controller** con responsabilità di puro dispatch.
+
+- La decisione di ritornare un `Option[Monster]` anche per eventi non combattivi permette di mantenere un'interfaccia coerente, semplificando l'integrazione lato `GameController`.
+
+- L’approccio facilita anche l’uso nel testing: essendo privo di stato e dipendenze interne, il comportamento è completamente deterministico in funzione del `GameEventFactory`.
 
 
  
