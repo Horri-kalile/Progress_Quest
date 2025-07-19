@@ -19,66 +19,16 @@ L’architettura di Progress Quest è progettata per massimizzare la modularità
 ## **Schema Architetturale**
 
 ```mermaid
-graph TD
+stateDiagram
+    [*] --> Main: Game Starts
+    Main --> PlayerGenerationUI: Initialize Player Setup
+    PlayerGenerationUI --> GameUI: Player Ready
+    GameUI --> GameLoopController: Start Game Loop
+    GameLoopController --> Model: Update Game State
+    Model --> GameLoopController: Return Updated Data
+    GameLoopController --> GameUI: Render Updated State and Wait for Input if special event occurred
+    GameUI --> GameLoopController: Send User Input
 
-    subgraph UI[UI (ScalaFX)]
-        GameUI[GameUI]
-    end
-
-    subgraph MAIN
-        Main[Main]
-        PlayerGen[PlayerGeneration]
-    end
-
-    subgraph CTRL[GameLoopController]
-        GameLoopCtrl[GameLoopController]
-        CombatCtrl[CombatController]
-        MissionCtrl[MissionController]
-        EventCtrl[EventController]
-    end
-
-    subgraph LOOP[Game Loop]
-        GameCycle[Gestione del ciclo automatico]
-    end
-
-    subgraph MODULES[Moduli di gioco]
-        EventModule[GameEventModule]
-        MissionModule[MissionModule]
-    end
-
-    subgraph MODEL[Models]
-        Player[Player]
-        Monster[Monster]
-        Inventory[Inventory]
-        Equipment[Equipment]
-        Skill[Skill]
-        World[World]
-    end
-
-    Main --> PlayerGen
-    PlayerGen --> Player
-
-    GameUI -->|input opzionale| GameLoopCtrl
-    GameLoopCtrl --> GameCycle
-
-    GameLoopCtrl --> CombatCtrl
-    GameLoopCtrl --> MissionCtrl
-    GameLoopCtrl --> EventCtrl
-
-    CombatCtrl --> Player
-    CombatCtrl --> Monster
-
-    MissionCtrl --> MissionModule
-    EventCtrl --> EventModule
-
-    GameCycle -->|genera eventi| EventModule
-    EventModule -->|risolve| MODEL
-    MissionModule --> MODEL
-
-    GameCycle -->|aggiorna| MODEL
-    MODEL -->|notify| GameUI
-
-    GameLoopCtrl --> GameUI
 ```
 
 ## **Descrizione dei Componenti**
