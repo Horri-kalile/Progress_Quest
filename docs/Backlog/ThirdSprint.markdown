@@ -70,6 +70,7 @@ Il team ha affrontato il **terzo sprint** con l’obiettivo di completare le fun
 - Azioni speciali e missioni implementate con aggiornamento stato coerente
 - Completamento del modulo `SpecialEventDialog` per eventi inaspettati
 - Copertura base dei test automatizzati su eventi e controller
+- GameLoop finito
 - Release
 - GameUi e PlayerGenerationUi completati
 
