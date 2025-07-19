@@ -75,6 +75,7 @@ Utilizza ricorsione **tail-recursive** per gestire level-up multipli consecutivi
 2. Applicazione della **cura**
 3. Ricorsione tramite `levelUpLoop`
 4. Tentativo di apprendimento **skill** con **probabilità configurabile**
+
 ### `useSkill(player, skill, monster)`
 Consente l’uso di una **Skill attiva**, sottraendo il **mana** richiesto e applicando l'effetto della skill.
 

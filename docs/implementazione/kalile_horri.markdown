@@ -16,14 +16,14 @@ Ho sviluppato il modulo Monster con l'obiettivo di rappresentare in maniera dett
 
 ### Aspetti implementativi
 
-- Utilizzo di una enum per rappresentare i diversi tipi di mostri (Beast, Undead, Dragon, ecc.), ognuno con modificatori specifici alle statistiche.
-- Classe Monster come entità centrale, composta da attributi base (MonsterAttributes) e stati speciali (berserk, regenerating), oltre a informazioni di contesto come la zona di origine e il comportamento.
+- Utilizzo di una enum per rappresentare i diversi tipi di mostri (Beast, Undead, Dragon, ecc.), ognuno con modificatori specifici alle statistiche
+- Classe Monster come entità centrale, composta da attributi base (MonsterAttributes) e stati speciali (berserk, regenerating), oltre a informazioni di contesto come la zona di origine e il comportamento
 - Implementazione di una factory (MonstersFactory) per la generazione dinamica di mostri, con logiche per:
   - Scelta casuale del nome da una lista caricata tramite MonsterLoader
   - Scala delle statistiche in base al livello del giocatore e alla difficoltà (strong)
   - Applicazione di modificatori legati al tipo (applyTypeModifiers) e al comportamento (MonsterBehavior)
   - Calcolo delle ricompense (oro, esperienza, oggetti)
-- Comportamenti modulari definiti tramite il trait MonsterBehavior con implementazioni come Aggressive, Defensive, Berserk, Regenerating, ecc. Questi comportamenti modificano direttamente le statistiche o gli stati del mostro.
+- Comportamenti modulari definiti tramite il trait MonsterBehavior con implementazioni come Aggressive, Defensive, Berserk, Regenerating, ecc. Questi comportamenti modificano direttamente le statistiche o gli stati del mostro
 
 ### Funzionalità principali
 
@@ -48,6 +48,7 @@ Ho sviluppato il modulo Monster con l'obiettivo di rappresentare in maniera dett
 
 **Descrizione**  
 Il modulo World gestisce la logica del mondo di gioco, con un focus specifico sulle zone di origine dei mostri (OriginZone) e sugli effetti ambientali che influenzano le dinamiche di combattimento. Ogni zona rappresenta un bioma con caratteristiche distinte, come foreste, deserti o vulcani, e può conferire buff ai mostri che vi appartengono. Il modulo permette anche di gestire le transizioni tra zone, garantendo varietà e dinamismo durante l'esplorazione del mondo da parte del giocatore.
+
 L'interazione tra World e Monster permette la creazione di mostri ambientati e bilanciati in funzione del contesto in cui vengono generati.
 
 <details>
@@ -55,15 +56,15 @@ L'interazione tra World e Monster permette la creazione di mostri ambientati e b
 
 ### Aspetti implementativi
 
-- Definizione dell'enumerazione OriginZone che rappresenta le diverse aree del mondo (Forest, Swamp, Desert, Volcano, Plains), ognuna con caratteristiche ambientali uniche.
+- Definizione dell'enumerazione OriginZone che rappresenta le diverse aree del mondo (Forest, Swamp, Desert, Volcano, Plains), ognuna con caratteristiche ambientali uniche
 - La funzione applyZoneBuffs(monster, currentZone) applica modificatori alle statistiche del mostro solo se si trova nella sua zona di origine:
   - Forest: aumenta la difesa
   - Desert: aumenta l'attacco
   - Volcano: aumenta gli HP
   - Swamp: riduce le vulnerabilità ai danni (fisici e magici)
   - Plains: nessun effetto speciale
-- La funzione randomWorld(currentZone) garantisce la transizione verso una nuova zona casuale diversa da quella attuale.
-- La funzione getZoneDescription(zone) fornisce descrizioni testuali leggibili e utili per l'interfaccia utente, spiegando gli effetti di ogni zona.
+- La funzione randomWorld(currentZone) garantisce la transizione verso una nuova zona casuale diversa da quella attuale
+- La funzione getZoneDescription(zone) fornisce descrizioni testuali leggibili e utili per l'interfaccia utente, spiegando gli effetti di ogni zona
 
 ### Funzionalità principali
 
@@ -91,11 +92,11 @@ Il design è stato pensato per essere reattivo, modulare e facilmente aggiornabi
 GameUi è strutturato come un oggetto che gestisce la finestra principale del gioco tramite una griglia di pannelli, ciascuno dedicato a una sezione specifica (statistiche, inventario, mondo, abilità, missioni, diario, log combattimenti, info mostro).  
 L'interfaccia si adatta dinamicamente alle dimensioni dello schermo e aggiorna i dati in tempo reale in risposta agli eventi di gioco.
 
-- Utilizzo di layout flessibili (BorderPane, VBox, HBox, GridPane) per organizzare i contenuti.
-- Aggiornamento automatico delle informazioni tramite metodi come `updatePlayerInfo`, `addCombatLog`, `addEventLog`, `updateMonsterInfo`.
-- Gestione dello stato interno (player, messaggi, mostro corrente) per garantire coerenza tra logica e visualizzazione.
-- Implementazione di funzionalità interattive come la barra di progresso animata nel diario dell'eroe e la schermata di game over con possibilità di restart.
-- Modularità dei pannelli per facilitare l'estensione e la manutenzione dell'interfaccia.
+- Utilizzo di layout flessibili (BorderPane, VBox, HBox, GridPane) per organizzare i contenuti
+- Aggiornamento automatico delle informazioni tramite metodi come `updatePlayerInfo`, `addCombatLog`, `addEventLog`, `updateMonsterInfo`
+- Gestione dello stato interno (player, messaggi, mostro corrente) per garantire coerenza tra logica e visualizzazione
+- Implementazione di funzionalità interattive come la barra di progresso animata nel diario dell'eroe e la schermata di game over con possibilità di restart
+- Modularità dei pannelli per facilitare l'estensione e la manutenzione dell'interfaccia
 
 ### Funzionalità principali
 
@@ -132,12 +133,12 @@ Il ciclo principale (`startGameLoop`) attiva eventi a intervalli regolari, alter
 La logica di combattimento è gestita tramite sequenze di passi (`showFightStepsSequentially`), con aggiornamenti graduali della UI per migliorare la presentazione.  
 Il controller si occupa anche della gestione del game over, offrendo la possibilità di riavviare la partita tramite una callback che riapre la schermata di creazione del personaggio e la UI di gioco.
 
-- Gestione dello stato del giocatore e del timer del gioco.
-- Attivazione automatica di eventi tramite intervalli temporizzati.
-- Coordinamento tra moduli di combattimento, eventi e interfaccia grafica.
-- Aggiornamento reattivo della UI in base allo stato del gioco.
-- Gestione del game over e restart tramite callback.
-- Supporto per il triggering manuale di eventi (utile per test/debug).
+- Gestione dello stato del giocatore e del timer del gioco
+- Attivazione automatica di eventi tramite intervalli temporizzati
+- Coordinamento tra moduli di combattimento, eventi e interfaccia grafica
+- Aggiornamento reattivo della UI in base allo stato del gioco
+- Gestione del game over e restart tramite callback
+- Supporto per il triggering manuale di eventi (utile per test/debug)
 
 ### Funzionalità principali
 
