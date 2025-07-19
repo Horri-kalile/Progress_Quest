@@ -17,7 +17,7 @@ lazy val root = (project in file("."))
   .settings(
     name := "ProgressQuest",
     scalafmtOnCompile := true,
-    coverageEnabled := false,
+    coverageEnabled := true,
 
     // Assembly settings
     assembly / assemblyJarName := s"${name.value}-${version.value}.jar",
