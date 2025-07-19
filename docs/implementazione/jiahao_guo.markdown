@@ -226,8 +226,97 @@ Le strategie private (`Aggressive`, `Defensive`, `Lucky`, `OneShotChance`, ecc.)
 ---
 
 ## Modello Identity
+Descrizione del Modello Identity
 
-## View PlayerGenerationUi
+Il modello Identity definisce meccanismi per l’applicazione di bonus specifici di razza e classe al giocatore, influenzando attributi, HP, MP, equipaggiamento e abilità iniziali.
+
+---
+
+Enumerazioni fondamentali
+
+- `Race`: definisce le razze disponibili (Human, Elf, Dwarf, Orc, Gnome, Titan, PandaMan, Gundam).
+- `ClassType`: definisce alcune classi RPG (Warrior, Mage, Poisoner, Cleric, Paladin, Assassin, CowBoy).
+- `Identity`: combina `Race` e `ClassType` per rappresentare l’identità del personaggio.
+
+---
+
+Modulo PlayerBonusesModule
+
+Contiene le strategie per l’applicazione dei bonus di razza e classe tramite:
+
+- **RaceBonusStrategy**: applica bonus specifici di razza, restituendo un moltiplicatore per HP, MP e un nuovo `Player` con modifiche ad attributi o equipaggiamento.
+- **ClassBonusStrategy**: applica bonus fissi di HP e MP legati alla classe del giocatore.
+
+Factory di Strategie
+
+- `RaceBonusStrategyFactory`: restituisce la strategia corretta per la razza del giocatore.
+- `ClassBonusStrategyFactory`: restituisce la strategia corretta per la classe del giocatore.
+
+---
+
+Implementazioni private
+
+Ogni razza modifica attributi specifici (es. Elf aumenta destrezza, Dwarf costituzione, Titan forza, ecc.) e può influenzare i moltiplicatori di HP e MP. Alcune razze assegnano anche equipaggiamenti iniziali (es. Human).
+
+Le classi forniscono bonus HP e MP variabili o nulli (es. Warrior bonus HP, Poisoner bonus MP, Mage nessun bonus).
+
+---
+
+Applicazione dei bonus
+
+L’oggetto `PlayerBonusesApplication` gestisce l’applicazione combinata dei bonus di razza e classe:
+
+1. Ottiene la strategia di razza e applica i bonus al giocatore.
+2. Ottiene la strategia di classe e applica i bonus di HP/MP.
+3. Calcola i nuovi valori di HP e MP moltiplicati e aggiunti ai bonus.
+4. Aggiunge le skill iniziali appropriate alla classe e livello.
+5. Restituisce un nuovo `Player` aggiornato con tutti i bonus e le abilità.
+
+```scala
+object RaceBonusStrategyFactory:
+
+    def getStrategy(race: Race): RaceBonusStrategy = race match
+      case Human => HumanRaceBonus
+      case Elf => ElfRaceBonus
+      case Dwarf => DwarfRaceBonus
+      case Orc => OrcRaceBonus
+      case Gnome => GnomeRaceBonus
+      case Titan => TitanRaceBonus
+      case PandaMan => PandaManRaceBonus
+      case Gundam => GundamRaceBonus
+
+  /** Factory object to retrieve the appropriate [[ClassBonusStrategy]] for a given [[ClassType]]. */
+  object ClassBonusStrategyFactory:
+
+    def getStrategy(classType: ClassType): ClassBonusStrategy = classType match
+      case Mage | Cleric | Paladin | Assassin => NoClassBonus
+      case Warrior => WarriorBonus
+      case Poisoner => PoisonerBonus
+      case CowBoy => CowBoyBonus
+
+    def applyRaceAndClassBonuses(player: Player): Player =
+        val raceStrategy = RaceBonusStrategyFactory.getStrategy(player.identity.race)
+        val (hpMultiplier, mpMultiplier, playerWithRaceBonuses) = raceStrategy.applyBonuses(player)
+        
+        val classStrategy = ClassBonusStrategyFactory.getStrategy(player.identity.classType)
+        val (classHpBonus, classMpBonus) = classStrategy.applyBonuses(playerWithRaceBonuses)
+        
+        val raceHp = (player.hp * hpMultiplier).toInt
+        val raceMp = (player.mp * mpMultiplier).toInt
+        
+        val startingSkills = SkillFactory.generateStartingSkill(player.level, player.identity.classType).toList
+        
+        playerWithRaceBonuses
+          .withHp(raceHp + classHpBonus)
+          .withMp(raceMp + classMpBonus)
+          .withCurrentHp(raceHp + classHpBonus)
+          .withCurrentMp(raceMp + classMpBonus)
+          .withSkills(startingSkills)
+```
+---
+
+
+
 
 ## Controller CombattController
 
