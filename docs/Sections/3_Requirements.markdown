@@ -16,31 +16,35 @@ nav_order: 3
    - Eventi speciali
    - Allenamento
    - Riposo
-   - Quest
+   - Missioni
+   - etc... (vedi l'introduzione, sezione eventi)
 
 3. **Combattimento automatizzato e comportamenti dinamici**  
    Il combattimento avviene in modo automatico.  
    Player e mostri possono avere **behavior** specifici che alterano il flusso del combattimento.
 
-4. **Sistema di quest**  
-   Le quest sono composte da sequenze di azioni automatiche.  
-   Offrono ricompense come **gold**, **esperienza (EXP)** e **equipment**.
+4. **Sistema di missioni**  
+   Le missioni sono composte da sequenze di azioni automatiche.  
+   Offrono ricompense come **gold**, **esperienza (EXP)**, **item** e **equipment**.
 
-5. **Inventario e risorse**  
-   Il player raccoglie **materiali** che possono essere venduti per ottenere **gold**, usato per migliorare le statistiche.
+5. **Inventario e item**  
+   Il player raccoglie **item**, messi in **inventory**, che possono essere venduti per ottenere **gold**, usato per migliorare le statistiche.
 
 6. **Gestione dell’equipaggiamento**  
-   Gli oggetti equipaggiati influenzano direttamente le statistiche del personaggio e vengono ottenuti tramite eventi o quest.
+   Gli oggetti equipaggiati influenzano direttamente le statistiche del personaggio e vengono ottenuti tramite eventi o quest. 
+   Gestione automatica dell'equipaggiamento dell'equipment migliore e vendita di quello vecchio.
 
 7. **Skill e vulnerabilità**  
-   Il player dispone di **skill** fisiche e magiche.  
-   I mostri possono essere vulnerabili o resistenti a uno dei due tipi.
+   Il player dispone di **skill** fisiche, magiche e curative.  
+   I mostri possono essere vulnerabili o resistenti a tali tipi.
 
 8. **Interazione opzionale**  
    Durante eventi speciali, il giocatore può compiere **scelte cruciali** (opzionali) con esiti casuali.  
-   *Esempio*: “È comparso Red Goblin: fight or not?”  
-   - Esito positivo: +5 livelli  
-   - Esito negativo: morte del personaggio
+   *Esempio*: “È comparso un mostro potente: fight or not?”  
+   - Esito positivo: loot, guadagnamento gold e exp.
+   - Esito negativo: morte del personaggio.
+   - Rifiuto dell'evento: non succede nulla.
+   - Nessuna scelta: scelta randomica dell'azione.
 
 9. **Gameplay infinito**
     Il gioco è strutturato come endless, ovvero senza una fine prestabilita.

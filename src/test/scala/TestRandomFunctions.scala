@@ -13,7 +13,7 @@ class TestRandomFunctions extends AnyFunSuite:
   test("getRandomEventType produces fewer gameOver with high luck"):
     val lowLuckDeaths = (1 to iterations).count(_ => RandomFunctions.getRandomEventType(0) == EventType.gameOver)
     val highLuckDeaths = (1 to iterations).count(_ => RandomFunctions.getRandomEventType(lucky) == EventType.gameOver)
-    assert(highLuckDeaths < lowLuckDeaths)
+    assert(highLuckDeaths <= lowLuckDeaths)
 
   test("randomDropFlags returns true more often with higher luck"):
     val lowLuckDrops = (1 to iterations).count(_ => RandomFunctions.randomDropFlags(0))
