@@ -23,4 +23,4 @@ Ogni pannello è creato tramite funzioni dedicate, favorendo riuso e chiarezza d
 - **Singleton/Object**: Uso di oggetti Scala per gestire costanti, utility e collezioni degli eventi.
 
 ## Diagramma del modello Player
-![Player Domain Model](images/playerModelDiagram.png)
+![Player Domain Model](../images/playerModelDiagram.png)
