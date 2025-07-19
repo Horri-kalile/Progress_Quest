@@ -1,3 +1,9 @@
+---
+layout: default
+title: Kalile horri
+nav_order: 1
+parent: Implementazione
+---
 # Implementazione - Kalile Horri
 
 ## Monster Model
