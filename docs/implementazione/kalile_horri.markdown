@@ -1,4 +1,5 @@
 ---
+layout: default
 title: Kalile Horri
 nav_order: 1
 parent: Implementazione
