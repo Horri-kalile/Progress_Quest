@@ -6,7 +6,7 @@ nav_order: 5
 
 # Design di Dettaglio
 
-L’interfaccia utente di Progress Quest è progettata con ScalaFX, sfruttando layout a pannelli (BorderPane, HBox, VBox) per una chiara separazione delle sezioni principali: informazioni del personaggio, inventario, mondo, skill, missioni, diario e combat log.
+L’interfaccia utente di Progress Quest è progettata con ScalaFX, sfruttando layout a pannelli (BorderPane, HBox, VBox) per una chiara separazione delle sezioni principali: informazioni del player, inventary, equipment, monster, world, skill, mission, event log e combat log.
 
 La generazione del personaggio avviene in una schermata dedicata (`PlayerGenerationUi.scala`), dove l’utente può randomizzare razza, classe, comportamento e attributi tramite bottoni interattivi. Una volta confermato, si accede all’interfaccia principale (`UI.scala`), organizzata in:
 
