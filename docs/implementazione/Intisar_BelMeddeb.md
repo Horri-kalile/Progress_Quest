@@ -265,7 +265,7 @@ Questo metodo rappresenta un punto d’ingresso uniforme per l’interazione con
 ## Descrizione:
 `GameEventModule` gestisce tutti gli eventi principali del gioco, come combattimenti, missioni, cambi di zona, potenziamenti o eventi speciali. Ogni evento è definito come effetto puro: modifica lo stato del `Player`, produce messaggi e opzionalmente coinvolge un `Monster`.
 
- ## Componenti principali:
+## Componenti principali:
 
 - `EventType`: Enum dei tipi di eventi (fight, mission, restore, training, craft, magic, ecc.).
 
@@ -273,7 +273,7 @@ Questo metodo rappresenta un punto d’ingresso uniforme per l’interazione con
 
 - `GameEventFactory`: Risolve e gestisce l’esecuzione degli eventi a partire dal tipo (`EventType`)
 
-  ## Eventi principali:
+## Eventi principali:
 
 - **FightEvent**: Gestisce le ricompense dopo un combattimento (XP, oro, loot). Se il mostro non è morto, l’evento termina senza premi.
 
@@ -301,7 +301,52 @@ Questo metodo rappresenta un punto d’ingresso uniforme per l’interazione con
 
 - Uso di Option[Monster] solo quando l’evento lo richiede.
 
+# Module: Mission
 
+## Descrizione:
+Il modulo Mission gestisce il sistema delle missioni del gioco, dalla definizione di missioni statiche (`MissionData`), alla generazione dinamica (`MissionFactory`), fino alla rappresentazione e progressione delle missioni assegnate al giocatore (`Mission`).
+
+
+## Componenti principali:
+
+- `MissionData`: Rappresenta un template di missione (*nome, descrizione*). I dati sono caricati da file tramite `MissionLoader`.
+
+- `Missions`: Contenitore per una lista di `MissionData`.
+
+- `Mission`: Istanza concreta assegnata al giocatore. Ogni missione ha:
+  - `id` univoco  
+  - `progression` e `goal` per monitorare lo stato  
+  - Ricompense: `rewardExp`, `rewardGold`, `rewardItem` (`Option`)
+
+## Funzionalità:
+
+- `progressed()`: Avanza la progressione della missione di 1 passo, se non già completata.
+
+- `isCompleted`: Verifica se la missione è terminata (`progression >= goal`).
+
+- `complete`: Imposta direttamente la missione come completata (utile per test/debug).
+
+## MissionFactory:
+
+- **`randomMission(playerLucky, playerLevel)`**
+
+   - Seleziona una missione casuale da `MissionLoader`.
+
+    - Calcola XP e oro in base al livello del giocatore.
+
+     - Aggiunge eventualmente un oggetto (`Item`) in base alla fortuna**.
+
+     - Genera una missione con obiettivo randomico (`goal ∈ [1, 3]`).
+ 
+## Caratteristiche tecniche:
+
+- Design **immutabile** per tutte le entità missione.
+
+- Separazione tra **template statici** (file) e **istanze dinamiche** (gioco).
+
+- Le ricompense sono **scalabili** e **probabilistiche** (oggetto opzionale basato sulla fortuna).
+
+- Sistema adatto sia a missioni testuali che meccaniche (es. uccidi X mostri, trova oggetto...).
 
 
 
