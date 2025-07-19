@@ -8,7 +8,14 @@ parent: Implementazione
 
 
 
-desc
+
+
+Il mio contributo al progetto si è concentrato sull’implementazione dei controller principali (`PlayerController`, `MonsterController`, `MissionController`, `EventController`).
+
+Ho anche collaborato allo sviluppo dei moduli `GameEventModule` e `Mission`, contribuendo alla gestione degli eventi e alla generazione delle missioni.
+
+Il lavoro è stato svolto seguendo principi di **modularità**, **immutabilità** e **separazione delle responsabilità**.
+
 
 ---
 # Controller: PlayerController
