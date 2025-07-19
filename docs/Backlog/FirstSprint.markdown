@@ -56,7 +56,7 @@ Il team si è riunito in presenza per analizzare le specifiche del progetto e de
 - Strutturazione dei **Behavior**
 - Mockup della **view**
 
-### Intissar
+### Intisar
 - Analisi e progettazione del **Controller**
 - Progettazione del modello **GameEvent**
 ---

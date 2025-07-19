@@ -45,7 +45,7 @@ Nel **quarto sprint**, il team si è concentrato sul consolidamento delle funzio
 - Aggiunta di ulteriori eventi dinamici e possibilità di scelta
 - Ottimizzazione del modulo utils
 
-### Intissar
+### Intisar
 - Debugging di problemi logici su eventi
 - Completamento finale dei **controller**
 - Fase di **refactoring e cleanup** del codice

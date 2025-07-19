@@ -52,7 +52,7 @@ Il team ha affrontato il **terzo sprint** con l’obiettivo di completare le fun
 - Collaborazione per GameUi
 - Collegamento tra interfaccia utente e logica di gioco
 
-### Intissar
+### Intisar
 - Testing e debugging intensivo sui controller di supporto e `GameEvent`
 - Implementazione e collaborazione sul modulo gameEvent
 - Coordinamento con gli altri controller per il game loop

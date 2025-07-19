@@ -17,19 +17,20 @@ La riunione è durata circa **2 ore**, durante le quali è stata chiarita la vis
 
 È stato definito un flusso organizzativo basato su ruoli distinti:
 
-### 👤 Kalile Horri – Product Owner & Sviluppatore
+### Kalile Horri – Product Owner & Sviluppatore
 
 - Gestisce la pianificazione del progetto e coordina le attività del team.
 - Suddivide i task e mantiene la visione d’insieme.
 - È responsabile del **repository GitHub** (owner).
 
-### 👤 Jiahao Guo – Scrum Master & Sviluppatore
+### Jiahao Guo – Scrum Master & Sviluppatore
 
 - Funziona da collegamento tra requisiti e implementazione.
 - Supervisiona il rispetto delle priorità e dei tempi.
 - Gestisce le **GitHub Pages**.
+- Continuos integration and release
 
-### 👤 NOME COGNOME – Sviluppatore
+### Intisar Bel Meddeb – Sviluppatore
 
 - Cura l’**integrazione continua** e ne garantisce l’efficacia tramite aggiornamenti regolari.
 - È responsabile della scrittura e manutenzione dei **test**.
