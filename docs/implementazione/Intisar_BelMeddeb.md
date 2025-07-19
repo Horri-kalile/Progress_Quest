@@ -260,8 +260,47 @@ Questo metodo rappresenta un punto d’ingresso uniforme per l’interazione con
 
 - L’approccio facilita anche l’uso nel testing: essendo privo di stato e dipendenze interne, il comportamento è completamente deterministico in funzione del `GameEventFactory`.
 
+# Module: GameEventModule
 
- 
+## Descrizione:
+`GameEventModule` gestisce tutti gli eventi principali del gioco, come combattimenti, missioni, cambi di zona, potenziamenti o eventi speciali. Ogni evento è definito come effetto puro: modifica lo stato del `Player`, produce messaggi e opzionalmente coinvolge un `Monster`.
+
+ ## Componenti principali:
+
+- `EventType`: Enum dei tipi di eventi (fight, mission, restore, training, craft, magic, ecc.).
+
+- `GameEvent`: Trait che rappresenta un evento generico con metodo `action`.
+
+- `GameEventFactory`: Risolve e gestisce l’esecuzione degli eventi a partire dal tipo (`EventType`)
+
+  ## Eventi principali:
+
+- **FightEvent**: Gestisce le ricompense dopo un combattimento (XP, oro, loot). Se il mostro non è morto, l’evento termina senza premi.
+
+- **MissionEvent**: Se ci sono missioni attive, ne progredisce una. Altrimenti, ne assegna una nuova.
+
+- **RestoreEvent**: Ripristina completamente HP/MP del giocatore.
+
+- **TrainingEvent**: Fornisce EXP in base al livello del giocatore.
+
+- **SellEvent / PowerUpEvent**: Vendita di oggetti o potenziamento statistiche, se il giocatore ha abbastanza oro.
+
+- **CraftEvent / MagicEvent**: Permette di forgiare o potenziare equipaggiamenti/abilità.
+
+- **SpecialEvent**: Evento casuale tra 8 scenari possibili (*trappole, dungeon, ladri, mostri...*).
+
+- **GameOverEvent**: Termina il gioco impostando `HP = 0`.
+
+## Caratteristiche tecniche:
+
+- Architettura modulare e ad eventi.
+
+- Tutti gli eventi sono **immutabili** e restituendo un nuovo stato del `Player`.
+
+- I messaggi sono **descrittivi** e utili per la UI.
+
+- Uso di Option[Monster] solo quando l’evento lo richiede.
+
 
 
 
