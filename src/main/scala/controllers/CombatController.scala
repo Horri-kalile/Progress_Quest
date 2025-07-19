@@ -8,7 +8,7 @@ import scala.annotation.tailrec
 import scala.util.Random
 
 /** Handles turn-based combat logic between a player and a monster.
-  */
+ */
 object CombatController:
 
   /** Internal reference to last fought monster (for tracking/debugging). */
@@ -21,23 +21,63 @@ object CombatController:
   def setLastMonster(monster: Monster): Unit =
     _lastMonster = Some(monster)
 
+  /** Curried function for messages with actor and target:
+   *
+   * Example: "Alice attacked Goblin for 5 damage"
+   *
+   * @param actorName  name of the acting entity (player or monster)
+   * @param targetName name of the target entity
+   * @param action     the action verb or phrase (e.g. "attacked", "used skill on")
+   * @param details    additional detail string (e.g. "for 5 damage")
+   * @return formatted message string
+   */
+  private def actionMessage(actorName: String)(targetName: String)(action: String, details: String): String =
+    s"$actorName $action $targetName $details"
+
+  /** Curried function for messages with only actor name:
+   *
+   * Example: "Alice used a healing skill"
+   *
+   * @param actorName name of the acting entity
+   * @param event     description of the event/action
+   * @return formatted message string
+   */
+  private def actorOnlyMessage(actorName: String)(event: String): String =
+    s"$actorName $event"
+
+  /** Curried function for messages with only target name:
+   *
+   * Example: "Slime was defeated"
+   *
+   * @param targetName name of the target entity
+   * @param event      description of the event/action
+   * @return formatted message string
+   */
+  private def targetOnlyMessage(targetName: String)(event: String): String =
+    s"$targetName $event"
+
   /** Simulates a full turn-based combat between player and monster.
-    *
-    * @param player
-    *   the player character
-    * @param monster
-    *   the enemy monster
-    * @return
-    *   a list of (Player state, optional Monster state, log message) for each action
-    */
+   *
+   * @param player
+   * the player character
+   * @param monster
+   * the enemy monster
+   * @return
+   * a list of (Player state, optional Monster state, log message) for each action
+   */
   def simulateFight(player: Player, monster: Monster): List[(Player, Option[Monster], String)] =
+
+    // Partial application of message functions to fix actor/target names
+    val playerAct = actionMessage(player.name) _
+    val playerOnly = actorOnlyMessage(player.name) _
+    val monsterOnly = targetOnlyMessage(monster.name) _
 
     @tailrec
     def loop(p: Player, m: Monster, acc: List[(Player, Option[Monster], String)], turn: Int)
-        : List[(Player, Option[Monster], String)] =
+    : List[(Player, Option[Monster], String)] =
       if !p.isAlive || m.isDead then acc.reverse
       else if turn > maxTurnBattle then
-        val msg = "The enemy is too exhaustive, better run away."
+        val msg = monsterOnly("is too exhaustive, better run away.")
         ((p, Some(m), msg) :: acc).reverse
       else
         val acc1 = (p, Some(m), s"Turn $turn:") :: acc
@@ -47,19 +87,19 @@ object CombatController:
           if p.skills.nonEmpty && Random.nextBoolean() && p.currentMp >= 3 then
             val skill = Random.shuffle(p.skills).head
             PlayerController.useSkill(p, skill, m) match
-              case (pp, mm, log) => (pp, mm, List(log))
+              case (pp, mm, log) => (pp, mm, List(playerOnly(s"tried to use a skill: $log")))
           else
             val dmg = PlayerController.calculatePlayerAttack(p, m)
             val (mDamaged, explosionOpt) = MonsterController.takeDamage(m, dmg)
             val pDamaged = explosionOpt.map(PlayerController.takeDamage(p, _)).getOrElse(p)
-            val logs = List(s"You attacked ${m.name} for $dmg.") ++
-              explosionOpt.map(e => s"[Explosive] ${m.name} exploded for $e!")
+            val logs = List(playerAct(m.name)("attacked for", s"$dmg damage.")) ++
+              explosionOpt.map(e => monsterOnly(s"exploded for $e damage!"))
             (pDamaged, mDamaged, logs)
 
         val acc2 = playerLogs.reverse.foldLeft(acc1)((a, log) => (pAfterAttack, Some(mAfterAttack), log) :: a)
 
         if mAfterAttack.isDead then
-          ((pAfterAttack, Some(mAfterAttack), s"${mAfterAttack.name} was defeated!") :: acc2).reverse
+          ((pAfterAttack, Some(mAfterAttack), monsterOnly("was defeated!")) :: acc2).reverse
         else
           val (mRegen, regenMsgOpt) = MonsterController.handleRegeneration(mAfterAttack)
           val (dmgToPlayer, attackMsg, mUpdated) = MonsterController.attackPlayer(mRegen, pAfterAttack)
@@ -74,15 +114,15 @@ object CombatController:
     loop(player, monster, Nil, 1)
 
   /** Handles equipment drop after a monster is defeated. Compares new equipment to existing, either equipping or
-    * selling it.
-    *
-    * @param player
-    *   the player
-    * @param monster
-    *   the defeated monster
-    * @return
-    *   (updatedPlayer, resultMessage)
-    */
+   * selling it.
+   *
+   * @param player
+   * the player
+   * @param monster
+   * the defeated monster
+   * @return
+   * (updatedPlayer, resultMessage)
+   */
   def handleEquipDrop(player: Player, monster: Monster): (Player, String) =
     MonsterController.getEquipReward(monster) match
       case Some(newEquip) =>
@@ -97,14 +137,14 @@ object CombatController:
       case None => (player, "No equipment drop.")
 
   /** Handles item drop after a monster is defeated.
-    *
-    * @param player
-    *   the player
-    * @param monster
-    *   the defeated monster
-    * @return
-    *   (updatedPlayer, resultMessage)
-    */
+   *
+   * @param player
+   * the player
+   * @param monster
+   * the defeated monster
+   * @return
+   * (updatedPlayer, resultMessage)
+   */
   def handleItemDrop(player: Player, monster: Monster): (Player, String) =
     MonsterController.getItemReward(monster) match
       case Some(item) =>
