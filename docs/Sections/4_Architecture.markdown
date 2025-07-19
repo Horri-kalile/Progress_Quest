@@ -22,8 +22,8 @@ L’architettura di Progress Quest è progettata per massimizzare la modularità
 stateDiagram
     [*] --> Main: Game Starts
     Main --> PlayerGenerationUI: Initialize Player Setup
-    PlayerGenerationUI --> GameUI: Player Ready
-    GameUI --> GameLoopController: Start Game Loop
+    PlayerGenerationUI --> GameLoopController: Player Ready
+    GameLoopController --> GameUI: Start Game Loop
     GameLoopController --> Model: Update Game State
     Model --> GameLoopController: Return Updated Data
     GameLoopController --> GameUI: Render Updated State and Wait for Input if special event occurred
