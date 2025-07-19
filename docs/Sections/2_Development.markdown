@@ -89,7 +89,7 @@ Lo schema di versionamento adottato è il **Semantic Versioning** (`MAJOR.MINOR.
 Per garantire qualità, tracciabilità e velocità nel rilascio, il team ha configurato un sistema di **Integrazione e Deployment Continui (CI/CD)** basato su **GitHub Actions**. Questo processo automatizzato prevede:
 
 - **Test e release** automatici a ogni push o pull request su branch
-- **Deploy** automatico della documentazione su **GitHub Pages** a ogni rilascio stabile
+- **Deploy** automatico della documentazione su **GitHub Pages**.
 - Notifiche sugli esiti della pipeline per un monitoraggio costante
 
 ---
@@ -99,8 +99,8 @@ Per garantire qualità, tracciabilità e velocità nel rilascio, il team ha conf
 Il team adotta un **Git Workflow** chiaro e scalabile:
 
 1. Branch di sviluppo per ogni elemento (model,view,controller)
-2. Merge nel branch `main solo dopo review e con superamento dei test
-3. Release su `main` per ogni versione dopo un intervallo di tempo, associato a un tag e descrizione.
+2. Merge nel branch `main` solo dopo review e con superamento dei test
+3. Release su `main` per ogni versione dopo un traguardo raggiunto, associato a un tag.
 
 Questo approccio garantisce stabilità al codice rilasciato e facilita la collaborazione.
 
@@ -114,7 +114,7 @@ L’obiettivo minimo è mantenere una copertura superiore al **50%**, con partic
 Strumenti utilizzati:
 
 - **sbt-coverage** per Scala
-- **scalafmt per la formattazione del codice**
+- **scalafmt** per la formattazione del codice
 - Report generati automaticamente e consultabili nel repository
 
 Questo consente di identificare facilmente le aree meno testate e migliorare la robustezza generale del progetto.
