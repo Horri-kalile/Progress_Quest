@@ -242,7 +242,8 @@ L’`EventController` si occupa dell’esecuzione degli eventi di gioco dinamici
 Metodo principale ed unico del controller.
 
 
-#### Input:
+
+### Input:
 
 - `eventType`: specifica la tipologia dell’evento  da eseguire (es. `Fight`, `Mission`, `Training`, ecc.).
 
