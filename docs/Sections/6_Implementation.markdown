@@ -1,6 +1,6 @@
 ---
 title: Implementazione
 nav_order: 6
-parent: Report
+parent: docs
 has_children: true
 ---
