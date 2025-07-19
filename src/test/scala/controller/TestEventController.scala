@@ -8,7 +8,6 @@ import models.player.Behavior.BehaviorType
 
 class TestEventController extends AnyFunSuite:
 
-
   def freshPlayer: Player =
     val identity = Identity(Race.Human, ClassType.Warrior)
     val attributes = Attributes(10, 10, 10, 10, 10, 10)
@@ -30,14 +29,12 @@ class TestEventController extends AnyFunSuite:
     assert(messages.exists(_.toLowerCase.contains("training")), "Expected training message")
     assert(trained.exp > player.exp, "Player should gain experience")
 
-
   test("runEvent handles mission event"):
     val player = freshPlayer
     val (updated, messages, _) = EventController.runEvent(EventType.mission, player)
 
     assert(messages.exists(_.toLowerCase.contains("mission")), "Expected mission-related message")
     assert(updated.activeMissions.nonEmpty, "Player should have at least one active mission")
-
 
   test("runEvent handles fight event with a defeated monster"):
     val player = freshPlayer
@@ -47,6 +44,6 @@ class TestEventController extends AnyFunSuite:
     CombatController.setLastMonster(deadMonster)
 
     val (updated, messages, _) = EventController.runEvent(EventType.fight, player)
-    assert(messages.exists(_.toLowerCase.contains("won")) || messages.exists(_.toLowerCase.contains("xp")), "Expected fight resolution message")
+    assert(messages.exists(_.toLowerCase.contains("won")) || messages.exists(_.toLowerCase.contains("xp")),
+      "Expected fight resolution message")
     assert(updated.exp > player.exp || updated.gold > player.gold, "Player should gain XP or gold")
-

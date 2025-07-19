@@ -17,7 +17,7 @@ lazy val root = (project in file("."))
   .settings(
     name := "ProgressQuest",
     scalafmtOnCompile := true,
-    coverageEnabled := true,
+    coverageEnabled := false,
 
     // Assembly settings
     assembly / assemblyJarName := s"${name.value}-${version.value}.jar",
@@ -37,7 +37,9 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Seq(
       "org.scalafx" %% "scalafx" % "21.0.0-R32",
       "com.lihaoyi" %% "upickle" % "3.1.0",
-      "org.scalatest" %% "scalatest" % "3.2.18" % Test
+      "org.scalatest" %% "scalatest" % "3.2.18" % Test,
+      "org.testfx" % "testfx-core" % "4.0.15-alpha" % Test,
+      "org.testfx" % "testfx-junit" % "4.0.15-alpha" % Test
     ),
 
     // Automatic JavaFX modules

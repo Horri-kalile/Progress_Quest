@@ -66,7 +66,7 @@ class TestMonsterController extends AnyFunSuite:
     assert(description.contains(dummyMonster.name))
     assert(description.contains(dummyMonster.originZone.toString))
 
-  test("getMonsterDefenceAndWeakness returns correct tuple"): 
+  test("getMonsterDefenceAndWeakness returns correct tuple"):
     val (deff, phys, mag) = MonsterController.getMonsterDefenceAndWeakness(dummyMonster)
     assert(deff == baseAttributes.defense)
     assert(phys == baseAttributes.weaknessPhysical)

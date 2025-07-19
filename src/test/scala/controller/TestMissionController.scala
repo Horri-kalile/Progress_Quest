@@ -35,7 +35,7 @@ class TestMissionController extends AnyFunSuite:
 
     assert(updatedPlayer.missions.contains(mission))
 
-  test("progressMission increments mission progression without completion") :
+  test("progressMission increments mission progression without completion"):
     val mission = Mission("1", "Ongoing", "Do something", progression = 0, goal = 2, rewardExp = 50, rewardGold = 10)
     val playerWithMission = freshPlayer.withMissions(List(mission))
 
@@ -45,7 +45,7 @@ class TestMissionController extends AnyFunSuite:
     assert(updated.progression == 1)
     assert(!updated.isCompleted)
 
-  test("progressMission completes mission and gives rewards") :
+  test("progressMission completes mission and gives rewards"):
     val item = Item("Potion", 20.0, Rarity.Common)
 
     val mission = Mission(
@@ -63,5 +63,5 @@ class TestMissionController extends AnyFunSuite:
     val updatedPlayer = MissionController.progressMission(playerWithMission, mission)
 
     assert(!updatedPlayer.missions.exists(_.id == mission.id)) // Mission should be removed
-    assert(updatedPlayer.inventory.contains(item))             // Player should receive item
-    assert(updatedPlayer.gold >= 50)                           // Player should receive gold
+    assert(updatedPlayer.inventory.contains(item)) // Player should receive item
+    assert(updatedPlayer.gold >= 50) // Player should receive gold
