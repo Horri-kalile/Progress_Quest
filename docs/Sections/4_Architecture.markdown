@@ -33,30 +33,25 @@ stateDiagram
 
 ## **Descrizione dei Componenti**
 
-### UI (ScalaFX)
+### PlayerGenerationUi
+- Creazione del player per poi entrare in gioco.
 
-- Visualizza lo stato del personaggio, inventario, log eventi, missioni e combattimenti.
+### GameUi
+
+- Visualizza lo stato del personaggio, inventario, log eventi, missioni, skill, monster, stats, equipments, eventi e combattimenti.
 - Riceve input opzionali dall’utente durante eventi speciali.
-- Comunica con il Game Loop tramite messaggi e aggiornamenti.
+- Comunica con il GameLoopController per gli aggiornamenti e richieste di interazione.
 
-### Controller
+### GameLoopController
 
-- Coordina il flusso del gioco tra UI, Game Loop e Modelli.
-- Contiene sottocontroller specializzati: PlayerController, MonsterController, BattleController, MissionController, EventController, GameLoopController.
-- Gestisce la logica di alto livello, come la transizione tra stati (esplorazione, combattimento, quest) e la risoluzione degli eventi.
-- Implementa la gestione degli eventi (generazione e risoluzione), integrandosi con il Game Loop e la UI.
+- Il GameLoopController coordina il flusso del gioco tra GameUi e Model.
+- Contiene sottocontroller specializzati: PlayerController, MonsterController, CombattController, MissionController, EventController.
+- Questi sotticontroller gestiscono le logiche di alto livello, come la transizione tra stati (Player levelUp, Monster attack etc..) e la risoluzione degli eventi.
 
-### Game Loop 
 
-- Gestisce il ciclo di gioco automatico (round periodici).
-- Coordina la generazione e la risoluzione degli eventi.
-- Gestisce la progressione del personaggio, combattimenti, missioni e ricompense.
-- Comunica con la UI e aggiorna i modelli.
+### Model
 
-### Modelli (Models)
-
-- Rappresentano le entità principali: Player, Monster, Mondo, Inventory, Equipment, Skill.
-- Incapsulano la logica di dominio (es. calcolo danni, gestione inventario, progressione livelli).
+- Rappresentano le entità principali: Player, Monster, World, Inventory, Equipment, Skill, Events, Identity, etc...
 
 
 ### Gestione Eventi
