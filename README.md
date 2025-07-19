@@ -19,8 +19,9 @@ Per eseguire il progetto, assicurati di aver installato Java JDK 21 e di aver sc
 Estrai il JavaFX SDK in una cartella, ad esempio `C:\javafx-sdk-21.0.8\`, e assicurati che contenga la sottocartella `lib`.
 
 Scarica il file jar dall’ultima release e lancialo da terminale (CMD) con il seguente comando, sostituendo il percorso:
-
+```bash
 java --module-path C:\javafx-sdk-21.0.8\lib --add-modules=javafx.controls,javafx.fxml -Dprism.order=sw -jar progressquest.jar
+```
 ---
 
 ## Documentazione
