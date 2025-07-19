@@ -28,10 +28,11 @@ nav_order: 3
    Offrono ricompense come **gold**, **esperienza (EXP)**, **item** e **equipment**.
 
 5. **Inventario e item**  
-   Il player raccoglie **item** che possono essere venduti per ottenere **gold**, usato per migliorare le statistiche.
+   Il player raccoglie **item**, messi in **inventory**, che possono essere venduti per ottenere **gold**, usato per migliorare le statistiche.
 
 6. **Gestione dell’equipaggiamento**  
-   Gli oggetti equipaggiati influenzano direttamente le statistiche del personaggio e vengono ottenuti tramite eventi o quest.Gestione automatica dell'equipaggiamento dell'equipment migliore e vendita di quello vecchio.
+   Gli oggetti equipaggiati influenzano direttamente le statistiche del personaggio e vengono ottenuti tramite eventi o quest. 
+   Gestione automatica dell'equipaggiamento dell'equipment migliore e vendita di quello vecchio.
 
 7. **Skill e vulnerabilità**  
    Il player dispone di **skill** fisiche, magiche e curative.  
