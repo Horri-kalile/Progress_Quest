@@ -149,6 +149,12 @@ L’uso di un **pattern Strategy** per il behavior del giocatore permette di ass
 ```
 
 ---
+## Modello Behavior
 
+## Modello Identity
+
+## View PlayerGenerationUi
+
+## Controller CombattController
 
 
