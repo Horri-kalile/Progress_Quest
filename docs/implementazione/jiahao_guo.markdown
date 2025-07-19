@@ -151,6 +151,80 @@ L’uso di un **pattern Strategy** per il behavior del giocatore permette di ass
 ---
 ## Modello Behavior
 
+Descrizione del Modello Behavior
+
+Il package `Behavior` definisce strategie di behavior per il giocatore, influenzando meccaniche come danni, attacco, skill e attributi iniziali.
+
+---
+
+Enumerazione `BehaviorType`
+
+Tipi di behavior disponibili:
+
+- `Aggressive`: aumenta del 10-30% il danno inflitto
+- `Defensive`: riduce del 10-30% il danno subito
+- `FastLeveling`: aumenta del 10-50% l’esperienza guadagnata
+- `TwiceAttack`: effettua un doppio attacco con danni variabili
+- `Heal`: converte parte dell’XP in guarigione dopo la battaglia
+- `Lucky`: raddoppia la fortuna iniziale del giocatore
+- `MoreDodge`: incrementa casualmente la destrezza per migliorare la schivata
+- `OneShotChance`: 25% di possibilità di colpo letale (danno = 99 × livello giocatore)
+
+---
+
+Trait `Strategy`
+
+Interfaccia che definisce i metodi per modificare il comportamento del giocatore durante il gioco:
+
+- `onGameStart(player)`: modifica gli attributi o lo stato all’inizio del gioco
+- `onBattleDamage(player, damage)`: modifica il danno in uscita durante il combattimento
+- `onBattleEnd(value)`: modifica i punti esperienza o le ricompense dopo la battaglia
+- `onDamageTaken(player, damage)`: modifica il danno subito dal giocatore
+
+Le implementazioni concrete di questo trait definiscono le logiche specifiche di ciascun behavior.
+
+---
+
+Conversione e Implementazioni
+
+Ogni valore di `BehaviorType` viene convertito automaticamente nella corrispondente strategia tramite una conversione implicita (`given Conversion`), permettendo una risoluzione modulare e dinamica del behavior.
+
+Le strategie private (`Aggressive`, `Defensive`, `Lucky`, `OneShotChance`, ecc.) sovrascrivono i metodi del trait per applicare le modifiche specifiche relative a danni, attributi o esperienza.
+
+```scala
+  trait Strategy:
+    /** Called once when the game starts. Can modify player attributes or state. */
+    def onGameStart(player: Player): Player = player
+
+    /** Modifies the outgoing damage dealt by the player during combat. */
+    def onBattleDamage(player: Player, damage: Int): Int = damage
+
+    /** Modifies experience points or rewards earned after a battle ends. */
+    def onBattleEnd(value: Int): Int = value
+
+    /** Modifies the incoming damage when the player is attacked. */
+    def onDamageTaken(player: Player, damage: Int): Int = damage
+
+    /** Converts a BehaviorType enum to its corresponding Strategy implementation. */
+    given Conversion[BehaviorType, Strategy] with
+        def apply(bt: BehaviorType): Strategy = bt match
+        case BehaviorType.Aggressive => Aggressive()
+        case BehaviorType.Defensive => Defensive()
+        case BehaviorType.FastLeveling => FastLeveling()
+        case BehaviorType.TwiceAttack => TwiceAttack()
+        case BehaviorType.Heal => Heal()
+        case BehaviorType.Lucky => Lucky()
+        case BehaviorType.MoreDodge => DexterityBoost() 
+        case BehaviorType.OneShotChance => OneShotChance()
+    
+    /** Aggressive: Increases the player's outgoing damage by 10% to 30%.
+     */
+    private case class Aggressive() extends Strategy:
+      override def onBattleDamage(player: Player, damage: Int): Int =
+        (damage * Random.between(1.1, 1.3)).toInt
+```
+---
+
 ## Modello Identity
 
 ## View PlayerGenerationUi
