@@ -20,7 +20,7 @@ I test comportamentali sono stati implementati con **ScalaTest**, **AnyFunSpec**
 
 ---
 
-## Test sul modulo `GameEvent`
+## Test sul modulo model `GameEvent`
 
 ```scala
 test("RestoreEvent fully restores the player"):
@@ -57,7 +57,7 @@ test("FightEvent awards XP and gold"):
 ```
 ---
 
-## Test sul modulo `SpecialDialog`
+## Test sul modulo view `SpecialDialog`
 
 ```scala
 package view
@@ -116,6 +116,7 @@ class TestSpecialDialog extends AnyWordSpec with Matchers with BeforeAndAfterAll
     }
 ```
 ---
+## Test sul modulo controller `CombatController`
 
 ```scala
 package controller
