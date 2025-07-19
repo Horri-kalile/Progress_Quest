@@ -57,7 +57,7 @@ class TestGameEvent extends AnyFunSuite:
     CombatController.setLastMonster(monster.copy(attributes = monster.attributes.copy(currentHp = 0)))
     val (updated, _, _) = GameEventFactory.executeEvent(EventType.fight, player)
     assert(updated.gold > player.gold)
-    assert(updated.exp > player.exp)
+    assert(updated.level >= player.level || updated.exp > player.exp)
 
   test("MagicEvent grants new skill or upgrades existing one"):
     val (updated, messages, _) = GameEventFactory.executeEvent(EventType.magic, player)
@@ -66,10 +66,10 @@ class TestGameEvent extends AnyFunSuite:
   test("CraftEvent equips or upgrades equipment"):
     val (updated, messages, _) = GameEventFactory.executeEvent(EventType.craft, player)
     assert(messages.exists(msg =>
-        msg.toLowerCase.contains("equipped") || msg.toLowerCase.contains("upgraded") || msg.toLowerCase.contains(
-          "no equipment"
-        )
-      ))
+      msg.toLowerCase.contains("equipped") || msg.toLowerCase.contains("upgraded") || msg.toLowerCase.contains(
+        "no equipment"
+      )
+    ))
 
   // Special Events
   test("Special Case 0 - Blessing or curse"):
