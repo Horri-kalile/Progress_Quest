@@ -15,7 +15,12 @@ Il progetto appartiene al genere dei zero-player game (ZPG), in cui il personagg
 ---
 
 ## Instruzioni di run
+Per eseguire il progetto, assicurati di aver installato Java JDK 21 e di aver scaricato JavaFX SDK versione 21.0.* dal sito ufficiale (https://gluonhq.com/products/javafx/). 
+Estrai il JavaFX SDK in una cartella, ad esempio `C:\javafx-sdk-21.0.8\`, e assicurati che contenga la sottocartella `lib`.
 
+Scarica il file jar dall’ultima release e lancialo da terminale (CMD) con il seguente comando, sostituendo il percorso:
+
+java --module-path C:\javafx-sdk-21.0.8\lib --add-modules=javafx.controls,javafx.fxml -Dprism.order=sw -jar progressquest.jar
 ---
 
 ## Documentazione
