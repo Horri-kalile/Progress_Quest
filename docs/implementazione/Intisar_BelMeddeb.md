@@ -44,7 +44,7 @@ Le sue responsabilità spaziano dalla gestione dell’esperienza e del livello, 
 
 ## Comportamento dettagliato
 
-### `calculatePlayerAttack(player, monster)`
+### calculatePlayerAttack(player, monster)
 Calcola il danno inflitto da un giocatore a un mostro combinando i seguenti elementi:
 
 - **Forza base** del giocatore  

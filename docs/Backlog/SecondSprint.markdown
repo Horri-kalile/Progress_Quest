@@ -46,7 +46,7 @@ Il team ha avviato il **secondo sprint** con l’obiettivo di estendere la base 
 - Collaborazione e implementazione di **combatController**
 
 
-### Intissar
+### Intisar
 - Collaborazione e implementazione di **combatController**
 - Implementazione del modulo **GameEvent**
 - Implementazione delle **prime logiche di interazione** tra player e monster.
