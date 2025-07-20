@@ -23,6 +23,7 @@ Ogni pannello è creato tramite funzioni dedicate, favorendo riuso e chiarezza d
 - **Singleton/Object**: Uso di oggetti Scala per gestire costanti, utility e collezioni degli eventi.
 
 ## Diagramma del modello Player
+
 ![Player Domain Model](../assets/images/playerModelDiagram.png)
 
 Questo diagramma illustra il modello di dominio principale per l'entità **Player** nel gioco, con particolare attenzione all’esternalizzazione del behavior del giocatore. Vengono inoltre evidenziate le relazioni tra il player e i modelli correlati come identity, attributes, originZone , equipments, skills, items e mission.
@@ -59,13 +60,16 @@ La classe **Player** rappresenta l'entità principale con le seguenti proprietà
 Il behavior del giocatore è esternalizzato tramite l'interfaccia **Strategy** e le sue implementazioni concrete. Questo pattern permette di assegnare dinamicamente diversi comportamenti che influenzano meccaniche di gioco come il danno inflitto, il danno subito, il guadagno di esperienza e i bonus applicati all’avvio del gioco.
 
 - **Interfaccia Strategy**: Definisce metodi da implementare per eventi di gameplay:
-    - `onGameStart(player)`
-    - `onBattleDamage(player, damage)`
-    - `onBattleEnd(value)`
-    - `onDamageTaken(player, damage)`
+
+  - `onGameStart(player)`
+  - `onBattleDamage(player, damage)`
+  - `onBattleEnd(value)`
+  - `onDamageTaken(player, damage)`
 
 - Le classi concrete (es. AggressiveStrategy, DefensiveStrategy) implementano queste funzioni con la logica specifica del comportamento.
 - La classe **BehaviorResolver** si occupa di risolvere il tipo di `BehaviorType` e restituire la strategia corrispondente.
+
+![PlayerBehavior Domain Model](../assets/images/PlayerBehavior.png)
 
 ---
 
@@ -93,4 +97,54 @@ Il behavior del giocatore è esternalizzato tramite l'interfaccia **Strategy** e
 
 ---
 
+## Dominio Principale: Monster
 
+La classe **Monster** rappresenta i nemici principali del gioco, ciascuno con attributi unici, tipo, zona di origine, ricompense e comportamento speciale.  
+La generazione dei mostri è gestita da una factory che tiene conto del livello del giocatore, della zona e della fortuna, garantendo varietà e bilanciamento.
+
+- **MonsterType**: Enum per la categoria del mostro (Beast, Undead, ecc.).
+- **MonsterAttributes**: Statistiche di combattimento (HP, attacco, difesa, debolezze).
+- **MonsterBehavior**: Comportamenti modulari che modificano le capacità del mostro.
+- **MonstersFactory**: Generazione procedurale e bilanciata dei mostri.
+
+![Monster Domain Model](../assets/images/MonsterDiagram.png)  
+![MonsterFactory Domain Model](../assets/images/MonsterFactoryDiagram.png)
+
+---
+
+## Dominio Principale: World
+
+Il modulo **World** gestisce le zone del gioco e gli effetti ambientali.  
+Ogni zona (Forest, Swamp, Desert, Volcano, Plains) può influenzare le statistiche dei mostri tramite buff specifici, rendendo ogni incontro diverso a seconda dell’ambiente.
+
+- **OriginZone**: Enum delle zone del mondo.
+- **World**: Gestione delle transizioni tra zone, applicazione di buff ambientali e descrizioni delle zone.
+
+![World Domain Model](../assets/images/WorldDiagram.png)
+
+---
+
+## Interfaccia Utente: GameUi
+
+**GameUi** gestisce la finestra principale del gioco, mostrando tutte le informazioni rilevanti: statistiche, equipaggiamento, inventario, abilità, missioni, log degli eventi e dei combattimenti, dettagli sui mostri e zona attuale.  
+L’interfaccia è organizzata in pannelli e aggiornata in tempo reale per una user experience chiara e reattiva.
+
+- Layout a pannelli (BorderPane, VBox, HBox) per separare le sezioni.
+- Aggiornamento dinamico delle informazioni tramite metodi dedicati.
+- Gestione del game over e restart.
+
+![GameUi Domain View](../assets/images/GameUiDiagram.png)
+
+---
+
+## Controller Principale: GameController
+
+**GameController** coordina il flusso del gioco, gestendo il ciclo principale, gli eventi automatici, le sequenze di combattimento e la logica di game over/restart.  
+Si occupa di aggiornare la UI e di mantenere lo stato globale della partita.
+
+- Gestione del ciclo di gioco e timer.
+- Attivazione automatica di eventi e combattimenti.
+- Aggiornamento reattivo della UI.
+- Gestione del game over e restart.
+
+![GameController Domain Controller](../assets/images/GameControllerDiagram.png)
