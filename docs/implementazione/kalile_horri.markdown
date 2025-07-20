@@ -12,9 +12,6 @@ parent: Implementazione
 **Descrizione**  
 Ho sviluppato il modulo Monster con l'obiettivo di rappresentare in maniera dettagliata e flessibile i mostri presenti nel mondo di gioco. Ogni mostro è un'entità con caratteristiche uniche legate a statistiche di combattimento, tipo, zona di origine, ricompense e comportamenti speciali. Il design del modulo è stato pensato per essere estensibile e facilmente integrabile con altri sistemi del gioco come il World, il sistema di ricompense (Item ed Equipment) e (MonsterBehavior). La generazione dei mostri avviene in modo procedurale tramite una factory (MonstersFactory) che tiene conto del livello del giocatore, della zona e della fortuna, rendendo ogni incontro variabile e bilanciato.
 
-<details>
-<summary><strong>➤ Full details</strong></summary>
-
 ### Aspetti implementativi
 
 - Utilizzo di una enum per rappresentare i diversi tipi di mostri (Beast, Undead, Dragon, ecc.), ognuno con modificatori specifici alle statistiche
@@ -43,17 +40,12 @@ Ho sviluppato il modulo Monster con l'obiettivo di rappresentare in maniera dett
 | **MonstersFactory.applyTypeModifiers**   | Applica modifiche agli attributi in base al tipo di mostro                  |
 | **MonstersFactory.generateRewards**      | Calcola le ricompense (oro, esperienza, oggetti, equipaggiamento)           |
 
-</details>
-
 ## World Model
 
 **Descrizione**  
 Il modulo World gestisce la logica del mondo di gioco, con un focus specifico sulle zone di origine dei mostri (OriginZone) e sugli effetti ambientali che influenzano le dinamiche di combattimento. Ogni zona rappresenta un bioma con caratteristiche distinte, come foreste, deserti o vulcani, e può conferire buff ai mostri che vi appartengono. Il modulo permette anche di gestire le transizioni tra zone, garantendo varietà e dinamismo durante l'esplorazione del mondo da parte del giocatore.
 
 L'interazione tra World e Monster permette la creazione di mostri ambientati e bilanciati in funzione del contesto in cui vengono generati.
-
-<details>
-<summary><strong>➤ Full details</strong></summary>
 
 ### Aspetti implementativi
 
@@ -76,17 +68,12 @@ L'interazione tra World e Monster permette la creazione di mostri ambientati e b
 | **World.applyZoneBuffs**     | Applica buff ambientali ai mostri che si trovano nella loro zona di origine     |
 | **World.getZoneDescription** | Restituisce una descrizione testuale degli effetti ambientali di una zona       |
 
-</details>
-
 ## GameUi
 
 **Descrizione**  
 Ho sviluppato il modulo GameUi per gestire l'interfaccia grafica principale del gioco.  
 Questo modulo si occupa di visualizzare tutte le informazioni rilevanti per il giocatore: statistiche, equipaggiamento, inventario, abilità, missioni, log degli eventi e dei combattimenti, dettagli sui mostri incontrati e informazioni sulla zona attuale.  
 Il design è stato pensato per essere reattivo, modulare e facilmente aggiornabile in tempo reale, offrendo una user experience chiara e coinvolgente.
-
-<details>
-<summary><strong>➤ Full details</strong></summary>
 
 ### Aspetti implementativi
 
@@ -115,17 +102,12 @@ L'interfaccia si adatta dinamicamente alle dimensioni dello schermo e aggiorna i
 | **createCombatLogContent**   | Visualizza il log dei combattimenti                                 |
 | **createMonsterInfoContent** | Visualizza i dettagli del mostro incontrato                         |
 
-</details>
-
 ## GameController
 
 **Descrizione**  
 Ho sviluppato il modulo GameController per gestire il flusso principale del gioco e la logica degli eventi.  
 Questo controller coordina l'interazione tra i modelli di gioco (giocatore, mostri, eventi) e l'interfaccia utente, gestendo il ciclo di gioco automatico, la sequenza dei combattimenti, la progressione degli eventi e lo stato globale della partita.  
 Il design permette di avviare, fermare e riavviare il gioco, oltre a gestire in modo reattivo gli aggiornamenti della UI e le transizioni tra gli stati.
-
-<details>
-<summary><strong>➤ Full details</strong></summary>
 
 ### Aspetti implementativi
 
@@ -155,5 +137,3 @@ Il controller si occupa anche della gestione del game over, offrendo la possibil
 | **getCurrentPlayer**           | Restituisce il giocatore attuale                                  |
 | **isRunning**                  | Indica se il ciclo di gioco è attivo                              |
 | **triggerEvent**               | Attiva manualmente un evento specifico (per test/debug)           |
-
-</details>
