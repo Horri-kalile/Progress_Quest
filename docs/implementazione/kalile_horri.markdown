@@ -1,10 +1,4 @@
----
-title: Kalile Horri
-nav_order: 1
-parent: Implementazione
----
-
-# Kalile Horri
+# Implementazione - Kalile Horri
 
 ## Monster Model
 
