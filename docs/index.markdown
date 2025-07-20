@@ -22,7 +22,7 @@ title: ProgressQuest
 
 [![JiahaoGuo](https://github.com/schwein69.png?size=80)](https://github.com/schwein69)
 [![KalileHorri](https://github.com/Horri-kalile.png?size=80)](https://github.com/Horri-kalile)
-[![Intisar Bel Meddeb](https://github.com/intissar99?size=80)](https://github.com/intissar99)
+[![Intisar Bel Meddeb](https://github.com/intissar99.png?size=80)](https://github.com/intissar99)
 
 
 ---
